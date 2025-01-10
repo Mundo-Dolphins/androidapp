@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name" translatable="false">Mundo Dolphins Podcast</string>
+    <string name="logo_description" translatable="false">Mundo Dolphins</string>
+    <string name="more">Más información</string>
+    <string name="published_on">Publicado: %1$s</string>
+    <string name="duration">Duración: %1$s:%2$s:%3$s</string>
+</resources>
