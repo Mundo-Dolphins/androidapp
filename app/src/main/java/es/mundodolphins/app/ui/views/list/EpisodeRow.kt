@@ -21,14 +21,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.mundodolphins.app.R
 import es.mundodolphins.app.models.Enclosure
+import es.mundodolphins.app.models.Episode
 import es.mundodolphins.app.models.Item
 import es.mundodolphins.app.models.Rating
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 
 @Composable
-fun EpisodeRow(episode: Item, navController: NavController) {
+fun EpisodeRow(episode: Episode, navController: NavController) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -47,7 +48,7 @@ fun EpisodeRow(episode: Item, navController: NavController) {
             textAlign = TextAlign.Left
         )
         Text(
-            text = episode.pubDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+            text = episode.publishedOn,
             fontSize = 10.sp,
             color = colorScheme.tertiary,
             modifier = Modifier
@@ -78,26 +79,15 @@ fun EpisodeRow(episode: Item, navController: NavController) {
 fun EpisodeRowPreview() {
     MundoDolphinsTheme {
         EpisodeRow(
-            Item(
-                title = "Carta a los Reyes Magos",
-                author = "Mundo Dolphins",
-                categories = emptyList(),
-                content = "Hugo, Santos y Javi se re\u00fanen en este inicio de a\u00f1o 2025 para escribir a sus majestades de oriente y pedirles una victoria de Miami frente a los Jets y que los Chiefs consigan ganar a los Broncos para que se obre el milagro navide\u00f1o y los Dolphins clasifiquen para postemporada.\r\nAdem\u00e1s comentan los premios otorgados por los Miami Dolphins e intentan aclarar la situacion de Tua Tagovailoa",
-                description = "Hugo, Santos y Javi se re\u00fanen en este inicio de a\u00f1o 2025 para escribir a sus majestades de oriente y pedirles una victoria de Miami frente a los Jets y que los Chiefs consigan ganar a los Broncos para que se obre el milagro navide\u00f1o y los Dolphins clasifiquen para postemporada.\r\nAdem\u00e1s comentan los premios otorgados por los Miami Dolphins e intentan aclarar la situacion de Tua Tagovailoa",
-                enclosure = Enclosure(
-                    link = "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3",
-                    length = 40220064,
-                    type = "audio/mpeg",
-                    duration = 5027,
-                    rating = Rating(
-                        scheme = "urn:itunes",
-                        value = "no"
-                    )
-                ),
-                guid = "https://www.ivoox.com/137429858",
-                link = "https://www.ivoox.com/carta-a-reyes-magos-audios-mp3_rf_137429858_1.html",
-                pubDate = "2025-01-03 07:43:43",
-                thumbnail = "",
+            Episode(
+                date = "1736440860",
+                description = "Hugo , Santos y Javi se juntan para analizar el último partido de la temporada de los Miami Dolphins . No hubo milagro ; los Broncos ganaron a los Chiefs y además los Dolphins sucumbieron frente a los Jets en el Met Life Stadium debido a los múltiples errores y turnovers ofensivos.  Esta derrota ha traido una variedad de reacciones que analizan en un especial Phin News: la continuidad de Grier y McDaniel , la situación de Weaver , el caso Hill . Nos espera una postemporada movida en Miami",
+                audio = "http://ivoox.com/listen_mn_137612153_1.mp3",
+                imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",
+                imgMini = "https://static-1.ivoox.com/usuarios/2/6/4/4/5951733314462_XXL.jpg",
+                len = "01:22:14",
+                link = "https://www.ivoox.com/carbon-reyes-magos-audios-mp3_rf_137612153_1.html",
+                title = "Carbón de Reyes Magos"
             ),
             NavController(LocalContext.current)
         )

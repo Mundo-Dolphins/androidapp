@@ -16,17 +16,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import es.mundodolphins.app.R
-import es.mundodolphins.app.models.Enclosure
-import es.mundodolphins.app.models.Item
-import es.mundodolphins.app.models.Rating
+import es.mundodolphins.app.models.Episode
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.player.AudioPlayerView
-import java.time.Duration
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun EpisodeScreen(
-    item: Item?,
+    episode: Episode?,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -38,7 +35,7 @@ fun EpisodeScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = item?.title ?: "",
+                text = episode?.title ?: "",
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
@@ -46,28 +43,21 @@ fun EpisodeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = item?.pubDate?.let { stringResource(R.string.published_on, it) } ?: "",
+                text = stringResource(R.string.published_on, episode?.publishedOn ?: ""),
                 fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = item?.enclosure?.duration?.toEpisodeDuration()?.let {
-                    stringResource(
-                        R.string.duration,
-                        it.toHoursPart(),
-                        it.toMinutesPart(),
-                        it.toSecondsPart()
-                    )
-                } ?: "",
+                text = stringResource(R.string.duration, episode?.len ?: ""),
                 fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = item?.description ?: "",
+                text = episode?.description ?: "",
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
@@ -77,14 +67,10 @@ fun EpisodeScreen(
                     .padding(top = 16.dp)
             )
 
-            item?.enclosure?.link?.let {
-                AudioPlayerView(it)
-            }
+            AudioPlayerView(episode?.audio ?: "")
         }
     }
 }
-
-private fun Int.toEpisodeDuration() = Duration.ofSeconds(this.toLong())
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -92,27 +78,15 @@ private fun Int.toEpisodeDuration() = Duration.ofSeconds(this.toLong())
 fun EpisodeScreenPreview() {
     MundoDolphinsTheme {
         EpisodeScreen(
-            item =
-            Item(
-                title = "Carta a los Reyes Magos",
-                author = "Mundo Dolphins",
-                categories = emptyList(),
-                content = "Hugo, Santos y Javi se re\u00fanen en este inicio de a\u00f1o 2025 para escribir a sus majestades de oriente y pedirles una victoria de Miami frente a los Jets y que los Chiefs consigan ganar a los Broncos para que se obre el milagro navide\u00f1o y los Dolphins clasifiquen para postemporada.\r\nAdem\u00e1s comentan los premios otorgados por los Miami Dolphins e intentan aclarar la situacion de Tua Tagovailoa",
-                description = "Hugo, Santos y Javi se re\u00fanen en este inicio de a\u00f1o 2025 para escribir a sus majestades de oriente y pedirles una victoria de Miami frente a los Jets y que los Chiefs consigan ganar a los Broncos para que se obre el milagro navide\u00f1o y los Dolphins clasifiquen para postemporada.\r\nAdem\u00e1s comentan los premios otorgados por los Miami Dolphins e intentan aclarar la situacion de Tua Tagovailoa",
-                enclosure = Enclosure(
-                    link = "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3",
-                    length = 40220064,
-                    type = "audio/mpeg",
-                    duration = 5027,
-                    rating = Rating(
-                        scheme = "urn:itunes",
-                        value = "no"
-                    )
-                ),
-                guid = "https://www.ivoox.com/137429858",
-                link = "https://www.ivoox.com/carta-a-reyes-magos-audios-mp3_rf_137429858_1.html",
-                pubDate = "2025-01-03 07:43:43",
-                thumbnail = "",
+            episode = Episode(
+                date = "1736440860",
+                description = "Hugo , Santos y Javi se juntan para analizar el último partido de la temporada de los Miami Dolphins . No hubo milagro ; los Broncos ganaron a los Chiefs y además los Dolphins sucumbieron frente a los Jets en el Met Life Stadium debido a los múltiples errores y turnovers ofensivos.  Esta derrota ha traido una variedad de reacciones que analizan en un especial Phin News: la continuidad de Grier y McDaniel , la situación de Weaver , el caso Hill . Nos espera una postemporada movida en Miami",
+                audio = "http://ivoox.com/listen_mn_137612153_1.mp3",
+                imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",
+                imgMini = "https://static-1.ivoox.com/usuarios/2/6/4/4/5951733314462_XXL.jpg",
+                len = "01:22:14",
+                link = "https://www.ivoox.com/carbon-reyes-magos-audios-mp3_rf_137612153_1.html",
+                title = "Carbón de Reyes Magos"
             )
         )
 

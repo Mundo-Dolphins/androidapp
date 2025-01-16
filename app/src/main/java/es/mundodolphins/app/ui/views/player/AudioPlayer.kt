@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -29,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 
@@ -61,7 +62,6 @@ fun AudioPlayerView(mp3Url: String, playerViewModel: PlayerViewModel = viewModel
     }
 
     Column {
-        //PlayerAndroidView(player)
         PlayerControls(player)
     }
 
@@ -190,9 +190,9 @@ fun TrackSlider(
         },
         valueRange = 0f..songDuration,
         colors = SliderDefaults.colors(
-            thumbColor = Color.Black,
-            activeTrackColor = Color.DarkGray,
-            inactiveTrackColor = Color.Gray,
+            thumbColor = MaterialTheme.colorScheme.primary,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTrackColor = MaterialTheme.colorScheme.secondary,
         )
     )
 }
@@ -242,7 +242,9 @@ private fun Long.convertToText(): String {
 
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun AudioPlayerViewPreview() {
-    AudioPlayerView("https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3")
+    MundoDolphinsTheme {
+        AudioPlayerView("https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3")
+    }
 }

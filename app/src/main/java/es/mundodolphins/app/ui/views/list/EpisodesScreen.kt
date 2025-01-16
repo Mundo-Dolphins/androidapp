@@ -9,21 +9,21 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import es.mundodolphins.app.viewmodel.RssViewModel
-import es.mundodolphins.app.viewmodel.RssViewModel.LoadStatus.ERROR
-import es.mundodolphins.app.viewmodel.RssViewModel.LoadStatus.LOADING
-import es.mundodolphins.app.viewmodel.RssViewModel.LoadStatus.SUCCESS
+import es.mundodolphins.app.viewmodel.FeedViewModel
+import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.ERROR
+import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.LOADING
+import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.SUCCESS
 
 @Composable
 fun EpisodesScreen(
-    model: RssViewModel = viewModel(),
+    model: FeedViewModel = viewModel(),
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
     when (model.statusFeed) {
         SUCCESS -> {
             ListEpisodesView(
-                episodes = model.feed.items,
+                episodes = model.feed,
                 modifier = modifier,
                 navController = navController
             )

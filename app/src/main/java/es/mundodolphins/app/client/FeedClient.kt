@@ -3,14 +3,14 @@ package es.mundodolphins.app.client
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RssClient {
+object FeedClient {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.rss2json.com/")
+        .baseUrl("https://www.mundodolphins.es/")
         .addConverterFactory(
             GsonConverterFactory.create())
         .build()
 
-    val service: RssService by lazy {
-        retrofit.create(RssService::class.java)
+    val service: FeedService by lazy {
+        retrofit.create(FeedService::class.java)
     }
 }
