@@ -28,7 +28,7 @@ fun MainScreen(model: FeedViewModel = viewModel(), modifier: Modifier = Modifier
         }
         composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
             EpisodeScreen(
-                episode = model.getEpisode(backStackEntry.arguments?.getString("id")?.toInt() ?: 0),
+                episode = model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0),
                 modifier = modifier
             )
         }

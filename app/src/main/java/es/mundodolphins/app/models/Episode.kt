@@ -1,13 +1,11 @@
 package es.mundodolphins.app.models
 
-import java.time.Instant.ofEpochSecond
-import java.time.LocalDateTime
-import java.time.LocalDateTime.ofInstant
+import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.format.DateTimeFormatter.ofPattern
 
 data class Episode(
-    val date: String,
+    val dateAndTime: String,
     val description: String,
     val audio: String,
     val imgMain: String,
@@ -16,12 +14,12 @@ data class Episode(
     val link: String,
     val title: String
 ) {
-    val id: Int
-        get() = date.toInt()
+    private val pubDateTime: Instant
+        get() = Instant.parse(dateAndTime)
 
-    val pubDateTime: LocalDateTime
-        get() = ofInstant(ofEpochSecond(date.toLong()), UTC)
+    val id: Long
+        get() = pubDateTime.toEpochMilli()
 
     val publishedOn: String
-        get() = pubDateTime.format(ofPattern("dd/MM/yyyy HH:mm"))
+        get() = pubDateTime.atOffset(UTC).format(ofPattern("dd/MM/yyyy HH:mm"))
 }

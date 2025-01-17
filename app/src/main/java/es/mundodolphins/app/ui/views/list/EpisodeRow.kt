@@ -20,13 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.mundodolphins.app.R
-import es.mundodolphins.app.models.Enclosure
 import es.mundodolphins.app.models.Episode
-import es.mundodolphins.app.models.Item
-import es.mundodolphins.app.models.Rating
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
-import java.time.format.DateTimeFormatter.ofPattern
 
 @Composable
 fun EpisodeRow(episode: Episode, navController: NavController) {
@@ -80,7 +76,7 @@ fun EpisodeRowPreview() {
     MundoDolphinsTheme {
         EpisodeRow(
             Episode(
-                date = "1736440860",
+                dateAndTime = "1736440860",
                 description = "Hugo , Santos y Javi se juntan para analizar el último partido de la temporada de los Miami Dolphins . No hubo milagro ; los Broncos ganaron a los Chiefs y además los Dolphins sucumbieron frente a los Jets en el Met Life Stadium debido a los múltiples errores y turnovers ofensivos.  Esta derrota ha traido una variedad de reacciones que analizan en un especial Phin News: la continuidad de Grier y McDaniel , la situación de Weaver , el caso Hill . Nos espera una postemporada movida en Miami",
                 audio = "http://ivoox.com/listen_mn_137612153_1.mp3",
                 imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",

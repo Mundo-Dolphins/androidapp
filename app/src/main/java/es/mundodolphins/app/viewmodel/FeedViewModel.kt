@@ -33,7 +33,7 @@ class FeedViewModel : ViewModel() {
         }
     }
 
-    fun getEpisode(id: Int) = feed.firstOrNull { it.id == id }
+    fun getEpisode(id: Long) = feed.firstOrNull { it.id == id }
 
     enum class LoadStatus {
         LOADING, SUCCESS, ERROR

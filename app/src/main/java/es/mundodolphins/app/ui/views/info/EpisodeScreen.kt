@@ -79,9 +79,9 @@ fun EpisodeScreenPreview() {
     MundoDolphinsTheme {
         EpisodeScreen(
             episode = Episode(
-                date = "1736440860",
+                dateAndTime = "2025-01-09T16:41:00Z",
                 description = "Hugo , Santos y Javi se juntan para analizar el último partido de la temporada de los Miami Dolphins . No hubo milagro ; los Broncos ganaron a los Chiefs y además los Dolphins sucumbieron frente a los Jets en el Met Life Stadium debido a los múltiples errores y turnovers ofensivos.  Esta derrota ha traido una variedad de reacciones que analizan en un especial Phin News: la continuidad de Grier y McDaniel , la situación de Weaver , el caso Hill . Nos espera una postemporada movida en Miami",
-                audio = "http://ivoox.com/listen_mn_137612153_1.mp3",
+                audio = "https://ivoox.com/listen_mn_137612153_1.mp3",
                 imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",
                 imgMini = "https://static-1.ivoox.com/usuarios/2/6/4/4/5951733314462_XXL.jpg",
                 len = "01:22:14",
