@@ -1,5 +1,6 @@
 package es.mundodolphins.app.ui.views.player
 
+import PlayerViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,11 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
-import es.mundodolphins.app.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -57,20 +58,20 @@ fun AudioPlayerView(mp3Url: String, playerViewModel: PlayerViewModel = viewModel
     DisposableEffect(Unit) {
         onDispose {
             playerViewModel.savePlayerState()
-            playerViewModel.releasePlayer()
+            playerViewModel.releasePlayer(context)
         }
     }
 
     Column {
-        PlayerControls(player)
+        PlayerControls(player, playerViewModel)
     }
 
 }
 
 @Composable
-fun PlayerControls(player: ExoPlayer?) {
+fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
     val isPlaying = remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     val currentPosition = remember {
@@ -85,6 +86,12 @@ fun PlayerControls(player: ExoPlayer?) {
         mutableLongStateOf(0)
     }
 
+    playerViewModel.isPlaying.observeForever {
+        isPlaying.value = it
+    }
+    playerViewModel.duration.observeForever {
+        totalDuration.longValue = it
+    }
 
     LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
         delay(1000)
@@ -160,7 +167,7 @@ fun PlayerControls(player: ExoPlayer?) {
                         } else {
                             player?.play()
                         }
-                        isPlaying.value = player?.isPlaying ?: false
+                        isPlaying.value = player?.isPlaying == true
                     })
                 Spacer(modifier = Modifier.width(20.dp))
             }
@@ -184,9 +191,7 @@ fun TrackSlider(
             onValueChange(it)
         },
         onValueChangeFinished = {
-
             onValueChangeFinished()
-
         },
         valueRange = 0f..songDuration,
         colors = SliderDefaults.colors(
