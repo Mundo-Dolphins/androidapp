@@ -16,9 +16,9 @@ import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.SUCCESS
 
 @Composable
 fun EpisodesScreen(
-    model: FeedViewModel = viewModel(),
+    navController: NavController,
     modifier: Modifier = Modifier,
-    navController: NavController
+    model: FeedViewModel = viewModel()
 ) {
     when (model.statusFeed) {
         SUCCESS -> {

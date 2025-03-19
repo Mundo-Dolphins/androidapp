@@ -15,7 +15,7 @@ import es.mundodolphins.app.viewmodel.FeedViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MainScreen(model: FeedViewModel = viewModel(), modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier, model: FeedViewModel = viewModel()) {
     val navController = rememberNavController()
 
     NavHost(
@@ -24,7 +24,7 @@ fun MainScreen(model: FeedViewModel = viewModel(), modifier: Modifier = Modifier
     )
     {
         composable(route = Routes.EpisodesList.route) {
-            EpisodesScreen(model = model, navController = navController, modifier = modifier)
+            EpisodesScreen(navController = navController, modifier = modifier, model = model)
         }
         composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
             EpisodeScreen(

@@ -12,6 +12,10 @@ build/
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/inspectionProfiles
+/.idea/deploymentTargetSelector.xml
+/.idea/kotlinc.xml
+/.idea/misc.xml
 .DS_Store
 /build
 /captures
@@ -28,6 +32,7 @@ captures/
 .cxx/
 *.apk
 output.json
+app/release/
 
 # IntelliJ
 *.iml

@@ -1,54 +1,64 @@
-package es.mundodolphins.app.viewmodel
-
+import android.app.Application
+import android.content.ComponentName
 import android.content.Context
-import android.net.Uri
-import androidx.annotation.OptIn
-import androidx.lifecycle.ViewModel
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import es.mundodolphins.app.services.AudioPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
-class PlayerViewModel : ViewModel() {
+class PlayerViewModel(application: Application) : AndroidViewModel(application) {
     private val _playerState = MutableStateFlow<ExoPlayer?>(null)
+    private var currentPosition: Long = 0L
+    private var isServiceBound = false
+    private lateinit var audioPlayerService: AudioPlayerService
+
+    private val _isPlaying = MutableLiveData<Boolean>()
+    val isPlaying: LiveData<Boolean> get() = _isPlaying
+
+    private val _duration = MutableLiveData<Long>()
+    val duration: LiveData<Long> get() = _duration
+
 
     val playerState: StateFlow<ExoPlayer?> = _playerState
 
-    private var currentPosition: Long = 0L
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as AudioPlayerService.AudioPlayerBinder
+            audioPlayerService = binder.getService()
+            _playerState.value = audioPlayerService.getExoPlayer()
+            isServiceBound = true
 
-    @OptIn(UnstableApi::class)
+            // Observe player state
+            audioPlayerService.playerState.observeForever { state ->
+                _isPlaying.postValue(state)
+            }
+
+            // Observe player duration
+            audioPlayerService.playerDuration.observeForever { duration ->
+                _duration.postValue(duration)
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isServiceBound = false
+        }
+    }
+
     fun initializePlayer(context: Context, mp3Url: String) {
-        if (_playerState.value == null) {
-            viewModelScope.launch {
-                val exoPlayer = ExoPlayer.Builder(context)
-                    .setMediaSourceFactory(
-                        DefaultMediaSourceFactory(
-                            DefaultHttpDataSource.Factory()
-                                .setUserAgent(USER_AGENT)
-                                .setAllowCrossProtocolRedirects(true)
-                        )
-                    )
-                    .build()
-                    .also {
-                        it.setMediaItem(MediaItem.fromUri(Uri.parse(mp3Url)))
-                        it.prepare()
-                        it.playWhenReady = false
-                        it.seekTo(currentPosition)
-                        it.addListener(object : Player.Listener {
-                            override fun onPlayerError(error: PlaybackException) {
-                                handleError(error)
-                            }
-                        })
-                    }
-                _playerState.value = exoPlayer
+        viewModelScope.launch {
+            if (!isServiceBound) {
+                val intent = Intent(context, AudioPlayerService::class.java)
+                intent.putExtra("MP3_URL", mp3Url)
+                context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+                context.startForegroundService(intent)
             }
         }
     }
@@ -59,33 +69,12 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
-    fun releasePlayer() {
-        _playerState.value?.release()
-        _playerState.value = null
-    }
-
-    private fun handleError(error: PlaybackException) {
-        when (error.errorCode) {
-            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> {
-                println("Network connection error")
-            }
-
-            PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> {
-                println("File not found")
-            }
-
-            PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> {
-                println("Decoder initialization error")
-            }
-
-            else -> {
-                println("Other error: ${error.message}")
-            }
+    fun releasePlayer(context: Context) {
+        if (isServiceBound) {
+            context.unbindService(serviceConnection)
+            isServiceBound = false
         }
-    }
-
-    companion object {
-        private const val USER_AGENT =
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0"
+        val intent = Intent(context, AudioPlayerService::class.java)
+        context.stopService(intent)
     }
 }

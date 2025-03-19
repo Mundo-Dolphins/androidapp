@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object FeedClient {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://www.mundodolphins.es/")
+        .baseUrl("https://mundodolphins.es/api/")
         .addConverterFactory(
             GsonConverterFactory.create())
         .build()
