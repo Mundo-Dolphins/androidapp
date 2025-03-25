@@ -8,10 +8,11 @@ import androidx.compose.ui.graphics.Color.Companion.White
 private val LightColorScheme = lightColorScheme(
     primary = orange,
     secondary = aqua,
-    tertiary = blue,
+    tertiary = orange,
     background = White,
     primaryContainer = White,
     secondaryContainer = aqua,
+    tertiaryContainer = orange
     /*
     Other default colors to override
     surface = Color(0xFFFFFBFE),

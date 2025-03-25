@@ -1,5 +1,6 @@
 package es.mundodolphins.app.ui.views.list
 
+import android.text.Html
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -39,23 +41,25 @@ fun EpisodeRow(episode: Episode, navController: NavController) {
             fontSize = 24.sp,
             fontWeight = Bold,
             modifier = Modifier
-                .padding(top = 6.dp),
-            color = colorScheme.primaryContainer,
+                .padding(top = 6.dp, start = 6.dp, end = 6.dp),
+            color = Color.White,
             textAlign = TextAlign.Left
         )
         Text(
             text = episode.publishedOn,
-            fontSize = 10.sp,
+            fontSize = 20.sp,
             color = colorScheme.tertiary,
             modifier = Modifier
                 .fillMaxWidth(0.9f),
-            textAlign = TextAlign.Left
+            textAlign = TextAlign.Left,
+            fontWeight = Bold
         )
         Text(
-            text = episode.description.let { it.substring(0, 100) + "..." },
-            fontSize = 14.sp,
-            color = colorScheme.primaryContainer,
-            textAlign = TextAlign.Justify
+            text = Html.fromHtml(episode.description.let { it.substring(0, 100) + "..." }, Html.FROM_HTML_MODE_LEGACY).toString(),
+            fontSize = 18.sp,
+            color = Color.White,
+            textAlign = TextAlign.Justify,
+            modifier = Modifier.padding(6.dp)
         )
         Button(
             modifier = Modifier.padding(bottom = 6.dp),
@@ -64,7 +68,11 @@ fun EpisodeRow(episode: Episode, navController: NavController) {
             },
         ) {
             Text(
-                text = stringResource(R.string.more)
+                text = stringResource(R.string.more),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontWeight = Bold,
+                fontSize = 16.sp
             )
         }
     }
