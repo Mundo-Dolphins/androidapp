@@ -1,6 +1,7 @@
 package es.mundodolphins.app.ui.views.info
 
 import android.os.Build
+import android.text.Html
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,18 +47,18 @@ fun EpisodeScreen(
                 text = stringResource(R.string.published_on, episode?.publishedOn ?: ""),
                 fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
+                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = stringResource(R.string.duration, episode?.len ?: ""),
                 fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
+                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = episode?.description ?: "",
+                text = Html.fromHtml(episode?.description, Html.FROM_HTML_MODE_COMPACT).toString(),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
@@ -89,6 +90,5 @@ fun EpisodeScreenPreview() {
                 title = "Carbón de Reyes Magos"
             )
         )
-
     }
 }
