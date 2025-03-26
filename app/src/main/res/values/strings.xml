@@ -4,4 +4,7 @@
     <string name="more">Más información</string>
     <string name="published_on">Publicado: %1$s</string>
     <string name="duration">Duración: %1$s</string>
+    <string name="episodios">Episodios</string>
+    <string name="redes_sociales">Redes Sociales</string>
+    <string name="links">Enlaces</string>
 </resources>
