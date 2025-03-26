@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface FeedService {
-    @GET("season_7.json")
+    @GET("latests.json")
     suspend fun getFeed(): Response<List<Episode>>
 }
