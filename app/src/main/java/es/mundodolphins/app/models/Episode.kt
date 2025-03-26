@@ -1,9 +1,11 @@
 package es.mundodolphins.app.models
 
+import androidx.annotation.Keep
 import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.format.DateTimeFormatter.ofPattern
 
+@Keep
 data class Episode(
     val dateAndTime: String,
     val description: String,
