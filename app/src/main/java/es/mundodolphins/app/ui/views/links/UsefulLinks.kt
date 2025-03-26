@@ -1,7 +1,10 @@
 package es.mundodolphins.app.ui.views.links
 
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import es.mundodolphins.app.R
 
@@ -48,12 +52,22 @@ fun UsefulLinksScreen(modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                            context.startActivity(intent)
+                            openTab(url, context)
                         }
                         .padding(vertical = 8.dp)
                 )
             }
         }
     }
+}
+
+
+fun openTab(url: String, context: Context) {
+    val builder = CustomTabsIntent.Builder().apply {
+        setShowTitle(true)
+        setInstantAppsEnabled(true)
+    }.build()
+
+    builder.intent.setPackage("com.android.chrome")
+    builder.launchUrl(context, url.toUri())
 }
