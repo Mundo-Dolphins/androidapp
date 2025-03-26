@@ -14,22 +14,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.views.info.EpisodeScreen
+import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
 import es.mundodolphins.app.viewmodel.FeedViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, model: FeedViewModel = viewModel()) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    model: FeedViewModel = viewModel(),
+    navController: NavHostController
+) {
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
-    val navController = rememberNavController()
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (isConnected) {
@@ -45,6 +49,9 @@ fun MainScreen(modifier: Modifier = Modifier, model: FeedViewModel = viewModel()
                         episode = model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0),
                         modifier = modifier
                     )
+                }
+                composable(route = Routes.UsefulLinks.route) {
+                    UsefulLinksScreen(modifier = modifier)
                 }
             }
         } else {
