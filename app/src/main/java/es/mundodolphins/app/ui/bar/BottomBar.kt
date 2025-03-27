@@ -1,6 +1,7 @@
 package es.mundodolphins.app.ui.bar
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,8 +23,8 @@ fun AppBottomBar(navController: NavHostController) {
     BottomAppBar(
         actions = {
             IconButton(
-                enabled = currentRoute(navController) != Routes.EpisodesList.route,
-                onClick = { navController.navigate(Routes.EpisodesList.route) }
+                enabled = currentRoute(navController) != Routes.Feed.route,
+                onClick = { navController.navigate(Routes.Feed.route) }
             ) {
                 Icon(
                     Icons.Filled.Home,
@@ -37,6 +38,15 @@ fun AppBottomBar(navController: NavHostController) {
                 Icon(
                     painterResource(id = R.drawable.travel_explore),
                     contentDescription = stringResource(R.string.links)
+                )
+            }
+            IconButton(
+                enabled = currentRoute(navController) != Routes.SeasonsList.route,
+                onClick = { navController.navigate(Routes.SeasonsList.route) }
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.List,
+                    contentDescription = stringResource(R.string.seasons)
                 )
             }
         }

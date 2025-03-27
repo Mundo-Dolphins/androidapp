@@ -58,7 +58,7 @@ fun EpisodeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = Html.fromHtml(episode?.description, Html.FROM_HTML_MODE_COMPACT).toString(),
+                text = Html.fromHtml(episode?.description ?: "", Html.FROM_HTML_MODE_COMPACT).toString(),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
