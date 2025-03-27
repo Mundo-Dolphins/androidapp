@@ -47,8 +47,8 @@ fun EpisodeRow(episode: Episode, navController: NavController) {
         )
         Text(
             text = episode.publishedOn,
-            fontSize = 20.sp,
-            color = colorScheme.tertiary,
+            fontSize = 16.sp,
+            color = Color.White,
             modifier = Modifier
                 .fillMaxWidth(0.9f),
             textAlign = TextAlign.Left,
