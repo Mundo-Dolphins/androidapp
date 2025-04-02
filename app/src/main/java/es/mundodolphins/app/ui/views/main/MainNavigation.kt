@@ -19,9 +19,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
+import es.mundodolphins.app.ui.views.seasons.SeasonsListScreen
 import es.mundodolphins.app.ui.views.info.EpisodeScreen
 import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
+import es.mundodolphins.app.ui.views.seasons.SeasonsView
 import es.mundodolphins.app.viewmodel.FeedViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -39,9 +41,9 @@ fun MainScreen(
         if (isConnected) {
             NavHost(
                 navController = navController,
-                startDestination = Routes.EpisodesList.route
+                startDestination = Routes.Feed.route
             ) {
-                composable(route = Routes.EpisodesList.route) {
+                composable(route = Routes.Feed.route) {
                     EpisodesScreen(navController = navController, modifier = modifier, model = model)
                 }
                 composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
@@ -52,6 +54,21 @@ fun MainScreen(
                 }
                 composable(route = Routes.UsefulLinks.route) {
                     UsefulLinksScreen(modifier = modifier)
+                }
+                composable(route = Routes.SeasonsList.route) {
+                    SeasonsListScreen(
+                        modifier = modifier,
+                        navController = navController,
+                        model = model
+                    )
+                }
+                composable(route = Routes.SeasonView.route + "/{id}") {
+                    SeasonsView(
+                        seasonId = it.arguments?.getString("id")?.toInt() ?: 0,
+                        modifier = modifier,
+                        navController = navController,
+                        model = model
+                    )
                 }
             }
         } else {
