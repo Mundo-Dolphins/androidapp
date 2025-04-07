@@ -5,32 +5,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import es.mundodolphins.app.viewmodel.FeedViewModel
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.ERROR
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.LOADING
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.SUCCESS
+import es.mundodolphins.app.viewmodel.EpisodesViewModel
+import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.ERROR
+import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.LOADING
+import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.SUCCESS
 
 @Composable
 fun EpisodesScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    model: FeedViewModel = viewModel()
+    model: EpisodesViewModel = viewModel()
 ) {
-    when (model.statusFeed) {
+    when (model.statusRefresh) {
         SUCCESS -> {
             ListEpisodesView(
-                episodes = model.feed,
+                episodes = model.feed.collectAsState(initial = emptyList()).value,
                 modifier = modifier,
                 navController = navController
             )
         }
 
         LOADING -> {
-            model.getFeed()
             Box(
                 contentAlignment = Center,
                 modifier = Modifier.fillMaxSize()

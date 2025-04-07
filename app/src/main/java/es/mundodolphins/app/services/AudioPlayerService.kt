@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
-import android.os.IBinder
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
@@ -56,12 +55,13 @@ class AudioPlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val mp3Url = intent?.getStringExtra("MP3_URL") ?: return START_NOT_STICKY
+        val currentPosition = intent.getLongExtra("CURRENT_POSITION", 0L)
         exoPlayer.setMediaItem(MediaItem.fromUri(mp3Url))
         exoPlayer.prepare()
         exoPlayer.setWakeMode(WAKE_MODE_NETWORK)
         exoPlayer.playWhenReady = true
+        exoPlayer.seekTo(currentPosition)
 
-//        it.seekTo(currentPosition)
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 handleError(error)

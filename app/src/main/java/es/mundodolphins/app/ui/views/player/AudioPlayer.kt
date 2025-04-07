@@ -1,6 +1,5 @@
 package es.mundodolphins.app.ui.views.player
 
-import PlayerViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,23 +34,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import es.mundodolphins.app.R
-import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
+import es.mundodolphins.app.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun AudioPlayerView(mp3Url: String, playerViewModel: PlayerViewModel = viewModel()) {
+fun AudioPlayerView(
+    episodeId: Long,
+    mp3Url: String,
+    playerViewModel: PlayerViewModel = viewModel()
+) {
 
     val context = LocalContext.current
     val player by playerViewModel.playerState.collectAsState()
 
     LaunchedEffect(mp3Url) {
-        playerViewModel.initializePlayer(context, mp3Url)
+        if (mp3Url.isNotEmpty())
+            playerViewModel.initializePlayer(context, episodeId, mp3Url)
     }
 
     DisposableEffect(Unit) {
@@ -69,28 +72,13 @@ fun AudioPlayerView(mp3Url: String, playerViewModel: PlayerViewModel = viewModel
 
 @Composable
 fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
-    val isPlaying = remember {
-        mutableStateOf(true)
-    }
+    val isPlaying = remember { mutableStateOf(true) }
+    val currentPosition = remember { mutableLongStateOf(0) }
+    val sliderPosition = remember { mutableLongStateOf(0) }
+    val totalDuration = remember { mutableLongStateOf(0) }
 
-    val currentPosition = remember {
-        mutableLongStateOf(0)
-    }
-
-    val sliderPosition = remember {
-        mutableLongStateOf(0)
-    }
-
-    val totalDuration = remember {
-        mutableLongStateOf(0)
-    }
-
-    playerViewModel.isPlaying.observeForever {
-        isPlaying.value = it
-    }
-    playerViewModel.duration.observeForever {
-        totalDuration.longValue = it
-    }
+    playerViewModel.isPlaying.observeForever { isPlaying.value = it }
+    playerViewModel.duration.observeForever { totalDuration.longValue = it }
 
     LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
         delay(1000)
@@ -244,7 +232,7 @@ private fun Long.convertToText(): String {
     return "$minutesString:$secondsString"
 }
 
-
+/*
 @Composable
 @Preview(showBackground = true)
 fun AudioPlayerViewPreview() {
@@ -252,3 +240,4 @@ fun AudioPlayerViewPreview() {
         AudioPlayerView("https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3")
     }
 }
+ */

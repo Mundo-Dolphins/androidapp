@@ -7,13 +7,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import es.mundodolphins.app.models.Episode
-import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
+import es.mundodolphins.app.data.Episode
 
 
 @Composable
@@ -34,6 +29,7 @@ fun ListEpisodesView(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun ListEpisodesViewPreview() {
@@ -43,7 +39,7 @@ fun ListEpisodesViewPreview() {
 }
 
 private fun parseJsonToItems() =
-    Gson().fromJson<List<Episode>>(jsonString, object : TypeToken<List<Episode>>() {}.type)
+    Gson().fromJson<List<EpisodeResponse>>(jsonString, object : TypeToken<List<EpisodeResponse>>() {}.type)
 
 private const val jsonString = """
 [
@@ -69,3 +65,4 @@ private const val jsonString = """
   }
 ]
 """
+ */

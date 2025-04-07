@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -24,13 +25,13 @@ import es.mundodolphins.app.ui.views.info.EpisodeScreen
 import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsView
-import es.mundodolphins.app.viewmodel.FeedViewModel
+import es.mundodolphins.app.viewmodel.EpisodesViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    model: FeedViewModel = viewModel(),
+    model: EpisodesViewModel = viewModel(),
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -47,8 +48,9 @@ fun MainScreen(
                     EpisodesScreen(navController = navController, modifier = modifier, model = model)
                 }
                 composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
+                    model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0)
                     EpisodeScreen(
-                        episode = model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0),
+                        episode = model.episode.collectAsState(null).value,
                         modifier = modifier
                     )
                 }

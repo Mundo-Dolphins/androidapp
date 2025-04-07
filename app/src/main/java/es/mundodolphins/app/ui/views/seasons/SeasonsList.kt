@@ -1,19 +1,16 @@
 package es.mundodolphins.app.ui.views.seasons
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -22,43 +19,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.Routes
-import es.mundodolphins.app.viewmodel.FeedViewModel
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.ERROR
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.LOADING
-import es.mundodolphins.app.viewmodel.FeedViewModel.LoadStatus.SUCCESS
+import es.mundodolphins.app.viewmodel.EpisodesViewModel
 
 @Composable
 fun SeasonsListScreen(
     modifier: Modifier = Modifier,
-    model: FeedViewModel = viewModel(),
+    model: EpisodesViewModel = viewModel(),
     navController: NavController
 ) {
-    when (model.statusSeasons) {
-        SUCCESS -> {
-            SeasonsList(
-                seasons = model.seasons,
-                modifier = modifier,
-                navController = navController
-            )
-        }
-
-        LOADING -> {
-            model.getSeasons()
-            Box(
-                contentAlignment = Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxSize(0.5F))
-            }
-        }
-
-        ERROR -> Text("Error")
-    }
+    SeasonsList(
+        seasons = model.seasons.collectAsState(initial = emptyList()).value,
+        modifier = modifier,
+        navController = navController
+    )
 }
 
 @Composable
 fun SeasonsList(
-    seasons: List<String>,
+    seasons: List<Int>,
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
@@ -78,8 +56,7 @@ fun SeasonsList(
 }
 
 @Composable
-fun SeasonRow(s: String, navController: NavController) {
-    val seasonId = s.convertJsonFilenameToSeason()
+fun SeasonRow(seasonId: Int, navController: NavController) {
     if (seasonId > 0) {
         Button(onClick = {
             navController.navigate(Routes.SeasonView.route + "/$seasonId")
@@ -89,30 +66,11 @@ fun SeasonRow(s: String, navController: NavController) {
     }
 }
 
-private fun String.convertJsonFilenameToSeason(): Int {
-    val matchResult = Regex("""season_(\d+)\.json""").find(this)
-
-    return if (matchResult != null) {
-        val seasonNumber = matchResult.groupValues[1]
-        seasonNumber.toInt()
-    } else {
-        0
-    }
-}
-
 @Preview
 @Composable
 fun SeasonsListPreview() {
     SeasonsList(
-        listOf(
-            "season_7.json",
-            "season_6.json",
-            "season_5.json",
-            "season_4.json",
-            "season_3.json",
-            "season_2.json",
-            "season_1.json"
-        ),
+        listOf(7, 6, 5, 4, 3, 2, 1),
         navController = NavController(LocalContext.current)
     )
 }
