@@ -9,4 +9,6 @@
     <string name="links">Enlaces</string>
     <string name="season">Temporada %1$s</string>
     <string name="seasons">Temporadas</string>
+    <string name="listening">Escuchando</string>
+    <string name="listened">Escuchado</string>
 </resources>
