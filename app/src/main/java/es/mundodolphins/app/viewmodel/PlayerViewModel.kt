@@ -2,7 +2,6 @@ package es.mundodolphins.app.viewmodel
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.security.MessageDigest
 
 class PlayerViewModel(private val episodeRepository: EpisodeRepository) : ViewModel() {
 
@@ -36,6 +34,8 @@ class PlayerViewModel(private val episodeRepository: EpisodeRepository) : ViewMo
     private val _duration = MutableLiveData<Long>()
     val duration: LiveData<Long> get() = _duration
 
+    private val _playerStatus = MutableLiveData<Int>()
+
     val playerState: StateFlow<ExoPlayer?> = _playerState
 
     private val serviceConnection = object : ServiceConnection {
@@ -51,6 +51,10 @@ class PlayerViewModel(private val episodeRepository: EpisodeRepository) : ViewMo
 
             audioPlayerService.playerDuration.observeForever { duration ->
                 _duration.postValue(duration)
+            }
+
+            audioPlayerService.playerStatus.observeForever { status ->
+                _playerStatus.postValue(status)
             }
         }
 
@@ -94,7 +98,11 @@ class PlayerViewModel(private val episodeRepository: EpisodeRepository) : ViewMo
 
     private fun savePlayerPosition(position: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodeRepository.updateEpisodePosition(audioID, position)
+            episodeRepository.updateEpisodePosition(
+                audioID,
+                position,
+                _playerStatus.value == ExoPlayer.STATE_ENDED
+            )
         }
     }
 }

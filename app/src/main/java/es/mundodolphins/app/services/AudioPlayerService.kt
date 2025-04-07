@@ -25,6 +25,7 @@ class AudioPlayerService : Service() {
 
     val playerState = MutableLiveData<Boolean>()
     val playerDuration = MutableLiveData<Long>()
+    val playerStatus = MutableLiveData<Int>()
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
@@ -46,6 +47,7 @@ class AudioPlayerService : Service() {
             }
 
             override fun onPlaybackStateChanged(state: Int) {
+                playerStatus.postValue(state)
                 if (state == Player.STATE_READY) {
                     playerDuration.postValue(exoPlayer.duration)
                 }
