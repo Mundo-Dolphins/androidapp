@@ -12,14 +12,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import es.mundodolphins.app.R
-import es.mundodolphins.app.models.Episode
-import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
+import es.mundodolphins.app.data.AppDatabase
+import es.mundodolphins.app.data.Episode
+import es.mundodolphins.app.repository.EpisodeRepository
 import es.mundodolphins.app.ui.views.player.AudioPlayerView
+import es.mundodolphins.app.viewmodel.PlayerViewModel
+import es.mundodolphins.app.viewmodel.PlayerViewModelFactory
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -27,6 +31,15 @@ fun EpisodeScreen(
     episode: Episode?,
     modifier: Modifier = Modifier
 ) {
+    val playerViewModel: PlayerViewModel = viewModel(
+        factory = PlayerViewModelFactory(
+            EpisodeRepository(
+                AppDatabase.getDatabase(context = LocalContext.current.applicationContext)
+                    .episodeDao()
+            )
+        )
+    )
+
     Surface(
         modifier = modifier.fillMaxSize()
     ) {
@@ -58,7 +71,8 @@ fun EpisodeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = Html.fromHtml(episode?.description ?: "", Html.FROM_HTML_MODE_COMPACT).toString(),
+                text = Html.fromHtml(episode?.description ?: "", Html.FROM_HTML_MODE_COMPACT)
+                    .toString(),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
@@ -68,18 +82,19 @@ fun EpisodeScreen(
                     .padding(top = 16.dp)
             )
 
-            AudioPlayerView(episode?.audio ?: "")
+            AudioPlayerView(episode?.id ?: 0, episode?.audio ?: "", playerViewModel)
         }
     }
 }
 
+/*
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 @Preview
 fun EpisodeScreenPreview() {
     MundoDolphinsTheme {
         EpisodeScreen(
-            episode = Episode(
+            episode = EpisodeResponse(
                 dateAndTime = "2025-01-09T16:41:00Z",
                 description = "Hugo , Santos y Javi se juntan para analizar el último partido de la temporada de los Miami Dolphins . No hubo milagro ; los Broncos ganaron a los Chiefs y además los Dolphins sucumbieron frente a los Jets en el Met Life Stadium debido a los múltiples errores y turnovers ofensivos.  Esta derrota ha traido una variedad de reacciones que analizan en un especial Phin News: la continuidad de Grier y McDaniel , la situación de Weaver , el caso Hill . Nos espera una postemporada movida en Miami",
                 audio = "https://ivoox.com/listen_mn_137612153_1.mp3",
@@ -92,3 +107,4 @@ fun EpisodeScreenPreview() {
         )
     }
 }
+ */
