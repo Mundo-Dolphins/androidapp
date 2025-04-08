@@ -51,6 +51,7 @@ fun MainScreen(
                     model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0)
                     EpisodeScreen(
                         episode = model.episode.collectAsState(null).value,
+                        navController = navController,
                         modifier = modifier
                     )
                 }
