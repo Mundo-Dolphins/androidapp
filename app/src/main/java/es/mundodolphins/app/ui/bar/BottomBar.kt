@@ -3,58 +3,80 @@ package es.mundodolphins.app.ui.bar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.painterResource
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.Routes
+import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+private val navigationItems = listOf(
+    BottomBarButton(
+        Routes.Feed.route,
+        Icons.Filled.Home,
+        R.string.episodios
+    ),
+    BottomBarButton(
+        Routes.UsefulLinks.route,
+        Icons.Filled.Search,
+        R.string.links
+    ),
+    BottomBarButton(
+        Routes.SeasonsList.route,
+        Icons.AutoMirrored.Filled.List,
+        R.string.seasons
+    )
+)
+
 @Composable
 fun AppBottomBar(navController: NavHostController) {
-    BottomAppBar(
-        actions = {
-            IconButton(
-                enabled = currentRoute(navController) != Routes.Feed.route,
-                onClick = { navController.navigate(Routes.Feed.route) }
-            ) {
-                Icon(
-                    Icons.Filled.Home,
-                    contentDescription = stringResource(R.string.episodios)
+    val selectedNavigationIndex = rememberSaveable { mutableIntStateOf(0) }
+
+    NavigationBar {
+        navigationItems.forEachIndexed { index, item ->
+            NavigationBarItem(
+                selected = selectedNavigationIndex.intValue == index,
+                onClick = {
+                    selectedNavigationIndex.intValue = index
+                    navController.navigate(item.route)
+                },
+                icon = {
+                    Icon(imageVector = item.icon, contentDescription = stringResource(item.label))
+                },
+                label = {
+                    Text(
+                        stringResource(item.label),
+                        color = if (index == selectedNavigationIndex.intValue) Color.Black else Color.Gray
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.surface,
+                    indicatorColor = MaterialTheme.colorScheme.primary
                 )
-            }
-            IconButton(
-                enabled = currentRoute(navController) != Routes.UsefulLinks.route,
-                onClick = { navController.navigate(Routes.UsefulLinks.route) }
-            ) {
-                Icon(
-                    painterResource(id = R.drawable.travel_explore),
-                    contentDescription = stringResource(R.string.links)
-                )
-            }
-            IconButton(
-                enabled = currentRoute(navController) != Routes.SeasonsList.route,
-                onClick = { navController.navigate(Routes.SeasonsList.route) }
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.List,
-                    contentDescription = stringResource(R.string.seasons)
-                )
-            }
+            )
         }
-    )
+    }
 }
 
 @Composable
-fun currentRoute(navController: NavController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
+@Preview(showBackground = true)
+fun AppBottomBarPreview() {
+    MundoDolphinsTheme {
+        AppBottomBar(NavHostController(LocalContext.current))
+    }
 }
+
+data class BottomBarButton(val route: String, val icon: ImageVector, val label: Int)
