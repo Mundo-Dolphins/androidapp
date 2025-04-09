@@ -64,7 +64,9 @@ fun SeasonsList(
 fun SeasonRow(seasonId: Int, navController: NavController) {
     if (seasonId > 0) {
         Button(
-            modifier = Modifier.fillMaxWidth(0.7f).padding(6.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .padding(6.dp),
             onClick = {
                 navController.navigate(Routes.SeasonView.route + "/$seasonId")
             }

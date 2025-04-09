@@ -8,9 +8,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,10 +20,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
-import es.mundodolphins.app.ui.views.seasons.SeasonsListScreen
 import es.mundodolphins.app.ui.views.info.EpisodeScreen
 import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
+import es.mundodolphins.app.ui.views.seasons.SeasonsListScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsView
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 
@@ -45,7 +45,11 @@ fun MainScreen(
                 startDestination = Routes.Feed.route
             ) {
                 composable(route = Routes.Feed.route) {
-                    EpisodesScreen(navController = navController, modifier = modifier, model = model)
+                    EpisodesScreen(
+                        navController = navController,
+                        modifier = modifier,
+                        model = model
+                    )
                 }
                 composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
                     model.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0)

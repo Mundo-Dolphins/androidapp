@@ -1,6 +1,8 @@
 package es.mundodolphins.app.ui.views.player
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -34,11 +37,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 
@@ -48,7 +54,6 @@ fun AudioPlayerView(
     mp3Url: String,
     playerViewModel: PlayerViewModel = viewModel()
 ) {
-
     val context = LocalContext.current
     val player by playerViewModel.playerState.collectAsState()
 
@@ -67,12 +72,11 @@ fun AudioPlayerView(
     Column {
         PlayerControls(player, playerViewModel)
     }
-
 }
 
 @Composable
-fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
-    val isPlaying = remember { mutableStateOf(true) }
+private fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
+    val isPlaying = remember { mutableStateOf(false) }
     val currentPosition = remember { mutableLongStateOf(0) }
     val sliderPosition = remember { mutableLongStateOf(0) }
     val totalDuration = remember { mutableLongStateOf(0) }
@@ -120,7 +124,6 @@ fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-
                     Text(
                         text = (currentPosition.longValue).convertToText(),
                         modifier = Modifier
@@ -146,16 +149,13 @@ fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ControlButton(
-                    icon = if (isPlaying.value) R.drawable.ic_pause else R.drawable.ic_play,
-                    size = 100.dp,
+                    isPlaying = isPlaying.value,
+                    size = 80.dp,
                     onClick = {
-                        if (isPlaying.value) {
-                            player?.pause()
-                        } else {
-                            player?.play()
-                        }
+                        if (isPlaying.value) player?.pause() else player?.play()
                         isPlaying.value = player?.isPlaying == true
-                    })
+                    }
+                )
                 Spacer(modifier = Modifier.width(20.dp))
             }
         }
@@ -165,6 +165,7 @@ fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
 /**
  * Tracks and visualizes the song playing actions.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackSlider(
     value: Float,
@@ -174,18 +175,23 @@ fun TrackSlider(
 ) {
     Slider(
         value = value,
-        onValueChange = {
-            onValueChange(it)
-        },
-        onValueChangeFinished = {
-            onValueChangeFinished()
-        },
+        onValueChange = { onValueChange(it) },
+        onValueChangeFinished = { onValueChangeFinished() },
         valueRange = 0f..songDuration,
         colors = SliderDefaults.colors(
             thumbColor = MaterialTheme.colorScheme.primary,
             activeTrackColor = MaterialTheme.colorScheme.primary,
-            inactiveTrackColor = MaterialTheme.colorScheme.secondary,
-        )
+            inactiveTrackColor = Color.LightGray,
+        ),
+        thumb = {
+            SliderDefaults.Thumb(
+                interactionSource = remember { MutableInteractionSource() },
+                thumbSize = DpSize(20.dp, 20.dp),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+        }
     )
 }
 
@@ -193,19 +199,19 @@ fun TrackSlider(
  * Player control button
  */
 @Composable
-fun ControlButton(icon: Int, size: Dp, onClick: () -> Unit) {
+fun ControlButton(isPlaying: Boolean, size: Dp, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .clickable {
-                onClick()
-            }, contentAlignment = Alignment.Center
+            .clickable { onClick() }
+            .background(MaterialTheme.colorScheme.secondary),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
+            painter = painterResource(if (isPlaying) R.drawable.pause_icon else R.drawable.play_arrow),
             modifier = Modifier.size(size / 1.5f),
-            painter = painterResource(id = icon),
-            tint = Color.Black,
+            tint = Color.White,
             contentDescription = null
         )
     }
@@ -232,12 +238,13 @@ private fun Long.convertToText(): String {
     return "$minutesString:$secondsString"
 }
 
-/*
 @Composable
 @Preview(showBackground = true)
 fun AudioPlayerViewPreview() {
     MundoDolphinsTheme {
-        AudioPlayerView("https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3")
+        AudioPlayerView(
+            1234567,
+            "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3"
+        )
     }
 }
- */

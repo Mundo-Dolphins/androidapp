@@ -143,13 +143,17 @@ private fun ColumnScope.EpisodeBottom(
 @Composable
 private fun ListeningBadge() {
     Row(
-        modifier = Modifier.background(lightYellow).padding(4.dp)
+        modifier = Modifier
+            .background(lightYellow)
+            .padding(4.dp)
     ) {
         Icon(
             painter = painterResource(R.drawable.pause_icon),
             contentDescription = stringResource(R.string.listening),
             tint = darkYellow,
-            modifier = Modifier.size(20.dp).align(Alignment.CenterVertically)
+            modifier = Modifier
+                .size(20.dp)
+                .align(Alignment.CenterVertically)
         )
         Text(
             text = stringResource(R.string.listening),
@@ -163,13 +167,17 @@ private fun ListeningBadge() {
 @Composable
 private fun ListenedBadge() {
     Row(
-        modifier = Modifier.background(lightGreen).padding(4.dp)
+        modifier = Modifier
+            .background(lightGreen)
+            .padding(4.dp)
     ) {
         Icon(
             Icons.Filled.Check,
             contentDescription = stringResource(R.string.listened),
             tint = darkGreen,
-            modifier = Modifier.size(20.dp).align(Alignment.CenterVertically)
+            modifier = Modifier
+                .size(20.dp)
+                .align(Alignment.CenterVertically)
         )
         Text(
             text = stringResource(R.string.listened),

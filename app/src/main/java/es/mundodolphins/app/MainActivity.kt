@@ -30,12 +30,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            val viewModel: EpisodesViewModel = viewModel(factory = EpisodesViewModelFactory(
-                EpisodeRepository(
-                    AppDatabase.getDatabase(context = LocalContext.current.applicationContext)
-                        .episodeDao()
+            val viewModel: EpisodesViewModel = viewModel(
+                factory = EpisodesViewModelFactory(
+                    EpisodeRepository(
+                        AppDatabase.getDatabase(context = LocalContext.current.applicationContext)
+                            .episodeDao()
+                    )
                 )
-            ))
+            )
 
             MundoDolphinsTheme {
                 Scaffold(

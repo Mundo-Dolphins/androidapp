@@ -7,7 +7,8 @@ object FeedClient {
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://mundodolphins.es/api/")
         .addConverterFactory(
-            GsonConverterFactory.create())
+            GsonConverterFactory.create()
+        )
         .build()
 
     val service: FeedService by lazy {

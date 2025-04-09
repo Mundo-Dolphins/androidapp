@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import es.mundodolphins.app.R
 import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.data.Episode
@@ -61,29 +64,45 @@ fun EpisodeScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             EpisodeHeader(navController, episode)
-            Spacer(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .height(2.dp)
-            )
-            EpisodeInfo(episode)
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)) {
-                Text(
-                    text = Html.fromHtml(episode?.description ?: "", Html.FROM_HTML_MODE_COMPACT)
-                        .toString(),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    color = Color.DarkGray,
-                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                    textAlign = TextAlign.Justify,
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .height(2.dp)
+                )
+                EpisodeInfo(episode)
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
-                )
-            }
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = Html.fromHtml(
+                            episode?.description ?: "",
+                            Html.FROM_HTML_MODE_COMPACT
+                        )
+                            .toString(),
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        color = Color.DarkGray,
+                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                        textAlign = TextAlign.Justify,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    )
+                }
 
-            AudioPlayerView(episode?.id ?: 0, episode?.audio ?: "", playerViewModel)
+                if (episode?.imgMain != null && episode.imgMain.isNotEmpty()) {
+                    AsyncImage(
+                        model = episode.imgMain,
+                        contentDescription = episode.title
+                    )
+                }
+
+                AudioPlayerView(episode?.id ?: 0, episode?.audio ?: "", playerViewModel)
+            }
         }
     }
 }
@@ -118,7 +137,11 @@ private fun EpisodeHeader(
 
 @Composable
 private fun EpisodeInfo(episode: Episode?) {
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Text(
             text = stringResource(R.string.published_on, episode?.publishedOn ?: ""),
             fontSize = MaterialTheme.typography.labelLarge.fontSize,
@@ -149,8 +172,8 @@ fun EpisodeScreenPreview() {
                 description = "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
                 audio = "https://www.ivoox.com/episodio1.mp3",
                 published = Instant.ofEpochMilli(1744098194000),
-                imgMain = "https://www.mundodolphins.es/img.jpg",
-                imgMini = "https://www.mundodolphins.es/img.jpg",
+                imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",
+                imgMini = "",
                 len = "01:29:11",
                 link = "https://wwww.mundodolphins.es/episodio.html",
                 season = 8,
