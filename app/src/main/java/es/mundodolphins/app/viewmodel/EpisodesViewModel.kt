@@ -58,7 +58,7 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository) : View
                     Log.e(
                         "Refreshing Database",
                         "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
-                            response.raw().request().url()
+                            response.raw().request.url
                         }"
                     )
                     Firebase.crashlytics.log(
@@ -66,7 +66,7 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository) : View
                                 "Status: ${response.code()}, " +
                                 "Body: ${response.errorBody()}, " +
                                 "Message: ${response.message()}, " +
-                                "URL: ${response.raw().request().url()}"
+                                "URL: ${response.raw().request.url}"
                     )
                     statusRefresh = LoadStatus.ERROR
                 }

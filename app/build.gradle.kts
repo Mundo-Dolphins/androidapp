@@ -73,6 +73,9 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
 
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // Room
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)

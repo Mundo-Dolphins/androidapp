@@ -11,5 +11,5 @@ interface FeedService {
     suspend fun getAllSeasons(): Response<List<String>>
 
     @GET("season_{id}.json")
-    suspend fun getSeasonEpisodes(@Path(value = "id")id: Int): Response<List<EpisodeResponse>>
+    suspend fun getSeasonEpisodes(@Path(value = "id") id: Int): Response<List<EpisodeResponse>>
 }
