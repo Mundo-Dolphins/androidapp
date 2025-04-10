@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>force_download</key>
+    <value>false</value>
+  </entry>
+  <entry>
+    <key>last_season</key>
+    <value>8</value>
+  </entry>
+</defaults>
