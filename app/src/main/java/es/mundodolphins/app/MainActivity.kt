@@ -28,6 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.repository.EpisodeRepository
@@ -67,13 +71,18 @@ fun MundoDolphinsScreen() {
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
+    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    remoteConfig.setConfigSettingsAsync(remoteConfigSettings {
+        minimumFetchIntervalInSeconds = 3600
+    })
+    remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { AppBar() },
         bottomBar = { AppBottomBar(navController) }
     ) { innerPadding ->
-        viewModel.refreshDatabase()
+        viewModel.refreshDatabase(remoteConfig.getLong("last_season"), remoteConfig.getBoolean("force_download"))
         Column(
             modifier = Modifier.fillMaxSize()
         ) {

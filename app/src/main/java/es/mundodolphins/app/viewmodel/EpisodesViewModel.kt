@@ -30,7 +30,7 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository) : View
 
     var episode: Flow<Episode> by mutableStateOf(emptyFlow())
 
-    fun refreshDatabase() {
+    fun refreshDatabase(lastSeason: Long, forceDownload: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = FeedClient.service.getAllSeasons()
