@@ -45,7 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.exoplayer.ExoPlayer
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
-import es.mundodolphins.app.viewmodel.PlayerViewModel
+import es.mundodolphins.app.viewmodel.player.PlayerViewModel
 import kotlinx.coroutines.delay
 
 @Composable

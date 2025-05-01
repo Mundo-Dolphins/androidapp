@@ -37,8 +37,8 @@ import es.mundodolphins.app.data.Episode.ListeningStatus.NOT_LISTENED
 import es.mundodolphins.app.repository.EpisodeRepository
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.player.AudioPlayerView
-import es.mundodolphins.app.viewmodel.PlayerViewModel
-import es.mundodolphins.app.viewmodel.PlayerViewModelFactory
+import es.mundodolphins.app.viewmodel.player.PlayerViewModel
+import es.mundodolphins.app.viewmodel.player.PlayerViewModelFactory
 import java.time.Instant
 
 @RequiresApi(Build.VERSION_CODES.S)

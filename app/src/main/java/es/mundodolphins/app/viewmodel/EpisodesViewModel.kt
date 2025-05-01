@@ -10,6 +10,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
 import es.mundodolphins.app.client.FeedClient
+import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.data.Episode
 import es.mundodolphins.app.models.EpisodeResponse
 import es.mundodolphins.app.repository.EpisodeRepository
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
-class EpisodesViewModel(private val episodeRepository: EpisodeRepository) : ViewModel() {
+class EpisodesViewModel(private val episodeRepository: EpisodeRepository, private val feedService: FeedService) : ViewModel() {
     var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
         private set
 
@@ -33,13 +34,13 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository) : View
     fun refreshDatabase(lastSeason: Long, forceDownload: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = FeedClient.service.getAllSeasons()
+                val response = feedService.getAllSeasons()
                 if (response.isSuccessful) {
                     response.body()!!.apply {
                         Log.i("Refreshing Database", "Found ${this.size} seasons")
                         val episodes = episodeRepository.getAllEpisodesIds()
                         map { it.convertJsonFilenameToSeason() }.forEach { season ->
-                            val seasonEpisodes = FeedClient.service.getSeasonEpisodes(season)
+                            val seasonEpisodes = feedService.getSeasonEpisodes(season)
                             if (seasonEpisodes.isSuccessful) {
                                 Log.i(
                                     "Refreshing Database",
