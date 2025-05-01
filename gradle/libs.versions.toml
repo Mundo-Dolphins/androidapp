@@ -35,7 +35,7 @@ roomTesting = "2.7.1"
 rules = "1.6.1"
 runner = "1.6.2"
 runtimeLivedata = "1.8.0"
-truth = "1.4.0"
+truth = "1.4.4"
 junitJupiter = "5.8.2"
 
 [libraries]
