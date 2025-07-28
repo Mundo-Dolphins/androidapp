@@ -32,7 +32,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import es.mundodolphins.app.client.FeedClient
+import es.mundodolphins.app.client.MundoDolphinsClient
 import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.repository.EpisodeRepository
@@ -67,7 +67,7 @@ fun MundoDolphinsScreen() {
                 AppDatabase.getDatabase(context = LocalContext.current.applicationContext)
                     .episodeDao()
             ),
-            FeedClient.service
+            MundoDolphinsClient.feedService
         )
     )
     val context = LocalContext.current
@@ -85,8 +85,6 @@ fun MundoDolphinsScreen() {
         bottomBar = { AppBottomBar(navController) }
     ) { innerPadding ->
         viewModel.refreshDatabase(
-            remoteConfig.getLong("last_season"),
-            remoteConfig.getBoolean("force_download")
         )
         Column(
             modifier = Modifier.fillMaxSize()
@@ -108,7 +106,7 @@ fun MundoDolphinsScreen() {
                 }
             }
             MainScreen(
-                model = viewModel,
+                episodesViewModel = viewModel,
                 modifier = Modifier.padding(innerPadding),
                 navController = navController
             )

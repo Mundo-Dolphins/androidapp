@@ -1,10 +1,10 @@
 package es.mundodolphins.app.repository
 
 import com.google.common.truth.Truth.assertThat
-import es.mundodolphins.app.data.Episode
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENING
-import es.mundodolphins.app.data.Episode.ListeningStatus.NOT_LISTENED
-import es.mundodolphins.app.data.EpisodeDao
+import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENING
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.NOT_LISTENED
+import es.mundodolphins.app.data.episodes.EpisodeDao
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -1,4 +1,4 @@
-package es.mundodolphins.app.data
+package es.mundodolphins.app.data.episodes
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -31,13 +31,4 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM episodes WHERE season = :seasonId ORDER BY published DESC")
     fun getSeason(seasonId: Int): Flow<List<Episode>>
-
-    @ProvidedTypeConverter
-    class Converters {
-        @TypeConverter
-        fun fromInstant(value: Long?): Instant? = value?.let { Instant.ofEpochMilli(it) }
-
-        @TypeConverter
-        fun toInstant(instant: Instant?): Long? = instant?.toEpochMilli()
-    }
 }

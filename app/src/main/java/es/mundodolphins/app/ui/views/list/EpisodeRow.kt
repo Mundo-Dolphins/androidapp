@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.mundodolphins.app.R
-import es.mundodolphins.app.data.Episode
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENED
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENING
+import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENED
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENING
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.theme.darkGreen

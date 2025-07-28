@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import es.mundodolphins.app.data.Episode
+import es.mundodolphins.app.data.episodes.Episode
 
 
 @Composable

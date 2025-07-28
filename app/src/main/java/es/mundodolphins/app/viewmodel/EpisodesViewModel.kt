@@ -9,9 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
-import es.mundodolphins.app.client.FeedClient
 import es.mundodolphins.app.client.FeedService
-import es.mundodolphins.app.data.Episode
+import es.mundodolphins.app.data.episodes.Episode
 import es.mundodolphins.app.models.EpisodeResponse
 import es.mundodolphins.app.repository.EpisodeRepository
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +30,7 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository, privat
 
     var episode: Flow<Episode> by mutableStateOf(emptyFlow())
 
-    fun refreshDatabase(lastSeason: Long, forceDownload: Boolean) {
+    fun refreshDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = feedService.getAllSeasons()

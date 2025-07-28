@@ -11,4 +11,6 @@
     <string name="listening">Escuchando</string>
     <string name="listened">Escuchado</string>
     <string name="back">Atrás</string>
+    <string name="news">Noticias</string>
+    <string name="author">Autor:  %1$s</string>
 </resources>
