@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import es.mundodolphins.app.client.FeedService
-import es.mundodolphins.app.data.Episode
+import es.mundodolphins.app.data.episodes.Episode
 import es.mundodolphins.app.models.EpisodeResponse
 import es.mundodolphins.app.repository.EpisodeRepository
 import io.mockk.coEvery
@@ -91,7 +91,7 @@ class EpisodesViewModelTest {
             coEvery { episodeRepository.getAllEpisodesIds() } returns emptyList()
             coEvery { episodeRepository.insertAllEpisodes(any()) } returns Unit
 
-            episodesViewModel.refreshDatabase(lastSeason = 1, forceDownload = true)
+            episodesViewModel.refreshDatabase()
             testDispatcher.scheduler.advanceUntilIdle()
 
             await atMost 1.seconds.toJavaDuration() untilAsserted {

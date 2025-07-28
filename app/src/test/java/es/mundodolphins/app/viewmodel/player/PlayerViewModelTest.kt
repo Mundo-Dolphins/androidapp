@@ -1,7 +1,7 @@
 package es.mundodolphins.app.viewmodel.player
 
 import android.content.Context
-import es.mundodolphins.app.data.Episode
+import es.mundodolphins.app.data.episodes.Episode
 import es.mundodolphins.app.repository.EpisodeRepository
 import io.mockk.Runs
 import io.mockk.coEvery

@@ -1,12 +1,11 @@
-package es.mundodolphins.app.data
+package es.mundodolphins.app.data.episodes
 
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.google.common.truth.Truth
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENING
-import es.mundodolphins.app.data.Episode.ListeningStatus.NOT_LISTENED
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import es.mundodolphins.app.data.AppDatabase
+import es.mundodolphins.app.data.InstantConverter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -34,7 +33,7 @@ class EpisodeDaoTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-            .addTypeConverter(EpisodeDao.Converters())
+            .addTypeConverter(InstantConverter())
             .build()
         episodeDao = db.episodeDao()
     }
@@ -112,7 +111,7 @@ class EpisodeDaoTest {
                 len = "01:00:00",
                 link = "",
                 season = 1,
-                listeningStatus = NOT_LISTENED
+                listeningStatus = Episode.ListeningStatus.NOT_LISTENED
             )
         }
         episodeDao.insertAllEpisodes(episodes)
@@ -145,7 +144,7 @@ class EpisodeDaoTest {
                 len = "01:00:00",
                 link = "",
                 season = it,
-                listeningStatus = NOT_LISTENED
+                listeningStatus = Episode.ListeningStatus.NOT_LISTENED
             )
         }
         episodeDao.insertAllEpisodes(episodes)
@@ -188,7 +187,7 @@ class EpisodeDaoTest {
             len = "01:29:55",
             link = "https://www.episode.com/1",
             season = 1,
-            listeningStatus = NOT_LISTENED,
+            listeningStatus = Episode.ListeningStatus.NOT_LISTENED,
         ),
         Episode(
             id = 2,
@@ -202,7 +201,7 @@ class EpisodeDaoTest {
             len = "01:29:55",
             link = "https://www.episode.com/2",
             season = 1,
-            listeningStatus = LISTENING,
+            listeningStatus = Episode.ListeningStatus.LISTENING,
         )
     ).take(takeEpisodes)
 }

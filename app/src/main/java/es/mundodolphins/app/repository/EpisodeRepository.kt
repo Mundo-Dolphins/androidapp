@@ -1,11 +1,11 @@
 package es.mundodolphins.app.repository
 
 import android.util.Log
-import es.mundodolphins.app.data.Episode
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENED
-import es.mundodolphins.app.data.Episode.ListeningStatus.LISTENING
-import es.mundodolphins.app.data.Episode.ListeningStatus.NOT_LISTENED
-import es.mundodolphins.app.data.EpisodeDao
+import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENED
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENING
+import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.NOT_LISTENED
+import es.mundodolphins.app.data.episodes.EpisodeDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first

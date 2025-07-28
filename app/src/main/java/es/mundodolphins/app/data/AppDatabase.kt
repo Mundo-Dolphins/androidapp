@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import es.mundodolphins.app.data.EpisodeDao.Converters
+import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.data.episodes.EpisodeDao
 
 @Database(entities = [Episode::class], version = 1, exportSchema = false)
-@TypeConverters(Converters::class)
+@TypeConverters(InstantConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun episodeDao(): EpisodeDao
 
@@ -22,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "mundodolphins_database"
-                ).addTypeConverter(Converters())
+                ).addTypeConverter(InstantConverter())
                     .build()
                 INSTANCE = instance
                 instance

@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "es.mundodolphins.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "es.mundodolphins.app"
@@ -88,6 +88,9 @@ dependencies {
 
     // KSP
     ksp(libs.androidx.room.compiler)
+
+    // Markwon
+    implementation(libs.markwon)
 
     // Test
     testImplementation(libs.androidx.core)

@@ -3,7 +3,7 @@ package es.mundodolphins.app.client
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object FeedClient {
+object MundoDolphinsClient {
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://mundodolphins.es/api/")
         .addConverterFactory(
@@ -11,7 +11,11 @@ object FeedClient {
         )
         .build()
 
-    val service: FeedService by lazy {
+    val feedService: FeedService by lazy {
         retrofit.create(FeedService::class.java)
+    }
+
+    val articlesService: ArticlesService by lazy {
+        retrofit.create(ArticlesService::class.java)
     }
 }

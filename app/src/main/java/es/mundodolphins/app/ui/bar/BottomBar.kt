@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -26,18 +27,23 @@ import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 private val navigationItems = listOf(
     BottomBarButton(
         Routes.Feed.route,
-        Icons.Filled.Home,
-        R.string.episodios
+        icon = Icons.Filled.Home,
+        label = R.string.episodios
     ),
     BottomBarButton(
         Routes.UsefulLinks.route,
-        Icons.Filled.Search,
-        R.string.links
+        icon = Icons.Filled.Search,
+        label = R.string.links
     ),
     BottomBarButton(
         Routes.SeasonsList.route,
-        Icons.AutoMirrored.Filled.List,
-        R.string.seasons
+        icon = Icons.AutoMirrored.Filled.List,
+        label = R.string.seasons
+    ),
+    BottomBarButton(
+        Routes.Articles.route,
+        drawable = R.drawable.newspaper,
+        label = R.string.news
     )
 )
 
@@ -54,7 +60,10 @@ fun AppBottomBar(navController: NavHostController) {
                     navController.navigate(item.route)
                 },
                 icon = {
-                    Icon(imageVector = item.icon, contentDescription = stringResource(item.label))
+                    if (item.icon != null)
+                        Icon(imageVector = item.icon, contentDescription = stringResource(item.label))
+                    else
+                        Icon(painter = painterResource(item.drawable!!), contentDescription = stringResource(item.label))
                 },
                 label = {
                     Text(
@@ -79,4 +88,9 @@ fun AppBottomBarPreview() {
     }
 }
 
-data class BottomBarButton(val route: String, val icon: ImageVector, val label: Int)
+data class BottomBarButton(
+    val route: String,
+    val label: Int,
+    val icon: ImageVector? = null,
+    val drawable: Int? = null
+)

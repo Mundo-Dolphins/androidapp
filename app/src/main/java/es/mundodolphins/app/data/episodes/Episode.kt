@@ -1,9 +1,8 @@
-package es.mundodolphins.app.data
+package es.mundodolphins.app.data.episodes
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import es.mundodolphins.app.data.Episode.ListeningStatus.NOT_LISTENED
 import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.format.DateTimeFormatter.ofPattern
@@ -25,7 +24,7 @@ data class Episode(
     @ColumnInfo(defaultValue = "0")
     var listenedProgress: Long = 0,
     @ColumnInfo(defaultValue = "NOT_LISTENED")
-    var listeningStatus: ListeningStatus = NOT_LISTENED,
+    var listeningStatus: ListeningStatus = ListeningStatus.NOT_LISTENED,
 ) {
     val publishedOn: String
         get() = published.atOffset(UTC).format(ofPattern("dd/MM/yyyy HH:mm"))

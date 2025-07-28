@@ -6,4 +6,6 @@ sealed class Routes(val route: String) {
     data object UsefulLinks : Routes("useful_links")
     data object SeasonsList : Routes("seasons_list")
     data object SeasonView : Routes("seasons_view")
+    data object Articles : Routes("articles")
+    data object Article : Routes("article")
 }
