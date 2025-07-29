@@ -36,10 +36,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
+        // Configure Kotlin-specific options here if needed
     }
     buildFeatures {
         compose = true
