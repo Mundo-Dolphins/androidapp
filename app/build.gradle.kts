@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "es.mundodolphins.app"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 11
         versionName = "2.0.1"
 
@@ -41,6 +41,7 @@ android {
     buildFeatures {
         compose = true
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
