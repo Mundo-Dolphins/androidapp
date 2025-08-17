@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "es.mundodolphins.app"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 11
         versionName = "2.0.1"
 
@@ -36,11 +36,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "11"
+        // Configure Kotlin-specific options here if needed
     }
     buildFeatures {
         compose = true
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
