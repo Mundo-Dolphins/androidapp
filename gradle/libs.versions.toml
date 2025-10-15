@@ -37,7 +37,7 @@ rules = "1.7.0"
 runner = "1.7.0"
 runtimeLivedata = "1.9.2"
 truth = "1.4.5"
-junitJupiter = "5.13.4"
+junitJupiter = "6.0.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
