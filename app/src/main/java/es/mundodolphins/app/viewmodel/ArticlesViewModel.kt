@@ -9,18 +9,33 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ArticlesViewModel : ViewModel() {
+class ArticlesViewModel(
+    private val articlesServiceProvided: es.mundodolphins.app.client.ArticlesService? = null
+) : ViewModel() {
+    // Use provided service in tests; fall back to client in production.
+    private val articlesService: es.mundodolphins.app.client.ArticlesService =
+        articlesServiceProvided ?: MundoDolphinsClient.articlesService
     private val _articles = MutableStateFlow<List<ArticlesResponse>>(emptyList())
     val articles: StateFlow<List<ArticlesResponse>> = _articles
 
     fun fetchArticles() {
         viewModelScope.launch {
-            try {
-                val response = MundoDolphinsClient.articlesService.getArticles()
-                _articles.value = response
-            } catch (e: Exception) {
-                Log.e("ArticlesViewModel", "Error fetching articles", e)
-            }
+            fetchArticlesSuspend()
+        }
+    }
+
+    /**
+     * Suspend function that fetches articles from the service and updates state.
+     * Returning Boolean makes it easier to assert success/failure in integration tests.
+     */
+    suspend fun fetchArticlesSuspend(): Boolean {
+        return try {
+            val response = articlesService.getArticles()
+            _articles.value = response
+            true
+        } catch (e: Exception) {
+            Log.e("ArticlesViewModel", "Error fetching articles", e)
+            false
         }
     }
 

@@ -45,7 +45,7 @@ class AudioPlayerServiceTest {
     fun `should not crash when exoPlayer initialization fails`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
         val service = serviceController.create().get()
-        // Simula error en la inicialización del reproductor
+        // Simulate error during player initialization
         try {
             service.simulateExoPlayerError()
             assertThat(service.getExoPlayer().isPlaying).isFalse()
