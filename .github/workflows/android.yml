@@ -8,55 +8,66 @@ on:
 
 jobs:
   build:
-
+    name: Build and run tests
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Load Google Service file
-      env:
-        DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-      run: |
-        if [ -n "$DATA" ]; then
-          echo "$DATA" | base64 -di > app/google-services.json
-        else
-          echo "No GOOGLE_SERVICES_JSON secret provided; skipping."
-        fi
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$DATA" ]; then
+            echo "$DATA" | base64 -di > app/google-services.json
+          else
+            echo "No GOOGLE_SERVICES_JSON secret provided; skipping."
+          fi
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
-    - name: Build debug APK (assemble)
-      run: |
-        ./gradlew assembleDebug --no-daemon --console=plain --info --stacktrace
+      - name: Additional Gradle cache (optional)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-    - name: Run unit tests (app)
-      run: |
-        ./gradlew clean :app:testDebugUnitTest --no-daemon --console=plain --info --stacktrace
+      - name: Build debug APK (assemble)
+        run: |
+          ./gradlew assembleDebug --no-daemon --console=plain --info --stacktrace
 
-    - name: Upload unit test report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-unit-test-report
-        path: app/build/reports/tests/testDebugUnitTest
+      - name: Run unit tests (app)
+        run: |
+          ./gradlew clean :app:testDebugUnitTest --no-daemon --console=plain --info --stacktrace
 
-    - name: Upload unit test results (xml)
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-unit-test-results-xml
-        path: app/build/test-results/testDebugUnitTest
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-unit-test-report
+          path: app/build/reports/tests/testDebugUnitTest
 
-    - name: Print test summary
-      if: always()
-      run: |
-        echo "Unit test report available as artifacts: app-unit-test-report and app-unit-test-results-xml"
+      - name: Upload unit test results (xml)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-unit-test-results-xml
+          path: app/build/test-results/testDebugUnitTest
+
+      - name: Print test summary
+        if: always()
+        run: |
+          echo "Unit test report available as artifacts: app-unit-test-report and app-unit-test-results-xml"

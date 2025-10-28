@@ -128,7 +128,7 @@ class EpisodeRepositoryTest {
             runBlocking {
                 episodeRepository.getEpisodeById(episodeId).first()
             }
-            assert(false) // Debe lanzar excepción
+            assert(false) // Should throw exception
         } catch (e: Exception) {
             assertThat(e).isInstanceOf(RuntimeException::class.java)
             assertThat(e.message).isEqualTo("DB error")
