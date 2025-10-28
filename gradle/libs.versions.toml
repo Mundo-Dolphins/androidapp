@@ -39,6 +39,8 @@ runner = "1.7.0"
 runtimeLivedata = "1.9.4"
 truth = "1.4.5"
 junitJupiter = "6.0.0"
+ktlint = "13.1.0"
+detekt = "1.23.8"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -99,3 +101,5 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

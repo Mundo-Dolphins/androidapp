@@ -10,6 +10,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("jacoco") // Added
+    // Static analysis plugins
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 // Import types to avoid fully-qualified names and remove warnings
@@ -196,3 +199,6 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
 // jacoco {
 //     toolVersion = "0.8.11" // Example: Using a specific version
 // }
+
+// Detekt plugin is applied above; no custom extension configuration here to avoid configuration-time type resolution issues.
+// The plugin will provide the `:app:detekt` tasks which the CI workflow will run. If you want custom rules, add a `detekt.yml` at project root later.
