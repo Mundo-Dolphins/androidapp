@@ -21,7 +21,7 @@ interface EpisodeDao {
     fun getAllEpisodesIds(): List<Long>
 
     @Query("SELECT * FROM episodes WHERE id = :episodeId")
-    fun getEpisodeById(episodeId: Long): Flow<Episode>
+    fun getEpisodeById(episodeId: Long): Flow<Episode?>
 
     @Query("SELECT * FROM episodes ORDER BY published DESC LIMIT 30")
     fun getFeed(): Flow<List<Episode>>

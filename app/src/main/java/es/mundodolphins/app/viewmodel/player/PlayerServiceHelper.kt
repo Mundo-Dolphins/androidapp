@@ -49,6 +49,7 @@ class PlayerServiceHelper(private val intentBuilder: IntentBuilder) {
     }
 
     class IntentBuilder {
+        @androidx.annotation.VisibleForTesting(otherwise = androidx.annotation.VisibleForTesting.PRIVATE)
         fun buildIntent(context: Context, mp3Url: String, currentPosition: Long) =
             Intent(context, AudioPlayerService::class.java).apply {
                 putExtra("MP3_URL", mp3Url)

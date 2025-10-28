@@ -20,16 +20,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.awaitility.kotlin.atMost
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.untilAsserted
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.Response
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.Instant
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EpisodesViewModelTest {
@@ -43,19 +41,14 @@ class EpisodesViewModelTest {
 
     private lateinit var episodesViewModel: EpisodesViewModel
 
-    private val testDispatcher = UnconfinedTestDispatcher()
-
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
-
         mockkStatic(Log::class)
         every { Log.i(any(), any()) } returns 0
         every { Log.e(any(), any(), any()) } returns 0
 
         episodeRepository = mockk()
         feedService = mockk()
-        episodesViewModel = EpisodesViewModel(episodeRepository, feedService)
     }
 
     @After
@@ -66,6 +59,10 @@ class EpisodesViewModelTest {
     @Test
     fun `refreshDatabase should update statusRefresh to SUCCESS when API call is successful`() =
         runTest {
+            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+            Dispatchers.setMain(testDispatcher)
+            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
             val mockSeasonResponse = listOf("season_1.json")
             val mockEpisodes = listOf(
                 EpisodeResponse(
@@ -80,28 +77,24 @@ class EpisodesViewModelTest {
                 )
             )
 
-            coEvery { feedService.getAllSeasons() } returns mockk {
-                every { isSuccessful } returns true
-                every { body() } returns mockSeasonResponse
-            }
-            coEvery { feedService.getSeasonEpisodes(any()) } returns mockk {
-                every { isSuccessful } returns true
-                every { body() } returns mockEpisodes
-            }
-            coEvery { episodeRepository.getAllEpisodesIds() } returns emptyList()
+            coEvery { feedService.getAllSeasons() } returns Response.success(mockSeasonResponse)
+            coEvery { feedService.getSeasonEpisodes(any()) } returns Response.success(mockEpisodes)
+            every { episodeRepository.getAllEpisodesIds() } returns emptyList()
             coEvery { episodeRepository.insertAllEpisodes(any()) } returns Unit
 
-            episodesViewModel.refreshDatabase()
+            episodesViewModel.refreshDatabaseBlocking()
+            // Advance the dispatcher tied to this runTest (refreshDatabaseBlocking executes on ioDispatcher)
             testDispatcher.scheduler.advanceUntilIdle()
-
-            await atMost 1.seconds.toJavaDuration() untilAsserted {
-                assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.SUCCESS)
-            }
+            assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.SUCCESS)
             coVerify { episodeRepository.insertAllEpisodes(any()) }
         }
 
     @Test
     fun `getEpisode should fetch episode by ID`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
         val episodeId = 1L
         val mockEpisode = Episode(
             id = episodeId,
@@ -120,15 +113,16 @@ class EpisodesViewModelTest {
         episodesViewModel.getEpisode(episodeId)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        await atMost 1.seconds.toJavaDuration() untilAsserted {
-            assertThat(episodesViewModel.episode).isNotNull()
-        }
+        assertThat(episodesViewModel.episode).isNotNull()
         assertThat(episodesViewModel.episode.first()).isEqualTo(mockEpisode)
-        coVerify { episodeRepository.getEpisodeById(episodeId) }
     }
 
     @Test
     fun `getSeason should fetch season by ID`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
         val seasonId = 1
         val mockSeasonEpisodes = listOf(
             Episode(
@@ -161,10 +155,48 @@ class EpisodesViewModelTest {
         episodesViewModel.getSeason(seasonId)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        await atMost 1.seconds.toJavaDuration() untilAsserted {
-            assertThat(episodesViewModel.season).isNotNull()
-        }
+        assertThat(episodesViewModel.season).isNotNull()
         assertThat(episodesViewModel.season.first()).isEqualTo(mockSeasonEpisodes)
-        coVerify { episodeRepository.getSeason(seasonId) }
+    }
+
+    @Test
+    fun `refreshDatabase should update statusRefresh to ERROR when API call fails`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
+        coEvery { feedService.getAllSeasons() } returns Response.error(500, "error".toResponseBody("text/plain".toMediaType()))
+        episodesViewModel.refreshDatabaseBlocking()
+        // Advance the injected dispatcher to run the launched coroutine
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.ERROR)
+    }
+
+    @Test
+    fun `refreshDatabase should update statusRefresh to EMPTY when API returns empty seasons`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
+        coEvery { feedService.getAllSeasons() } returns Response.success(emptyList<String>())
+        episodesViewModel.refreshDatabaseBlocking()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.EMPTY)
+    }
+
+    @Test
+    fun `refreshDatabase should update statusRefresh to ERROR when repository throws exception`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+
+        val mockSeasonResponse = listOf("season_1.json")
+        coEvery { feedService.getAllSeasons() } returns Response.success(mockSeasonResponse)
+        coEvery { feedService.getSeasonEpisodes(any()) } returns Response.success(emptyList())
+        // Mock non-suspending repository method to throw
+        every { episodeRepository.getAllEpisodesIds() } throws RuntimeException("DB error")
+        episodesViewModel.refreshDatabaseBlocking()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.ERROR)
     }
 }

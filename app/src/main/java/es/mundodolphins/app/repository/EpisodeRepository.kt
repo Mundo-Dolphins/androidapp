@@ -8,7 +8,7 @@ import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.NOT_LISTENED
 import es.mundodolphins.app.data.episodes.EpisodeDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull // Added import
 
 class EpisodeRepository(private val episodeDao: EpisodeDao) {
 
@@ -16,7 +16,7 @@ class EpisodeRepository(private val episodeDao: EpisodeDao) {
 
     fun getAllEpisodesIds() = episodeDao.getAllEpisodesIds()
 
-    fun getEpisodeById(episodeId: Long): Flow<Episode> = episodeDao.getEpisodeById(episodeId)
+    fun getEpisodeById(episodeId: Long): Flow<Episode?> = episodeDao.getEpisodeById(episodeId)
 
     fun getFeed(): Flow<List<Episode>> = try {
         episodeDao.getFeed()
@@ -30,18 +30,19 @@ class EpisodeRepository(private val episodeDao: EpisodeDao) {
     fun getSeasons() = episodeDao.getSeasons()
 
     suspend fun updateEpisodePosition(episodeId: Long, position: Long, hasFinished: Boolean) {
-        episodeDao.getEpisodeById(episodeId).first {
-            episodeDao.insertEpisode(
-                it.copy(
-                    listenedProgress = position,
-                    listeningStatus = when {
-                        hasFinished -> LISTENED
-                        position == 0L -> NOT_LISTENED
-                        else -> LISTENING
-                    }
-                )
+        val episode = episodeDao.getEpisodeById(episodeId).firstOrNull() // Changed to firstOrNull()
+        episode?.let { currentEpisode ->
+            val updatedEpisode = currentEpisode.copy(
+                listenedProgress = position,
+                listeningStatus = when {
+                    hasFinished -> LISTENED
+                    // Consider original state if position is 0 and it was already NOT_LISTENED
+                    position == 0L && currentEpisode.listenedProgress == 0L && currentEpisode.listeningStatus == NOT_LISTENED -> NOT_LISTENED
+                    position == 0L -> NOT_LISTENED
+                    else -> LISTENING
+                }
             )
-            true
+            episodeDao.insertEpisode(updatedEpisode)
         }
     }
 }

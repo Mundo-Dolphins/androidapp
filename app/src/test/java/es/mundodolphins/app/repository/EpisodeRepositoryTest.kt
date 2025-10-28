@@ -54,13 +54,24 @@ class EpisodeRepositoryTest {
     fun `should return the episode by given ID`() {
         val episodeId = 1L
         val episode = getTestEpisodes(1).first()
-        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episode)
+        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episode as Episode?)
 
         runBlocking {
             val actual = episodeRepository.getEpisodeById(episodeId).first()
             assertThat(actual).isEqualTo(episode)
         }
 
+        verify(exactly = 1) { episodeDao.getEpisodeById(episodeId) }
+    }
+
+    @Test
+    fun `should return null when episode ID does not exist`() {
+        val episodeId = 999L
+        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(null as Episode?)
+        runBlocking {
+            val actual = episodeRepository.getEpisodeById(episodeId).first()
+            assertThat(actual).isNull()
+        }
         verify(exactly = 1) { episodeDao.getEpisodeById(episodeId) }
     }
 
@@ -78,22 +89,51 @@ class EpisodeRepositoryTest {
     }
 
     @Test
+    fun `should return empty feed when no episodes exist`() {
+        every { episodeDao.getFeed() } returns flowOf(emptyList())
+        runBlocking {
+            val actual = episodeRepository.getFeed().first()
+            assertThat(actual).isEmpty()
+        }
+        verify(exactly = 1) { episodeDao.getFeed() }
+    }
+
+    @Test
     fun `should update the episode position`() = runBlocking {
         val episodeId = 1L
-        val episode = getTestEpisodes(1).first()
-        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episode)
+        val episodeNonNull = getTestEpisodes(1).first() // Renamed for clarity
+
+        // Mock getEpisodeById to return Flow<Episode?> containing a non-null Episode
+        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episodeNonNull as Episode?) 
+
         coEvery { episodeDao.insertEpisode(any()) } just Runs
 
         episodeRepository.updateEpisodePosition(episodeId, 50L, hasFinished = false)
 
         coVerify(exactly = 1) {
             episodeDao.insertEpisode(
-                episode.copy(
+                episodeNonNull.copy( // Use episodeNonNull here
                     listenedProgress = 50L,
                     listeningStatus = LISTENING
                 )
             )
         }
+    }
+
+    @Test
+    fun `should handle DAO exception gracefully`() {
+        val episodeId = 1L
+        every { episodeDao.getEpisodeById(episodeId) } throws RuntimeException("DB error")
+        try {
+            runBlocking {
+                episodeRepository.getEpisodeById(episodeId).first()
+            }
+            assert(false) // Debe lanzar excepción
+        } catch (e: Exception) {
+            assertThat(e).isInstanceOf(RuntimeException::class.java)
+            assertThat(e.message).isEqualTo("DB error")
+        }
+        verify(exactly = 1) { episodeDao.getEpisodeById(episodeId) }
     }
 
     private fun getTestEpisodes(takeEpisodes: Int = 1) = listOf(
