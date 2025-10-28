@@ -9,20 +9,23 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityInstrumentedTest {
-
     @Test
     fun useAppContext() {
-        // Verifica que el contexto de la app sea correcto
+        // Verify that the app context is correct
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("es.mundodolphins.app", appContext.packageName)
     }
 
     @Test
     fun activityLaunchesSuccessfully() {
-        // Lanza la actividad y verifica que se inicia correctamente
+        // Launch the activity and verify it starts correctly
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use {
-            assertEquals(MainActivity::class.java.name, it.result.resultData.component?.className)
+            assertEquals(
+                MainActivity::class.java.name,
+                it.result.resultData.component
+                    ?.className,
+            )
         }
     }
 }
