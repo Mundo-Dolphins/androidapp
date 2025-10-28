@@ -13,12 +13,19 @@ import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.data.episodes.Episode
 import es.mundodolphins.app.models.EpisodeResponse
 import es.mundodolphins.app.repository.EpisodeRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.annotation.VisibleForTesting
 
-class EpisodesViewModel(private val episodeRepository: EpisodeRepository, private val feedService: FeedService) : ViewModel() {
+class EpisodesViewModel(
+    private val episodeRepository: EpisodeRepository,
+    private val feedService: FeedService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
     var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
         private set
 
@@ -28,67 +35,100 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository, privat
 
     var season: Flow<List<Episode>> by mutableStateOf(emptyFlow())
 
-    var episode: Flow<Episode> by mutableStateOf(emptyFlow())
+    var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
     fun refreshDatabase() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
+        viewModelScope.launch { // Keep launching on viewModelScope, delegate to suspend function
+            refreshDatabaseBlocking()
+        }
+    }
+
+    // Public suspend function to perform refresh; tests can call this inside runTest for deterministic behavior
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    suspend fun refreshDatabaseBlocking() {
+        // Execute network and DB operations on the provided ioDispatcher
+        try {
+            withContext(ioDispatcher) {
                 val response = feedService.getAllSeasons()
                 if (response.isSuccessful) {
-                    response.body()!!.apply {
-                        Log.i("Refreshing Database", "Found ${this.size} seasons")
-                        val episodes = episodeRepository.getAllEpisodesIds()
-                        map { it.convertJsonFilenameToSeason() }.forEach { season ->
-                            val seasonEpisodes = feedService.getSeasonEpisodes(season)
-                            if (seasonEpisodes.isSuccessful) {
-                                Log.i(
-                                    "Refreshing Database",
-                                    "Found ${seasonEpisodes.body()!!.size} episodes for season $season"
-                                )
-                                episodeRepository.insertAllEpisodes(
-                                    seasonEpisodes.body()!!
-                                        .filter { !episodes.contains(it.id) }
-                                        .map { it.toEpisode(season) }
-                                )
+                    val seasonsBody = response.body()
+                    if (seasonsBody == null || seasonsBody.isEmpty()) {
+                        Log.i("Refreshing Database", "No seasons found or body is null")
+                        withContext(Dispatchers.Main) { statusRefresh = LoadStatus.EMPTY }
+                    } else {
+                        seasonsBody.apply {
+                            Log.i("Refreshing Database", "Found ${this.size} seasons")
+                            val episodes = episodeRepository.getAllEpisodesIds()
+                            map { it.convertJsonFilenameToSeason() }.forEach { season ->
+                                val seasonEpisodes = feedService.getSeasonEpisodes(season)
+                                if (seasonEpisodes.isSuccessful) {
+                                    Log.i(
+                                        "Refreshing Database",
+                                        "Found ${seasonEpisodes.body()!!.size} episodes for season $season"
+                                    )
+                                    episodeRepository.insertAllEpisodes(
+                                        seasonEpisodes.body()!!
+                                            .filter { !episodes.contains(it.id) }
+                                            .map { it.toEpisode(season) }
+                                    )
+                                }
                             }
                         }
+                        withContext(Dispatchers.Main) { statusRefresh = LoadStatus.SUCCESS }
                     }
-                    statusRefresh = LoadStatus.SUCCESS
                 } else {
-                    Log.e(
-                        "Refreshing Database",
-                        "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
-                            response.raw().request.url
-                        }"
-                    )
-                    Firebase.crashlytics.log(
-                        "Refreshing Database: " +
-                                "Status: ${response.code()}, " +
-                                "Body: ${response.errorBody()}, " +
-                                "Message: ${response.message()}, " +
-                                "URL: ${response.raw().request.url}"
-                    )
-                    statusRefresh = LoadStatus.ERROR
+                    // Mark as ERROR first so crash reporting failures don't prevent the state update
+                    withContext(Dispatchers.Main) { statusRefresh = LoadStatus.ERROR }
+                    try {
+                        Log.e(
+                            "Refreshing Database",
+                            "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
+                                response.raw().request.url
+                            }"
+                        )
+                    } catch (_: Exception) {
+                        // Ignore logging errors
+                    }
+                    try {
+                        Firebase.crashlytics.log(
+                            "Refreshing Database: " +
+                                    "Status: ${response.code()}, " +
+                                    "Body: ${response.errorBody()}, " +
+                                    "Message: ${response.message()}, " +
+                                    "URL: ${response.raw().request.url}"
+                        )
+                    } catch (_: Exception) {
+                        // Ignore crashlytics errors in test environment
+                    }
                 }
-            } catch (e: Exception) {
+            }
+        } catch (e: Exception) {
+            // Ensure status is set to ERROR even if crashlytics logging fails
+            withContext(Dispatchers.Main) { statusRefresh = LoadStatus.ERROR }
+            try {
                 Log.e("Loading Feed", e.message.toString(), e)
+            } catch (_: Exception) {
+                // ignore
+            }
+            try {
                 Firebase.crashlytics.recordException(
                     e,
                     CustomKeysAndValues.Builder().putString("process", "feed").build()
                 )
-                statusRefresh = LoadStatus.ERROR
+            } catch (_: Exception) {
+                // ignore crashlytics errors in test environment
             }
         }
     }
 
     fun getEpisode(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) { // Use injected dispatcher
             episode = episodeRepository.getEpisodeById(id)
         }
     }
 
     fun getSeason(seasonId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) { // Use injected dispatcher
             season = episodeRepository.getSeason(seasonId)
         }
     }
@@ -118,6 +158,6 @@ class EpisodesViewModel(private val episodeRepository: EpisodeRepository, privat
     }
 
     enum class LoadStatus {
-        LOADING, SUCCESS, ERROR
+        LOADING, SUCCESS, ERROR, EMPTY
     }
 }

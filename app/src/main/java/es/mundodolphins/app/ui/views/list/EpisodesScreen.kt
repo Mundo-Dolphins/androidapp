@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
+import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.EMPTY
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.ERROR
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.LOADING
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.SUCCESS
@@ -40,5 +41,13 @@ fun EpisodesScreen(
         }
 
         ERROR -> Text("Error")
+        EMPTY -> {
+            Box(
+                contentAlignment = Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text("No episodes found")
+            }
+        }
     }
 }

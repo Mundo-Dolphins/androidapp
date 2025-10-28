@@ -34,7 +34,7 @@ class PlayerViewModel(
     fun initializePlayer(context: Context, episodeId: Long, mp3Url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             audioID = episodeId
-            currentPosition = episodeRepository.getEpisodeById(audioID).first().listenedProgress
+            currentPosition = episodeRepository.getEpisodeById(audioID).first()?.listenedProgress ?: 0L
 
             playerServiceHelper.bindAndStartService(context, mp3Url, currentPosition) { exoPlayer, audioPlayerService ->
                 _playerState.value = exoPlayer
