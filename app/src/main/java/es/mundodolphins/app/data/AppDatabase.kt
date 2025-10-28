@@ -17,17 +17,18 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "mundodolphins_database"
-                ).addTypeConverter(InstantConverter())
-                    .build()
+        fun getDatabase(context: Context): AppDatabase =
+            INSTANCE ?: synchronized(this) {
+                val instance =
+                    Room
+                        .databaseBuilder(
+                            context.applicationContext,
+                            AppDatabase::class.java,
+                            "mundodolphins_database",
+                        ).addTypeConverter(InstantConverter())
+                        .build()
                 INSTANCE = instance
                 instance
             }
-        }
     }
 }

@@ -32,31 +32,39 @@ class AudioPlayerService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        exoPlayer = ExoPlayer.Builder(this)
-            .setMediaSourceFactory(
-                DefaultMediaSourceFactory(
-                    DefaultHttpDataSource.Factory()
-                        .setUserAgent(USER_AGENT)
-                        .setAllowCrossProtocolRedirects(true)
-                )
-            )
-            .build()
+        exoPlayer =
+            ExoPlayer
+                .Builder(this)
+                .setMediaSourceFactory(
+                    DefaultMediaSourceFactory(
+                        DefaultHttpDataSource
+                            .Factory()
+                            .setUserAgent(USER_AGENT)
+                            .setAllowCrossProtocolRedirects(true),
+                    ),
+                ).build()
 
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                playerState.postValue(isPlaying)
-            }
-
-            override fun onPlaybackStateChanged(state: Int) {
-                playerStatus.postValue(state)
-                if (state == Player.STATE_READY) {
-                    playerDuration.postValue(exoPlayer.duration)
+        exoPlayer.addListener(
+            object : Player.Listener {
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    playerState.postValue(isPlaying)
                 }
-            }
-        })
+
+                override fun onPlaybackStateChanged(state: Int) {
+                    playerStatus.postValue(state)
+                    if (state == Player.STATE_READY) {
+                        playerDuration.postValue(exoPlayer.duration)
+                    }
+                }
+            },
+        )
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val mp3Url = intent?.getStringExtra("MP3_URL")
         // If no intent or URL provided, keep service sticky but don't try to play
         if (mp3Url == null) return START_STICKY
@@ -67,11 +75,13 @@ class AudioPlayerService : Service() {
         exoPlayer.playWhenReady = true
         exoPlayer.seekTo(currentPosition)
 
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onPlayerError(error: PlaybackException) {
-                handleError(error)
-            }
-        })
+        exoPlayer.addListener(
+            object : Player.Listener {
+                override fun onPlayerError(error: PlaybackException) {
+                    handleError(error)
+                }
+            },
+        )
 
         val notification = createNotification()
         startForeground(1, notification)
@@ -100,7 +110,8 @@ class AudioPlayerService : Service() {
             NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
         notificationManager.createNotificationChannel(channel)
 
-        return NotificationCompat.Builder(this, channelId)
+        return NotificationCompat
+            .Builder(this, channelId)
             .setContentTitle("Mundo Dolphins")
             .setContentText("Episodio reproduciendo")
             .setSmallIcon(R.drawable.ic_play)

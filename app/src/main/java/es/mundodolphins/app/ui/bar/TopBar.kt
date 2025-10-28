@@ -24,28 +24,30 @@ import es.mundodolphins.app.R
 @Composable
 fun AppBar() {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.secondary,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.secondary,
+            ),
         title = {
             Row {
                 Image(
                     painter = painterResource(id = R.drawable.mundo_dolphins_small),
                     contentDescription = stringResource(id = R.string.logo_description),
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth(0.1f)
+                    modifier = Modifier.fillMaxWidth(0.1f),
                 )
                 Text(
                     text = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(start = 5.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(0.9f)
+                            .padding(start = 5.dp),
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
-        }
+        },
     )
 }

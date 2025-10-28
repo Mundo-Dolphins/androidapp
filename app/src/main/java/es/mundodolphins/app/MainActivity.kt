@@ -61,54 +61,59 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MundoDolphinsScreen() {
     val navController = rememberNavController()
-    val viewModel: EpisodesViewModel = viewModel(
-        factory = EpisodesViewModelFactory(
-            EpisodeRepository(
-                AppDatabase.getDatabase(context = LocalContext.current.applicationContext)
-                    .episodeDao()
-            ),
-            MundoDolphinsClient.feedService
+    val viewModel: EpisodesViewModel =
+        viewModel(
+            factory =
+                EpisodesViewModelFactory(
+                    EpisodeRepository(
+                        AppDatabase
+                            .getDatabase(context = LocalContext.current.applicationContext)
+                            .episodeDao(),
+                    ),
+                    MundoDolphinsClient.feedService,
+                ),
         )
-    )
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
     val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-    remoteConfig.setConfigSettingsAsync(remoteConfigSettings {
-        minimumFetchIntervalInSeconds = 3600
-    })
+    remoteConfig.setConfigSettingsAsync(
+        remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+        },
+    )
     remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { AppBar() },
-        bottomBar = { AppBottomBar(navController) }
+        bottomBar = { AppBottomBar(navController) },
     ) { innerPadding ->
-        viewModel.refreshDatabase(
-        )
+        viewModel.refreshDatabase()
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             if (!isConnected) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(color = Color.Red)
-                        .padding(top = 60.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .background(color = Color.Red)
+                            .padding(top = 60.dp),
                 ) {
                     Text(
                         text = "No internet connection",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Yellow
+                        color = Color.Yellow,
                     )
                 }
             }
             MainScreen(
                 episodesViewModel = viewModel,
                 modifier = Modifier.padding(innerPadding),
-                navController = navController
+                navController = navController,
             )
         }
     }

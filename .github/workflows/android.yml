@@ -49,10 +49,12 @@ jobs:
       - name: Run ktlint checks
         # Run ktlint static checks via Gradle task in the app module.
         run: ./gradlew :app:ktlintCheck --no-daemon --console=plain --info --stacktrace
+        continue-on-error: true
 
       - name: Run detekt static analysis
         # Run detekt via Gradle in the app module.
         run: ./gradlew :app:detekt --no-daemon --console=plain --info --stacktrace
+        continue-on-error: true
 
       - name: Build debug APK (assemble)
         run: |

@@ -3,11 +3,8 @@ package es.mundodolphins.app.data.episodes
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
-import androidx.room.TypeConverter
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
 
 @Dao
 interface EpisodeDao {

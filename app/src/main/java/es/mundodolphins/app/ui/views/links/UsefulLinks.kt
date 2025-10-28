@@ -1,6 +1,5 @@
 package es.mundodolphins.app.ui.views.links
 
-
 import android.content.Context
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
@@ -26,49 +25,54 @@ import androidx.core.net.toUri
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 
-val links = listOf(
-    "https://www.mundodolphins.es" to "Mundo Dolphins",
-    "https://www.instagram.com/dolfan_club_spain/" to "Dolfan Club España"
-)
+val links =
+    listOf(
+        "https://www.mundodolphins.es" to "Mundo Dolphins",
+        "https://www.instagram.com/dolfan_club_spain/" to "Dolfan Club España",
+    )
 
 @Composable
 fun UsefulLinksScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
     ) {
-
         links.forEach { (url, label) ->
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .shadow(1.dp)
-            ) {
-                Row(
-                    modifier = Modifier
+                modifier =
+                    Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
-                        .clickable { openTab(url, context) }
+                        .shadow(1.dp),
+            ) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .clickable { openTab(url, context) },
                 ) {
                     Icon(
                         painterResource(R.drawable.link),
                         contentDescription = label,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .align(Alignment.CenterVertically)
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically),
                     )
                     Spacer(modifier = Modifier.padding(8.dp))
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
+                        modifier =
+                            Modifier
+                                .padding(vertical = 8.dp),
                     )
                 }
             }
@@ -76,17 +80,21 @@ fun UsefulLinksScreen(modifier: Modifier = Modifier) {
     }
 }
 
-
-fun openTab(url: String, context: Context) {
-    val builder = CustomTabsIntent.Builder().apply {
-        setShowTitle(true)
-        setInstantAppsEnabled(true)
-    }.build()
+fun openTab(
+    url: String,
+    context: Context,
+) {
+    val builder =
+        CustomTabsIntent
+            .Builder()
+            .apply {
+                setShowTitle(true)
+                setInstantAppsEnabled(true)
+            }.build()
 
     builder.intent.setPackage("com.android.chrome")
     builder.launchUrl(context, url.toUri())
 }
-
 
 @Composable
 @Preview(showBackground = true)

@@ -10,18 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import es.mundodolphins.app.data.episodes.Episode
 
-
 @Composable
 fun ListEpisodesView(
     episodes: List<Episode>,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.background(color = colorScheme.background)
+        modifier = modifier.background(color = colorScheme.background),
     ) {
         items(episodes) {
             EpisodeRow(it, navController)

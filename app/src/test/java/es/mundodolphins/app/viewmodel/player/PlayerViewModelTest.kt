@@ -23,7 +23,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerViewModelTest {
-
     private lateinit var episodeRepository: EpisodeRepository
     private lateinit var playerServiceHelper: PlayerServiceHelper
     private lateinit var playerViewModel: PlayerViewModel
@@ -43,37 +42,39 @@ class PlayerViewModelTest {
     }
 
     @Test
-    fun `should bind and start service and update player state`() = runTest {
-        val context = mockk<Context>(relaxed = true)
-        val episodeId = 1L
-        val mp3Url = "https://example.com/audio.mp3"
-        val listenedProgress = 5000L
-        val episode = mockk<Episode>()
+    fun `should bind and start service and update player state`() =
+        runTest {
+            val context = mockk<Context>(relaxed = true)
+            val episodeId = 1L
+            val mp3Url = "https://example.com/audio.mp3"
+            val listenedProgress = 5000L
+            val episode = mockk<Episode>()
 
-        every { episode.listenedProgress } returns listenedProgress
-        coEvery { episodeRepository.getEpisodeById(episodeId) } returns flowOf(episode)
-        every {
-            playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any())
-        } just Runs
+            every { episode.listenedProgress } returns listenedProgress
+            coEvery { episodeRepository.getEpisodeById(episodeId) } returns flowOf(episode)
+            every {
+                playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any())
+            } just Runs
 
-        playerViewModel.initializePlayer(context, episodeId, mp3Url)
-        testDispatcher.scheduler.advanceUntilIdle()
+            playerViewModel.initializePlayer(context, episodeId, mp3Url)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { episodeRepository.getEpisodeById(episodeId) }
-        verify { playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any()) }
-    }
+            coVerify { episodeRepository.getEpisodeById(episodeId) }
+            verify { playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any()) }
+        }
 
     @Test
-    fun `should unbind service and save position`() = runTest {
-        val context = mockk<Context>()
+    fun `should unbind service and save position`() =
+        runTest {
+            val context = mockk<Context>()
 
-        coEvery { episodeRepository.updateEpisodePosition(any(), any(), any()) } just Runs
-        every { playerServiceHelper.unbindAndStopService(context) } just Runs
+            coEvery { episodeRepository.updateEpisodePosition(any(), any(), any()) } just Runs
+            every { playerServiceHelper.unbindAndStopService(context) } just Runs
 
-        playerViewModel.releasePlayer(context)
-        testDispatcher.scheduler.advanceUntilIdle()
+            playerViewModel.releasePlayer(context)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        verify { playerServiceHelper.unbindAndStopService(context) }
-        coVerify { episodeRepository.updateEpisodePosition(any(), any(), false) }
-    }
+            verify { playerServiceHelper.unbindAndStopService(context) }
+            coVerify { episodeRepository.updateEpisodePosition(any(), any(), false) }
+        }
 }

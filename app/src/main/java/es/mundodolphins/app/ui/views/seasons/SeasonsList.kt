@@ -30,12 +30,12 @@ import es.mundodolphins.app.viewmodel.EpisodesViewModel
 fun SeasonsListScreen(
     modifier: Modifier = Modifier,
     model: EpisodesViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
 ) {
     SeasonsList(
         seasons = model.seasons.collectAsState(initial = emptyList()).value,
         modifier = modifier,
-        navController = navController
+        navController = navController,
     )
 }
 
@@ -43,16 +43,17 @@ fun SeasonsListScreen(
 fun SeasonsList(
     seasons: List<Int>,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(color = colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(seasons) {
             SeasonRow(it, navController)
@@ -61,21 +62,25 @@ fun SeasonsList(
 }
 
 @Composable
-fun SeasonRow(seasonId: Int, navController: NavController) {
+fun SeasonRow(
+    seasonId: Int,
+    navController: NavController,
+) {
     if (seasonId > 0) {
         Button(
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .padding(6.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.7f)
+                    .padding(6.dp),
             onClick = {
                 navController.navigate(Routes.SeasonView.route + "/$seasonId")
-            }
+            },
         ) {
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = stringResource(R.string.season, seasonId),
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
             )
         }
     }
@@ -87,7 +92,7 @@ fun SeasonsListPreview() {
     MundoDolphinsTheme {
         SeasonsList(
             listOf(8, 7, 6, 5, 4, 3, 2, 1),
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
         )
     }
 }

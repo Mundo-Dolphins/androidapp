@@ -31,15 +31,16 @@ class EpisodeRepositoryTest {
     }
 
     @Test
-    fun `should save all episodes`() = runBlocking {
-        val episodes = getTestEpisodes(2)
+    fun `should save all episodes`() =
+        runBlocking {
+            val episodes = getTestEpisodes(2)
 
-        coEvery { episodeDao.insertAllEpisodes(episodes) } just Runs
+            coEvery { episodeDao.insertAllEpisodes(episodes) } just Runs
 
-        episodeRepository.insertAllEpisodes(episodes)
+            episodeRepository.insertAllEpisodes(episodes)
 
-        coVerify(exactly = 1) { episodeDao.insertAllEpisodes(episodes) }
-    }
+            coVerify(exactly = 1) { episodeDao.insertAllEpisodes(episodes) }
+        }
 
     @Test
     fun `should get all episode IDs`() {
@@ -99,26 +100,27 @@ class EpisodeRepositoryTest {
     }
 
     @Test
-    fun `should update the episode position`() = runBlocking {
-        val episodeId = 1L
-        val episodeNonNull = getTestEpisodes(1).first() // Renamed for clarity
+    fun `should update the episode position`() =
+        runBlocking {
+            val episodeId = 1L
+            val episodeNonNull = getTestEpisodes(1).first() // Renamed for clarity
 
-        // Mock getEpisodeById to return Flow<Episode?> containing a non-null Episode
-        every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episodeNonNull as Episode?) 
+            // Mock getEpisodeById to return Flow<Episode?> containing a non-null Episode
+            every { episodeDao.getEpisodeById(episodeId) } returns flowOf(episodeNonNull as Episode?)
 
-        coEvery { episodeDao.insertEpisode(any()) } just Runs
+            coEvery { episodeDao.insertEpisode(any()) } just Runs
 
-        episodeRepository.updateEpisodePosition(episodeId, 50L, hasFinished = false)
+            episodeRepository.updateEpisodePosition(episodeId, 50L, hasFinished = false)
 
-        coVerify(exactly = 1) {
-            episodeDao.insertEpisode(
-                episodeNonNull.copy( // Use episodeNonNull here
-                    listenedProgress = 50L,
-                    listeningStatus = LISTENING
+            coVerify(exactly = 1) {
+                episodeDao.insertEpisode(
+                    episodeNonNull.copy( // Use episodeNonNull here
+                        listenedProgress = 50L,
+                        listeningStatus = LISTENING,
+                    ),
                 )
-            )
+            }
         }
-    }
 
     @Test
     fun `should handle DAO exception gracefully`() {
@@ -136,34 +138,35 @@ class EpisodeRepositoryTest {
         verify(exactly = 1) { episodeDao.getEpisodeById(episodeId) }
     }
 
-    private fun getTestEpisodes(takeEpisodes: Int = 1) = listOf(
-        Episode(
-            id = 1,
-            title = "Test Episode",
-            description = "This is a test episode",
-            audio = "http://example.com/episode.mp3",
-            listenedProgress = 0,
-            published = Instant.parse("2025-02-20T15:44:39Z"),
-            imgMain = "https://wwww.image.com/1.jpg",
-            imgMini = "TODO()",
-            len = "01:29:55",
-            link = "https://www.episode.com/1",
-            season = 1,
-            listeningStatus = NOT_LISTENED,
-        ),
-        Episode(
-            id = 2,
-            title = "Test Episode",
-            description = "This is a test episode",
-            audio = "http://example.com/episode.mp3",
-            listenedProgress = 0,
-            published = Instant.parse("2025-02-20T15:44:39Z"),
-            imgMain = "https://wwww.image.com/2.jpg",
-            imgMini = "TODO()",
-            len = "01:29:55",
-            link = "https://www.episode.com/2",
-            season = 1,
-            listeningStatus = LISTENING,
-        )
-    ).take(takeEpisodes)
+    private fun getTestEpisodes(takeEpisodes: Int = 1) =
+        listOf(
+            Episode(
+                id = 1,
+                title = "Test Episode",
+                description = "This is a test episode",
+                audio = "http://example.com/episode.mp3",
+                listenedProgress = 0,
+                published = Instant.parse("2025-02-20T15:44:39Z"),
+                imgMain = "https://wwww.image.com/1.jpg",
+                imgMini = "TODO()",
+                len = "01:29:55",
+                link = "https://www.episode.com/1",
+                season = 1,
+                listeningStatus = NOT_LISTENED,
+            ),
+            Episode(
+                id = 2,
+                title = "Test Episode",
+                description = "This is a test episode",
+                audio = "http://example.com/episode.mp3",
+                listenedProgress = 0,
+                published = Instant.parse("2025-02-20T15:44:39Z"),
+                imgMain = "https://wwww.image.com/2.jpg",
+                imgMini = "TODO()",
+                len = "01:29:55",
+                link = "https://www.episode.com/2",
+                season = 1,
+                listeningStatus = LISTENING,
+            ),
+        ).take(takeEpisodes)
 }

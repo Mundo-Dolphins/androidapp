@@ -52,14 +52,15 @@ import kotlinx.coroutines.delay
 fun AudioPlayerView(
     episodeId: Long,
     mp3Url: String,
-    playerViewModel: PlayerViewModel = viewModel()
+    playerViewModel: PlayerViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val player by playerViewModel.playerState.collectAsState()
 
     LaunchedEffect(mp3Url) {
-        if (mp3Url.isNotEmpty())
+        if (mp3Url.isNotEmpty()) {
             playerViewModel.initializePlayer(context, episodeId, mp3Url)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -75,7 +76,10 @@ fun AudioPlayerView(
 }
 
 @Composable
-private fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel) {
+private fun PlayerControls(
+    player: ExoPlayer?,
+    playerViewModel: PlayerViewModel,
+) {
     val isPlaying = remember { mutableStateOf(false) }
     val currentPosition = remember { mutableLongStateOf(0) }
     val sliderPosition = remember { mutableLongStateOf(0) }
@@ -101,15 +105,15 @@ private fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel)
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
             ) {
-
                 TrackSlider(
                     value = sliderPosition.longValue.toFloat(),
                     onValueChange = {
@@ -119,34 +123,36 @@ private fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel)
                         currentPosition.longValue = sliderPosition.longValue
                         player?.seekTo(sliderPosition.longValue)
                     },
-                    songDuration = totalDuration.longValue.toFloat()
+                    songDuration = totalDuration.longValue.toFloat(),
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         text = (currentPosition.longValue).convertToText(),
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(8.dp),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(8.dp),
                         color = Color.Black,
-                        style = TextStyle(fontWeight = FontWeight.Bold)
+                        style = TextStyle(fontWeight = FontWeight.Bold),
                     )
 
                     val remainTime = totalDuration.longValue - currentPosition.longValue
                     Text(
                         text = if (remainTime >= 0) remainTime.convertToText() else "",
-                        modifier = Modifier
-                            .padding(8.dp),
+                        modifier =
+                            Modifier
+                                .padding(8.dp),
                         color = Color.Black,
-                        style = TextStyle(fontWeight = FontWeight.Bold)
+                        style = TextStyle(fontWeight = FontWeight.Bold),
                     )
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 ControlButton(
                     isPlaying = isPlaying.value,
@@ -154,7 +160,7 @@ private fun PlayerControls(player: ExoPlayer?, playerViewModel: PlayerViewModel)
                     onClick = {
                         if (isPlaying.value) player?.pause() else player?.play()
                         isPlaying.value = player?.isPlaying == true
-                    }
+                    },
                 )
                 Spacer(modifier = Modifier.width(20.dp))
             }
@@ -171,27 +177,29 @@ fun TrackSlider(
     value: Float,
     onValueChange: (newValue: Float) -> Unit,
     onValueChangeFinished: () -> Unit,
-    songDuration: Float
+    songDuration: Float,
 ) {
     Slider(
         value = value,
         onValueChange = { onValueChange(it) },
         onValueChangeFinished = { onValueChangeFinished() },
         valueRange = 0f..songDuration,
-        colors = SliderDefaults.colors(
-            thumbColor = MaterialTheme.colorScheme.primary,
-            activeTrackColor = MaterialTheme.colorScheme.primary,
-            inactiveTrackColor = Color.LightGray,
-        ),
+        colors =
+            SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = Color.LightGray,
+            ),
         thumb = {
             SliderDefaults.Thumb(
                 interactionSource = remember { MutableInteractionSource() },
                 thumbSize = DpSize(20.dp, 20.dp),
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                modifier =
+                    Modifier
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
             )
-        }
+        },
     )
 }
 
@@ -199,20 +207,25 @@ fun TrackSlider(
  * Player control button
  */
 @Composable
-fun ControlButton(isPlaying: Boolean, size: Dp, onClick: () -> Unit) {
+fun ControlButton(
+    isPlaying: Boolean,
+    size: Dp,
+    onClick: () -> Unit,
+) {
     Box(
-        modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .background(MaterialTheme.colorScheme.secondary),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(size)
+                .clip(CircleShape)
+                .clickable { onClick() }
+                .background(MaterialTheme.colorScheme.secondary),
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause_icon else R.drawable.play_arrow),
             modifier = Modifier.size(size / 1.5f),
             tint = Color.White,
-            contentDescription = null
+            contentDescription = null,
         )
     }
 }
@@ -225,16 +238,18 @@ private fun Long.convertToText(): String {
     val minutes = sec / 60
     val seconds = sec % 60
 
-    val minutesString = if (minutes < 10) {
-        "0$minutes"
-    } else {
-        minutes.toString()
-    }
-    val secondsString = if (seconds < 10) {
-        "0$seconds"
-    } else {
-        seconds.toString()
-    }
+    val minutesString =
+        if (minutes < 10) {
+            "0$minutes"
+        } else {
+            minutes.toString()
+        }
+    val secondsString =
+        if (seconds < 10) {
+            "0$seconds"
+        } else {
+            seconds.toString()
+        }
     return "$minutesString:$secondsString"
 }
 
@@ -244,7 +259,7 @@ fun AudioPlayerViewPreview() {
     MundoDolphinsTheme {
         AudioPlayerView(
             1234567,
-            "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3"
+            "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3",
         )
     }
 }

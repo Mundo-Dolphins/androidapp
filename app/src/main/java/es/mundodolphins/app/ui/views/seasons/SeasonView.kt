@@ -13,12 +13,12 @@ fun SeasonsView(
     seasonId: Int,
     navController: NavController,
     modifier: Modifier = Modifier,
-    model: EpisodesViewModel = viewModel()
+    model: EpisodesViewModel = viewModel(),
 ) {
     model.getSeason(seasonId)
     ListEpisodesView(
         episodes = model.season.collectAsState(emptyList()).value,
         modifier = modifier,
-        navController = navController
+        navController = navController,
     )
 }
