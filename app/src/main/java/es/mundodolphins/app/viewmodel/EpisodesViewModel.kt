@@ -1,6 +1,7 @@
 package es.mundodolphins.app.viewmodel
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,12 +20,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.annotation.VisibleForTesting
 
 class EpisodesViewModel(
     private val episodeRepository: EpisodeRepository,
     private val feedService: FeedService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
     var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
         private set
@@ -38,7 +38,8 @@ class EpisodesViewModel(
     var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
     fun refreshDatabase() {
-        viewModelScope.launch { // Keep launching on viewModelScope, delegate to suspend function
+        viewModelScope.launch {
+            // Keep launching on viewModelScope, delegate to suspend function
             refreshDatabaseBlocking()
         }
     }
@@ -64,12 +65,13 @@ class EpisodesViewModel(
                                 if (seasonEpisodes.isSuccessful) {
                                     Log.i(
                                         "Refreshing Database",
-                                        "Found ${seasonEpisodes.body()!!.size} episodes for season $season"
+                                        "Found ${seasonEpisodes.body()!!.size} episodes for season $season",
                                     )
                                     episodeRepository.insertAllEpisodes(
-                                        seasonEpisodes.body()!!
+                                        seasonEpisodes
+                                            .body()!!
                                             .filter { !episodes.contains(it.id) }
-                                            .map { it.toEpisode(season) }
+                                            .map { it.toEpisode(season) },
                                     )
                                 }
                             }
@@ -84,7 +86,7 @@ class EpisodesViewModel(
                             "Refreshing Database",
                             "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
                                 response.raw().request.url
-                            }"
+                            }",
                         )
                     } catch (_: Exception) {
                         // Ignore logging errors
@@ -92,10 +94,10 @@ class EpisodesViewModel(
                     try {
                         Firebase.crashlytics.log(
                             "Refreshing Database: " +
-                                    "Status: ${response.code()}, " +
-                                    "Body: ${response.errorBody()}, " +
-                                    "Message: ${response.message()}, " +
-                                    "URL: ${response.raw().request.url}"
+                                "Status: ${response.code()}, " +
+                                "Body: ${response.errorBody()}, " +
+                                "Message: ${response.message()}, " +
+                                "URL: ${response.raw().request.url}",
                         )
                     } catch (_: Exception) {
                         // Ignore crashlytics errors in test environment
@@ -113,7 +115,7 @@ class EpisodesViewModel(
             try {
                 Firebase.crashlytics.recordException(
                     e,
-                    CustomKeysAndValues.Builder().putString("process", "feed").build()
+                    CustomKeysAndValues.Builder().putString("process", "feed").build(),
                 )
             } catch (_: Exception) {
                 // ignore crashlytics errors in test environment
@@ -122,29 +124,32 @@ class EpisodesViewModel(
     }
 
     fun getEpisode(id: Long) {
-        viewModelScope.launch(ioDispatcher) { // Use injected dispatcher
+        viewModelScope.launch(ioDispatcher) {
+            // Use injected dispatcher
             episode = episodeRepository.getEpisodeById(id)
         }
     }
 
     fun getSeason(seasonId: Int) {
-        viewModelScope.launch(ioDispatcher) { // Use injected dispatcher
+        viewModelScope.launch(ioDispatcher) {
+            // Use injected dispatcher
             season = episodeRepository.getSeason(seasonId)
         }
     }
 
-    private fun EpisodeResponse.toEpisode(seasonId: Int) = Episode(
-        id = id,
-        title = title,
-        description = description,
-        audio = audio,
-        published = pubDateTime,
-        imgMain = imgMain,
-        imgMini = imgMini,
-        len = len,
-        link = link,
-        season = seasonId
-    )
+    private fun EpisodeResponse.toEpisode(seasonId: Int) =
+        Episode(
+            id = id,
+            title = title,
+            description = description,
+            audio = audio,
+            published = pubDateTime,
+            imgMain = imgMain,
+            imgMini = imgMini,
+            len = len,
+            link = link,
+            season = seasonId,
+        )
 
     private fun String.convertJsonFilenameToSeason(): Int {
         val matchResult = Regex("""season_(\d+)\.json""").find(this)
@@ -158,6 +163,9 @@ class EpisodesViewModel(
     }
 
     enum class LoadStatus {
-        LOADING, SUCCESS, ERROR, EMPTY
+        LOADING,
+        SUCCESS,
+        ERROR,
+        EMPTY,
     }
 }

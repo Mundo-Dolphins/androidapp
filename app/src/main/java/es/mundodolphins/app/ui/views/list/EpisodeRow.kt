@@ -45,30 +45,38 @@ import es.mundodolphins.app.ui.theme.lightYellow
 import java.time.Instant
 
 @Composable
-fun EpisodeRow(episode: Episode, navController: NavController) {
+fun EpisodeRow(
+    episode: Episode,
+    navController: NavController,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(6.dp)
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.Center)
-            .clip(shape = RoundedCornerShape(20.dp))
-            .shadow(elevation = 2.dp, clip = true)
+        modifier =
+            Modifier
+                .padding(6.dp)
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center)
+                .clip(shape = RoundedCornerShape(20.dp))
+                .shadow(elevation = 2.dp, clip = true),
     ) {
         EpisodeHeader(episode)
         Text(
-            text = Html.fromHtml(
-                episode.description.let {
-                    if (it.length > 100)
-                        truncateSentence(it) + "..."
-                    else it
-                },
-                Html.FROM_HTML_MODE_LEGACY
-            ).toString(),
+            text =
+                Html
+                    .fromHtml(
+                        episode.description.let {
+                            if (it.length > 100) {
+                                truncateSentence(it) + "..."
+                            } else {
+                                it
+                            }
+                        },
+                        Html.FROM_HTML_MODE_LEGACY,
+                    ).toString(),
             fontSize = 18.sp,
             color = Color.DarkGray,
             textAlign = TextAlign.Justify,
-            modifier = Modifier.padding(6.dp)
+            modifier = Modifier.padding(6.dp),
         )
         EpisodeBottom(episode, navController)
     }
@@ -77,9 +85,10 @@ fun EpisodeRow(episode: Episode, navController: NavController) {
 @Composable
 private fun EpisodeHeader(episode: Episode) {
     Column(
-        modifier = Modifier
-            .background(colorScheme.secondaryContainer)
-            .fillMaxWidth()
+        modifier =
+            Modifier
+                .background(colorScheme.secondaryContainer)
+                .fillMaxWidth(),
     ) {
         Text(
             text = episode.title,
@@ -87,16 +96,17 @@ private fun EpisodeHeader(episode: Episode) {
             fontWeight = Bold,
             modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
             color = Color.White,
-            textAlign = TextAlign.Left
+            textAlign = TextAlign.Left,
         )
         Text(
             text = episode.publishedOn,
             fontSize = 14.sp,
             color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(10.dp),
-            textAlign = TextAlign.Left
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(10.dp),
+            textAlign = TextAlign.Left,
         )
     }
 }
@@ -104,18 +114,20 @@ private fun EpisodeHeader(episode: Episode) {
 @Composable
 private fun ColumnScope.EpisodeBottom(
     episode: Episode,
-    navController: NavController
+    navController: NavController,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.CenterHorizontally)
-            .padding(10.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(10.dp),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(10.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(10.dp),
         ) {
             if (episode.listeningStatus == LISTENED) {
                 ListenedBadge()
@@ -134,7 +146,7 @@ private fun ColumnScope.EpisodeBottom(
                 color = Color.White,
                 textAlign = TextAlign.Center,
                 fontWeight = Bold,
-                fontSize = 16.sp
+                fontSize = 16.sp,
             )
         }
     }
@@ -143,23 +155,25 @@ private fun ColumnScope.EpisodeBottom(
 @Composable
 private fun ListeningBadge() {
     Row(
-        modifier = Modifier
-            .background(lightYellow)
-            .padding(4.dp)
+        modifier =
+            Modifier
+                .background(lightYellow)
+                .padding(4.dp),
     ) {
         Icon(
             painter = painterResource(R.drawable.pause_icon),
             contentDescription = stringResource(R.string.listening),
             tint = darkYellow,
-            modifier = Modifier
-                .size(20.dp)
-                .align(Alignment.CenterVertically)
+            modifier =
+                Modifier
+                    .size(20.dp)
+                    .align(Alignment.CenterVertically),
         )
         Text(
             text = stringResource(R.string.listening),
             color = darkYellow,
             modifier = Modifier.padding(start = 4.dp),
-            fontSize = 14.sp
+            fontSize = 14.sp,
         )
     }
 }
@@ -167,23 +181,25 @@ private fun ListeningBadge() {
 @Composable
 private fun ListenedBadge() {
     Row(
-        modifier = Modifier
-            .background(lightGreen)
-            .padding(4.dp)
+        modifier =
+            Modifier
+                .background(lightGreen)
+                .padding(4.dp),
     ) {
         Icon(
             Icons.Filled.Check,
             contentDescription = stringResource(R.string.listened),
             tint = darkGreen,
-            modifier = Modifier
-                .size(20.dp)
-                .align(Alignment.CenterVertically)
+            modifier =
+                Modifier
+                    .size(20.dp)
+                    .align(Alignment.CenterVertically),
         )
         Text(
             text = stringResource(R.string.listened),
             color = darkGreen,
             modifier = Modifier.padding(start = 4.dp),
-            fontSize = 14.sp
+            fontSize = 14.sp,
         )
     }
 }
@@ -208,7 +224,7 @@ fun EpisodeRowPreview() {
                     listenedProgress = 100,
                     listeningStatus = LISTENING,
                 ),
-                NavController(LocalContext.current)
+                NavController(LocalContext.current),
             )
             EpisodeRow(
                 Episode(
@@ -225,13 +241,16 @@ fun EpisodeRowPreview() {
                     listenedProgress = 100,
                     listeningStatus = LISTENED,
                 ),
-                NavController(LocalContext.current)
+                NavController(LocalContext.current),
             )
         }
     }
 }
 
-fun truncateSentence(sentence: String, maxLength: Int = 100): String {
+fun truncateSentence(
+    sentence: String,
+    maxLength: Int = 100,
+): String {
     if (sentence.length <= maxLength) {
         return sentence
     }

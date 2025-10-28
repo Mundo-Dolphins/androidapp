@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ArticlesViewModel(
-    private val articlesServiceProvided: es.mundodolphins.app.client.ArticlesService? = null
+    private val articlesServiceProvided: es.mundodolphins.app.client.ArticlesService? = null,
 ) : ViewModel() {
     // Use provided service in tests; fall back to client in production.
     private val articlesService: es.mundodolphins.app.client.ArticlesService =
@@ -28,8 +28,8 @@ class ArticlesViewModel(
      * Suspend function that fetches articles from the service and updates state.
      * Returning Boolean makes it easier to assert success/failure in integration tests.
      */
-    suspend fun fetchArticlesSuspend(): Boolean {
-        return try {
+    suspend fun fetchArticlesSuspend(): Boolean =
+        try {
             val response = articlesService.getArticles()
             _articles.value = response
             true
@@ -37,9 +37,9 @@ class ArticlesViewModel(
             Log.e("ArticlesViewModel", "Error fetching articles", e)
             false
         }
-    }
 
-    fun getArticleByPublishedDate(publishedTimestamp: Long): ArticlesResponse? {
-        return _articles.value.find { it.publishedTimestamp == publishedTimestamp }
-    }
+    fun getArticleByPublishedDate(publishedTimestamp: Long): ArticlesResponse? =
+        _articles.value.find {
+            it.publishedTimestamp == publishedTimestamp
+        }
 }

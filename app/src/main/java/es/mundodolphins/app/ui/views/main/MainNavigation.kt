@@ -28,18 +28,18 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     episodesViewModel: EpisodesViewModel = viewModel(),
     articlesViewModel: ArticlesViewModel = viewModel(),
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
-            startDestination = Routes.Feed.route
+            startDestination = Routes.Feed.route,
         ) {
             composable(route = Routes.Feed.route) {
                 EpisodesScreen(
                     navController = navController,
                     modifier = modifier,
-                    model = episodesViewModel
+                    model = episodesViewModel,
                 )
             }
             composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
@@ -47,7 +47,7 @@ fun MainScreen(
                 EpisodeScreen(
                     episode = episodesViewModel.episode.collectAsState(null).value,
                     navController = navController,
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
             composable(route = Routes.UsefulLinks.route) {
@@ -57,7 +57,7 @@ fun MainScreen(
                 SeasonsListScreen(
                     modifier = modifier,
                     navController = navController,
-                    model = episodesViewModel
+                    model = episodesViewModel,
                 )
             }
             composable(route = Routes.SeasonView.route + "/{id}") {
@@ -65,7 +65,7 @@ fun MainScreen(
                     seasonId = it.arguments?.getString("id")?.toInt() ?: 0,
                     modifier = modifier,
                     navController = navController,
-                    model = episodesViewModel
+                    model = episodesViewModel,
                 )
             }
 
@@ -74,7 +74,7 @@ fun MainScreen(
                 ListArticlesView(
                     articles = articlesViewModel.articles.collectAsState(emptyList()).value,
                     modifier = modifier,
-                    navController = navController
+                    navController = navController,
                 )
             }
 
@@ -84,10 +84,9 @@ fun MainScreen(
                 ArticleScreen(
                     article = articlesViewModel.getArticleByPublishedDate(publishedTimestamp),
                     modifier = modifier,
-                    navController = navController
+                    navController = navController,
                 )
             }
-
         }
     }
 }

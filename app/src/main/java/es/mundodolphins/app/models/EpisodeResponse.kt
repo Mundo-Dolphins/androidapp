@@ -12,7 +12,7 @@ data class EpisodeResponse(
     val imgMini: String,
     val len: String,
     val link: String,
-    val title: String
+    val title: String,
 ) {
     val pubDateTime: Instant
         get() = Instant.parse(dateAndTime)

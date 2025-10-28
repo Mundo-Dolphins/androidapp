@@ -20,21 +20,21 @@ import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.SUCCESS
 fun EpisodesScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    model: EpisodesViewModel = viewModel()
+    model: EpisodesViewModel = viewModel(),
 ) {
     when (model.statusRefresh) {
         SUCCESS -> {
             ListEpisodesView(
                 episodes = model.feed.collectAsState(initial = emptyList()).value,
                 modifier = modifier,
-                navController = navController
+                navController = navController,
             )
         }
 
         LOADING -> {
             Box(
                 contentAlignment = Center,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 CircularProgressIndicator(modifier = Modifier.fillMaxSize(0.5F))
             }
@@ -44,7 +44,7 @@ fun EpisodesScreen(
         EMPTY -> {
             Box(
                 contentAlignment = Center,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Text("No episodes found")
             }

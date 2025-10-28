@@ -8,7 +8,8 @@ on:
 
 jobs:
   build:
-    name: Build and run tests
+    name: Build, static analysis and tests
+
     runs-on: ubuntu-latest
 
     steps:
@@ -32,10 +33,10 @@ jobs:
             echo "No GOOGLE_SERVICES_JSON secret provided; skipping."
           fi
 
-      - name: Make gradlew executable
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Additional Gradle cache (optional)
+      - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: |
@@ -44,6 +45,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Run ktlint checks
+        # Run ktlint static checks via Gradle task in the app module.
+        run: ./gradlew :app:ktlintCheck --no-daemon --console=plain --info --stacktrace
+        continue-on-error: true
+
+      - name: Run detekt static analysis
+        # Run detekt via Gradle in the app module.
+        run: ./gradlew :app:detekt --no-daemon --console=plain --info --stacktrace
+        continue-on-error: true
 
       - name: Build debug APK (assemble)
         run: |
@@ -67,7 +78,16 @@ jobs:
           name: app-unit-test-results-xml
           path: app/build/test-results/testDebugUnitTest
 
+      - name: Upload static analysis reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis-reports
+          path: |
+            app/build/reports/detekt
+            app/build/reports/ktlint
+
       - name: Print test summary
         if: always()
         run: |
-          echo "Unit test report available as artifacts: app-unit-test-report and app-unit-test-results-xml"
+          echo "Artifacts: app-unit-test-report, app-unit-test-results-xml, static-analysis-reports"

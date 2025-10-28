@@ -38,40 +38,44 @@ import java.time.Instant
 fun ArticleScreen(
     article: ArticlesResponse?,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             ArticleHeader(navController, article)
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
                 Spacer(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .height(2.dp)
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .height(2.dp),
                 )
                 ArticleInfo(article)
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                 ) {
                     Text(
-                        text = article?.content?.let {
-                            Markwon.create(LocalContext.current).toMarkdown(it).toString()
-                        } ?: "",
+                        text =
+                            article?.content?.let {
+                                Markwon.create(LocalContext.current).toMarkdown(it).toString()
+                            } ?: "",
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         color = Color.DarkGray,
                         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
                         textAlign = TextAlign.Justify,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
                     )
                 }
             }
@@ -82,18 +86,18 @@ fun ArticleScreen(
 @Composable
 private fun ArticleHeader(
     navController: NavController,
-    article: ArticlesResponse?
+    article: ArticlesResponse?,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         IconButton(
-            onClick = { navController.popBackStack() }
+            onClick = { navController.popBackStack() },
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
                 contentDescription = stringResource(R.string.back),
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.secondary,
             )
         }
         Text(
@@ -102,7 +106,7 @@ private fun ArticleHeader(
             color = MaterialTheme.colorScheme.secondary,
             fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -110,27 +114,27 @@ private fun ArticleHeader(
 @Composable
 private fun ArticleInfo(article: ArticlesResponse?) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
     ) {
         Text(
             text = stringResource(R.string.published_on, article?.publishedDate ?: ""),
             fontSize = MaterialTheme.typography.labelLarge.fontSize,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.author, article?.author ?: ""),
             fontSize = MaterialTheme.typography.labelLarge.fontSize,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -138,13 +142,14 @@ private fun ArticleInfo(article: ArticlesResponse?) {
 fun ArticleScreenPreview() {
     MundoDolphinsTheme {
         ArticleScreen(
-            article = ArticlesResponse(
-                title = "Sample Article",
-                content = "This is a sample article content",
-                publishedDate = Instant.now().toString(),
-                author = "John Doe",
-            ),
-            navController = NavController(LocalContext.current)
+            article =
+                ArticlesResponse(
+                    title = "Sample Article",
+                    content = "This is a sample article content",
+                    publishedDate = Instant.now().toString(),
+                    author = "John Doe",
+                ),
+            navController = NavController(LocalContext.current),
         )
     }
 }

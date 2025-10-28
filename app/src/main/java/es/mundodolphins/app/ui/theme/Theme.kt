@@ -5,14 +5,15 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color.Companion.White
 
-private val LightColorScheme = lightColorScheme(
-    primary = orange,
-    secondary = aqua,
-    tertiary = orange,
-    background = White,
-    primaryContainer = White,
-    secondaryContainer = aqua,
-    tertiaryContainer = orange
+private val LightColorScheme =
+    lightColorScheme(
+        primary = orange,
+        secondary = aqua,
+        tertiary = orange,
+        background = White,
+        primaryContainer = White,
+        secondaryContainer = aqua,
+        tertiaryContainer = orange,
     /*
     Other default colors to override
     surface = Color(0xFFFFFBFE),
@@ -21,18 +22,14 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-    */
-
-)
-
+     */
+    )
 
 @Composable
-fun MundoDolphinsTheme(
-    content: @Composable () -> Unit
-) {
+fun MundoDolphinsTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = LightColorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

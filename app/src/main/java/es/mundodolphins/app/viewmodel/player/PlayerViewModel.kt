@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val episodeRepository: EpisodeRepository,
-    private val playerServiceHelper: PlayerServiceHelper
+    private val playerServiceHelper: PlayerServiceHelper,
 ) : ViewModel() {
     private val _playerState = MutableStateFlow<ExoPlayer?>(null)
     val playerState: StateFlow<ExoPlayer?> = _playerState
@@ -31,7 +31,11 @@ class PlayerViewModel(
 
     private val _playerStatus = MutableLiveData<Int>()
 
-    fun initializePlayer(context: Context, episodeId: Long, mp3Url: String) {
+    fun initializePlayer(
+        context: Context,
+        episodeId: Long,
+        mp3Url: String,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             audioID = episodeId
             currentPosition = episodeRepository.getEpisodeById(audioID).first()?.listenedProgress ?: 0L
@@ -71,7 +75,7 @@ class PlayerViewModel(
             episodeRepository.updateEpisodePosition(
                 audioID,
                 position,
-                _playerStatus.value == ExoPlayer.STATE_ENDED
+                _playerStatus.value == ExoPlayer.STATE_ENDED,
             )
         }
     }

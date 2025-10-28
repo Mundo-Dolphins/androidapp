@@ -10,5 +10,5 @@ data class Article(
     val title: String,
     val author: String,
     val publishedDate: Instant,
-    val content: String
+    val content: String,
 )

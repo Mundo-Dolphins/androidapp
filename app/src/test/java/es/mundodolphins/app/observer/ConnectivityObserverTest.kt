@@ -22,21 +22,21 @@ import java.util.concurrent.TimeoutException
 
 @RunWith(RobolectricTestRunner::class)
 class ConnectivityObserverTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
     // Helper to observe LiveData<Boolean> values synchronously in tests.
     private fun LiveData<Boolean>.getOrAwaitValueBoolean(
         time: Long = 2,
-        timeUnit: TimeUnit = TimeUnit.SECONDS
+        timeUnit: TimeUnit = TimeUnit.SECONDS,
     ): Boolean {
         val data = arrayOfNulls<Boolean>(1)
         val latch = CountDownLatch(1)
-        val observer = androidx.lifecycle.Observer<Boolean> { t ->
-            data[0] = t
-            latch.countDown()
-        }
+        val observer =
+            androidx.lifecycle.Observer<Boolean> { t ->
+                data[0] = t
+                latch.countDown()
+            }
 
         try {
             this.observeForever(observer)
@@ -76,7 +76,12 @@ class ConnectivityObserverTest {
         val value = observer.isConnected.getOrAwaitValueBoolean()
         assertThat(value).isTrue()
 
-        verify { connectivityManager.registerNetworkCallback(any<android.net.NetworkRequest>(), any<ConnectivityManager.NetworkCallback>()) }
+        verify {
+            connectivityManager.registerNetworkCallback(
+                any<android.net.NetworkRequest>(),
+                any<ConnectivityManager.NetworkCallback>(),
+            )
+        }
     }
 
     @Test
@@ -102,6 +107,11 @@ class ConnectivityObserverTest {
         val value = observer.isConnected.getOrAwaitValueBoolean()
         assertThat(value).isFalse()
 
-        verify { connectivityManager.registerNetworkCallback(any<android.net.NetworkRequest>(), any<ConnectivityManager.NetworkCallback>()) }
+        verify {
+            connectivityManager.registerNetworkCallback(
+                any<android.net.NetworkRequest>(),
+                any<ConnectivityManager.NetworkCallback>(),
+            )
+        }
     }
 }

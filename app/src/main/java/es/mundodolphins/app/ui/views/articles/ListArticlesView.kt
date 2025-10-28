@@ -14,13 +14,13 @@ import es.mundodolphins.app.models.ArticlesResponse
 fun ListArticlesView(
     articles: List<ArticlesResponse>,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.background(color = colorScheme.background)
+        modifier = modifier.background(color = colorScheme.background),
     ) {
         items(articles) {
             ArticleRow(it, navController)

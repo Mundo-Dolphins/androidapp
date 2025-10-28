@@ -6,4 +6,7 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.ksp) apply false
+    // Use plugin aliases defined in gradle/libs.versions.toml for consistency
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.detekt) apply false
 }

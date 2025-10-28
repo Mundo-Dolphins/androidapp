@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PlayerServiceHelperTest {
-
     private lateinit var playerServiceHelper: PlayerServiceHelper
 
     private lateinit var context: Context
@@ -35,9 +34,10 @@ class PlayerServiceHelperTest {
         val mp3Url = "https://example.com/audio.mp3"
         val currentPosition = 5000L
         val mockExoPlayer = mockk<ExoPlayer>()
-        val mockAudioPlayerService = mockk<AudioPlayerService> {
-            every { getExoPlayer() } returns mockExoPlayer
-        }
+        val mockAudioPlayerService =
+            mockk<AudioPlayerService> {
+                every { getExoPlayer() } returns mockExoPlayer
+            }
         val intent = mockk<Intent>()
 
         every { intentBuilder.buildIntent(context, mp3Url, currentPosition) } returns intent
@@ -45,7 +45,7 @@ class PlayerServiceHelperTest {
             context.bindService(
                 intent,
                 any(),
-                Context.BIND_AUTO_CREATE
+                Context.BIND_AUTO_CREATE,
             )
         } returns true
         every { context.startForegroundService(intent) } returns mockk()
@@ -53,7 +53,7 @@ class PlayerServiceHelperTest {
         playerServiceHelper.bindAndStartService(
             context,
             mp3Url,
-            currentPosition
+            currentPosition,
         ) { exoPlayer, service ->
             assert(exoPlayer == mockExoPlayer)
             assert(service == mockAudioPlayerService)
@@ -68,12 +68,14 @@ class PlayerServiceHelperTest {
         val intent = mockk<Intent>()
         every { intentBuilder.buildIntent(context, any(), any()) } returns intent
         val mockExoPlayer = mockk<ExoPlayer>()
-        val mockAudioPlayerService = mockk<AudioPlayerService> {
-            every { getExoPlayer() } returns mockExoPlayer
-        }
-        val audioPlayerBinder = mockk<AudioPlayerBinder> {
-            every { getService() } returns mockAudioPlayerService
-        }
+        val mockAudioPlayerService =
+            mockk<AudioPlayerService> {
+                every { getExoPlayer() } returns mockExoPlayer
+            }
+        val audioPlayerBinder =
+            mockk<AudioPlayerBinder> {
+                every { getService() } returns mockAudioPlayerService
+            }
 
         every { context.bindService(intent, any(), Context.BIND_AUTO_CREATE) } answers {
             val serviceConnection = arg<ServiceConnection>(1)
@@ -85,7 +87,7 @@ class PlayerServiceHelperTest {
         playerServiceHelper.bindAndStartService(
             context,
             "https://example.com/audio.mp3",
-            0L
+            0L,
         ) { _, _ -> }
 
         every { context.unbindService(any()) } just Runs

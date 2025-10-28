@@ -32,6 +32,6 @@ data class Episode(
     enum class ListeningStatus {
         NOT_LISTENED,
         LISTENING,
-        LISTENED
+        LISTENED,
     }
 }
