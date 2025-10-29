@@ -128,8 +128,8 @@ complexity:
     active: true
     threshold: 600
   LongMethod:
-    active: false
-    threshold: 60
+    active: true
+    threshold: 150
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -624,13 +624,21 @@ style:
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
     ignoreNumbers:
       - '-1'
+      - '-0.5'
+      - '-0.1'
       - '0'
+      - '0.1'
+      - '0.5'
+      - '0.7'
+      - '0.9'
       - '1'
+      - '1.5'
       - '2'
       - '3'
       - '4'
       - '5'
       - '6'
+      - '7'
       - '8'
       - '10'
       - '12'
@@ -651,9 +659,12 @@ style:
       - '256'
       - '500'
       - '1000'
+      - '3600'
+      - '60000'
+      - '1000000'
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: true
-    ignoreLocalVariableDeclaration: false
+    ignoreLocalVariableDeclaration: true
     ignoreConstantDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
     ignoreAnnotation: true
@@ -667,12 +678,13 @@ style:
     active: false
     maxChainedCalls: 5
   MaxLineLength:
-    active: false
-    maxLineLength: 150
+    active: true
+    maxLineLength: 550
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/*Preview.kt']
   MayBeConst:
     active: true
   ModifierOrder:
