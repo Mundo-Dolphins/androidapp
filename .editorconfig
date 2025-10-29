@@ -1,0 +1,13 @@
+[*.{kt,kts}]
+max_line_length = 140
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# Disable the function-naming rule for Compose functions
+# Composable functions should follow PascalCase per Compose guidelines
+ktlint_standard_function-naming = disabled
+
+# Disable property-naming to allow common Android patterns:
+# - Companion object singletons (INSTANCE)
+# - ViewModel backing properties with underscore prefix (_property)
+ktlint_standard_property-naming = disabled

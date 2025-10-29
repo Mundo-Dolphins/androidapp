@@ -213,7 +213,12 @@ fun EpisodeRowPreview() {
                 Episode(
                     id = 1L,
                     title = "Sorpresa y Análisis de la agencia libre",
-                    description = "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
+                    description =
+                        "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne " +
+                            "para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además " +
+                            "analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami " +
+                            "Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de " +
+                            "Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
                     audio = "https://wwww.ivoox.com/audio.mp3",
                     published = Instant.ofEpochMilli(1744038703000),
                     imgMain = "https://www.mundolphins.es/img.jpg",
@@ -230,7 +235,12 @@ fun EpisodeRowPreview() {
                 Episode(
                     id = 1L,
                     title = "Sorpresa y Análisis de la agencia libre",
-                    description = "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
+                    description =
+                        "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne " +
+                            "para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además " +
+                            "analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami " +
+                            "Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de " +
+                            "Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
                     audio = "https://wwww.ivoox.com/audio.mp3",
                     published = Instant.ofEpochMilli(1744038703000),
                     imgMain = "https://www.mundolphins.es/img.jpg",

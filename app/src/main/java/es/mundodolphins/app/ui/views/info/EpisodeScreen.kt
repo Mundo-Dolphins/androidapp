@@ -177,7 +177,12 @@ fun EpisodeScreenPreview() {
                 Episode(
                     id = 1,
                     title = "Sorpresa y Análisis de la Agencia Libre",
-                    description = "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
+                    description =
+                        "¡Estamos de vuelta!, El equipo habitual de Mundo Dolphins: Hugo, Javi y Santos se reúne " +
+                            "para contaros una sorpresa sobre el poryecto del podcast que nos hace mucha ilusión. Además " +
+                            "analizan pormenorizadamente todos los cambios que ha experimentado el roster de los Miami " +
+                            "Dolphins y lo que pueden aportar los fichajes de la Agencia libre del conjunto del sur de " +
+                            "Florida. Para finalizar aportan unas pequeñas claves de lo que podría esperarse en el próximo draft.",
                     audio = "https://www.ivoox.com/episodio1.mp3",
                     published = Instant.ofEpochMilli(1744098194000),
                     imgMain = "https://static-1.ivoox.com/canales/f/d/2/7/fd27a1f3dd4a0478e921cace5476381c_XXL.jpg",
