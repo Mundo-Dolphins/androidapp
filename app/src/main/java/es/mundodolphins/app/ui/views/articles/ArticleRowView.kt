@@ -141,7 +141,10 @@ fun EpisodeRowPreview() {
                     title = "Quinn Ewers: Una apuesta de futuro para los Miami Dolphins",
                     author = "Javi Martín",
                     publishedDate = "2025-04-28T07:55:00Z",
-                    content = "Aunque gran parte del foco mediático del Draft 2025 se centró en la caída de Shedeur Sanders hasta la quinta ronda, el descenso de Quinn Ewers hasta la séptima fue igualmente sorprendente.",
+                    content =
+                        "Aunque gran parte del foco mediático del Draft 2025 se centró en la caída de Shedeur " +
+                            "Sanders hasta la quinta ronda, el descenso de Quinn Ewers hasta la séptima fue igualmente " +
+                            "sorprendente.",
                 ),
                 NavController(LocalContext.current),
             )

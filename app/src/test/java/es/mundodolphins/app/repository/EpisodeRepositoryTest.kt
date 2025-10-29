@@ -114,7 +114,8 @@ class EpisodeRepositoryTest {
 
             coVerify(exactly = 1) {
                 episodeDao.insertEpisode(
-                    episodeNonNull.copy( // Use episodeNonNull here
+                    // Use episodeNonNull here
+                    episodeNonNull.copy(
                         listenedProgress = 50L,
                         listeningStatus = LISTENING,
                     ),
