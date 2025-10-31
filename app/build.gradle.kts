@@ -216,5 +216,8 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
 //     toolVersion = "0.8.11" // Example: Using a specific version
 // }
 
-// Detekt plugin is applied above; no custom extension configuration here to avoid configuration-time type resolution issues.
-// The plugin will provide the `:app:detekt` tasks which the CI workflow will run. If you want custom rules, add a `detekt.yml` at project root later.
+// Configure detekt to use our custom configuration file
+detekt {
+    config.setFrom(files("${project.rootDir}/detekt.yml"))
+    buildUponDefaultConfig = true
+}
