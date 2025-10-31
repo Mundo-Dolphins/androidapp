@@ -27,10 +27,29 @@ jobs:
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -n "$DATA" ]; then
-            echo "$DATA" | base64 -di > app/google-services.json
-          else
+          set -euo pipefail
+          if [ -z "${DATA:-}" ]; then
             echo "No GOOGLE_SERVICES_JSON secret provided; skipping."
+          else
+            mkdir -p app
+            # Try to decode as base64; if decoding succeeds, inspect decoded content
+            if printf '%s' "$DATA" | base64 --decode >/tmp/gs_decoded 2>/dev/null; then
+              # Check if decoded content looks like JSON (starts with { or [)
+              first_char=$(head -c 1 /tmp/gs_decoded || true)
+              if [ "$first_char" = "{" ] || [ "$first_char" = "[" ]; then
+                echo "Detected base64-encoded JSON -> writing decoded file"
+                mv /tmp/gs_decoded app/google-services.json
+              else
+                echo "Decoded content does not look like JSON; writing raw secret instead"
+                rm -f /tmp/gs_decoded
+                printf '%s' "$DATA" > app/google-services.json
+              fi
+            else
+              # Not valid base64: write raw content (handles multiline JSON secrets)
+              echo "Secret not base64 -> writing raw content"
+              printf '%s' "$DATA" > app/google-services.json
+            fi
+            echo "Wrote app/google-services.json (size: $(wc -c < app/google-services.json) bytes)"
           fi
 
       - name: Grant execute permission for gradlew
