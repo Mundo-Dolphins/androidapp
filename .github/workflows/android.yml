@@ -74,27 +74,22 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
+            ~/.gradle/caches/build-cache-1
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties','gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Run ktlint checks
-        # Run ktlint static checks via Gradle task in the app module.
-        run: ./gradlew :app:ktlintCheck --no-daemon --console=plain --info --stacktrace
+      - name: Run static analysis (ktlint + detekt)
+        # Combine static analysis tasks into a single Gradle invocation to reduce JVM startup overhead.
+        # Continue-on-error so analysis doesn't block the build (keeps previous behaviour).
+        run: |
+          ./gradlew :app:ktlintCheck :app:detekt --console=plain --info --stacktrace --parallel --build-cache
         continue-on-error: true
 
-      - name: Run detekt static analysis
-        # Run detekt via Gradle in the app module.
-        run: ./gradlew :app:detekt --no-daemon --console=plain --info --stacktrace
-        continue-on-error: true
-
-      - name: Build debug APK (assemble)
+      - name: Build and run unit tests
+        # Run assemble + unit tests in a single Gradle invocation to avoid extra daemon startup.
         run: |
-          ./gradlew assembleDebug --no-daemon --console=plain --info --stacktrace
-
-      - name: Run unit tests (app)
-        run: |
-          ./gradlew clean :app:testDebugUnitTest --no-daemon --console=plain --info --stacktrace
+          ./gradlew clean assembleDebug :app:testDebugUnitTest --console=plain --info --stacktrace --parallel --build-cache
 
       - name: Upload unit test report
         if: always()
