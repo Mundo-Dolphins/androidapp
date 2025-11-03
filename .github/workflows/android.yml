@@ -58,20 +58,8 @@ jobs:
           set -euo pipefail
           if [ -f app/google-services.json ]; then
             echo "Found app/google-services.json (size: $(wc -c < app/google-services.json) bytes)"
-            # Ensure jq is available for JSON validation
-            if ! command -v jq >/dev/null 2>&1; then
-              echo "jq not found -> installing"
-              sudo apt-get update -y && sudo apt-get install -y jq
-            fi
-            if ! jq -e . app/google-services.json >/dev/null 2>&1; then
-              echo "ERROR: invalid JSON in app/google-services.json"
-              exit 2
-            fi
-            if ! jq -e 'has("project_info") and has("client")' app/google-services.json >/dev/null 2>&1; then
-              echo "ERROR: missing required top-level keys: project_info and/or client"
-              exit 3
-            fi
-            echo "google-services.json parsed OK (project_info & client present)"
+            chmod +x .github/scripts/validate_google_services.py || true
+            .github/scripts/validate_google_services.py
           else
             echo "app/google-services.json not found"
             exit 1
