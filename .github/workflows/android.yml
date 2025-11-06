@@ -29,7 +29,14 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${DATA:-}" ]; then
-            echo "No GOOGLE_SERVICES_JSON secret provided; skipping."
+            # No secret provided: check if repository already contains the file (required for CI)
+            if [ -f app/google-services.json ]; then
+              echo "Found checked-in app/google-services.json; using committed file for CI."
+            else
+              echo "ERROR: GOOGLE_SERVICES_JSON secret not provided and app/google-services.json not present in repository. This file is required for CI."
+              echo "Either add the file to the repository (not recommended for private keys) or set the secret 'GOOGLE_SERVICES_JSON' in the repository settings."
+              exit 1
+            fi
           else
             mkdir -p app
             # Try to decode as base64; if decoding succeeds, inspect decoded content
@@ -61,7 +68,7 @@ jobs:
             chmod +x .github/scripts/validate_google_services.py || true
             .github/scripts/validate_google_services.py
           else
-            echo "app/google-services.json not found"
+            echo "ERROR: app/google-services.json not found; this file is required for CI."
             exit 1
           fi
 
