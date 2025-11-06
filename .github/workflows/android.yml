@@ -23,7 +23,26 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Debug CI context (print event + secret presence)
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          echo "GITHUB_EVENT_NAME=${{ github.event_name }}"
+          echo "GITHUB_REF=${{ github.ref }}"
+          echo "GITHUB_ACTOR=${{ github.actor }}"
+          echo "PR_HEAD_REPO=${{ github.event.pull_request.head.repo.full_name }}"
+          # secrets can't be printed; detect presence at runtime without exposing value
+          if [ -z "${DATA:-}" ]; then
+            echo "GOOGLE_SERVICES_JSON_PRESENT=false"
+          else
+            echo "GOOGLE_SERVICES_JSON_PRESENT=true"
+          fi
+
       - name: Load Google Service file
+        if: >-
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
@@ -60,7 +79,9 @@ jobs:
           fi
 
       - name: Validate google-services.json
-        if: always()
+        if: >-
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
         run: |
           set -euo pipefail
           if [ -f app/google-services.json ]; then
