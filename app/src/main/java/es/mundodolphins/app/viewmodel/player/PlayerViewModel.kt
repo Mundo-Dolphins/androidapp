@@ -30,6 +30,7 @@ class PlayerViewModel(
     val duration: LiveData<Long> get() = _duration
 
     private val _playerStatus = MutableLiveData<Int>()
+    val playerStatus: LiveData<Int> get() = _playerStatus
 
     fun initializePlayer(
         context: Context,

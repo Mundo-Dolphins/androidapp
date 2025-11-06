@@ -45,7 +45,8 @@ class EpisodeRepository(
                         when {
                             hasFinished -> LISTENED
                             // Consider original state if position is 0 and it was already NOT_LISTENED
-                            position == 0L && currentEpisode.listenedProgress == 0L &&
+                            position == 0L &&
+                                currentEpisode.listenedProgress == 0L &&
                                 currentEpisode.listeningStatus == NOT_LISTENED -> NOT_LISTENED
                             position == 0L -> NOT_LISTENED
                             else -> LISTENING
