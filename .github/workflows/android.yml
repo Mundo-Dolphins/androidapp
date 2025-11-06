@@ -31,7 +31,13 @@ jobs:
           echo "GITHUB_EVENT_NAME=${{ github.event_name }}"
           echo "GITHUB_REF=${{ github.ref }}"
           echo "GITHUB_ACTOR=${{ github.actor }}"
-          echo "PR_HEAD_REPO=${{ github.event.pull_request.head.repo.full_name }}"
+          # determine PR head repo at runtime (safe for pushes where pull_request may be absent)
+          if [ -n "${GITHUB_EVENT_PATH:-}" ]; then
+            pr_head_repo=$(python3 -c 'import json,os; p=os.environ.get("GITHUB_EVENT_PATH"); print("" if not p else json.load(open(p)).get("pull_request",{}).get("head",{}).get("repo",{}).get("full_name",""))')
+          else
+            pr_head_repo=""
+          fi
+          echo "PR_HEAD_REPO=${pr_head_repo}"
           # secrets can't be printed; detect presence at runtime without exposing value
           if [ -z "${DATA:-}" ]; then
             echo "GOOGLE_SERVICES_JSON_PRESENT=false"
@@ -39,10 +45,33 @@ jobs:
             echo "GOOGLE_SERVICES_JSON_PRESENT=true"
           fi
 
+      - name: Prepare CI context (internal PR + secret present)
+        id: ci_context
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          event_name="${GITHUB_EVENT_NAME}"
+          is_internal_pr=false
+          if [ "${event_name}" = "pull_request" ]; then
+            head_repo=$(python3 -c 'import json,os; p=os.environ.get("GITHUB_EVENT_PATH"); print("" if not p else json.load(open(p)).get("pull_request",{}).get("head",{}).get("repo",{}).get("full_name",""))')
+            if [ "${head_repo}" = "${GITHUB_REPOSITORY}" ]; then
+              is_internal_pr=true
+            fi
+          fi
+          secret_present=false
+          if [ -n "${DATA:-}" ]; then
+            secret_present=true
+          fi
+          echo "is_internal_pr=$is_internal_pr" >> $GITHUB_OUTPUT
+          echo "secret_present=$secret_present" >> $GITHUB_OUTPUT
+          echo "event_name=$event_name" >> $GITHUB_OUTPUT
+
       - name: Load Google Service file
         if: >-
           github.event_name == 'push' ||
-          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+          (github.event_name == 'pull_request' && steps.ci_context.outputs.is_internal_pr == 'true') ||
+          steps.ci_context.outputs.secret_present == 'true'
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
@@ -81,7 +110,8 @@ jobs:
       - name: Validate google-services.json
         if: >-
           github.event_name == 'push' ||
-          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+          (github.event_name == 'pull_request' && steps.ci_context.outputs.is_internal_pr == 'true') ||
+          steps.ci_context.outputs.secret_present == 'true'
         run: |
           set -euo pipefail
           if [ -f app/google-services.json ]; then
