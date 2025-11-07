@@ -1,0 +1,125 @@
+name: "Auto-merge Dependabot PRs"
+
+on:
+  workflow_run:
+    workflows: ["Android CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  issues: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-merge Dependabot PRs on successful CI
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const run = context.payload.workflow_run;
+            if (!run) {
+              core.info('No workflow_run payload found. Exiting.');
+              return;
+            }
+            if (run.conclusion !== 'success') {
+              core.info(`Workflow conclusion is '${run.conclusion}', not 'success'. Exiting.`);
+              return;
+            }
+            const head_sha = run.head_sha;
+            core.info(`Workflow succeeded for commit ${head_sha}. Searching associated PRs...`);
+
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: head_sha
+            });
+
+            core.info(`Found ${prs.length} PR(s) associated with commit.`);
+
+            for (const pr of prs) {
+              const number = pr.number;
+              const author = pr.user && pr.user.login;
+              core.info(`#${number} by ${author}`);
+
+              // Only handle Dependabot PRs
+              if (!author || !['dependabot[bot]', 'dependabot-preview[bot]', 'dependabot'].includes(author)) {
+                core.info(`Skipping #${number} because author is not dependabot.`);
+                continue;
+              }
+
+              // Refresh PR details and wait if mergeable is null (GitHub may compute it)
+              let prDetails;
+              for (let i = 0; i < 6; i++) {
+                const res = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: number
+                });
+                prDetails = res.data;
+                if (prDetails.mergeable !== null) break;
+                core.info(`mergeable is null; waiting 2s (attempt ${i + 1}/6)`);
+                await new Promise(r => setTimeout(r, 2000));
+              }
+
+              core.info(`PR #${number} mergeable: ${prDetails.mergeable} state: ${prDetails.mergeable_state}`);
+
+              if (!prDetails.mergeable) {
+                core.info(`Skipping #${number} because not mergeable.`);
+                continue;
+              }
+
+              if (prDetails.draft) {
+                core.info(`Skipping #${number} because it's a draft.`);
+                continue;
+              }
+
+              if (prDetails.merged) {
+                core.info(`Skipping #${number} because it's already merged.`);
+                continue;
+              }
+
+              // Try to merge with squash method
+              try {
+                const mergeRes = await github.rest.pulls.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: number,
+                  merge_method: 'squash'
+                });
+
+                if (mergeRes.status === 200) {
+                  core.info(`Merged PR #${number} (sha: ${mergeRes.data.sha}).`);
+                } else {
+                  core.info(`Merge response for #${number}: ${mergeRes.status}`);
+                  // Comment on the PR explaining the failed merge attempt
+                  const body = `Automated merge attempt for this Dependabot PR failed.\n\nMerge API response status: ${mergeRes.status}\n\nIf branch protection rules or required reviews are blocking the merge, please address them and re-run CI.\n\nResponse: ${JSON.stringify(mergeRes.data, null, 2)}`;
+                  try {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: number,
+                      body
+                    });
+                  } catch (commentErr) {
+                    core.info(`Failed to create comment on #${number}: ${commentErr.message}`);
+                  }
+                }
+              } catch (err) {
+                core.info(`Failed to merge #${number}: ${err.message}`);
+                const body = `Automated merge attempt for this Dependabot PR failed with an error:\n\n${err.message}\n\nPlease check branch protection rules, required reviewers or merge conflicts.`;
+                try {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: number,
+                    body
+                  });
+                } catch (commentErr) {
+                  core.info(`Failed to create comment on #${number}: ${commentErr.message}`);
+                }
+              }
+            }
