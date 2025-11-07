@@ -31,6 +31,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Enable resources in unit tests so Robolectric can access strings, layouts, etc.
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -125,6 +130,8 @@ dependencies {
     testImplementation(libs.awaitility.kotlin)
     // AssertJ for fluent assertions
     testImplementation(libs.assertj.core)
+    // Compose UI testing in unit tests (Robolectric + Compose)
+    testImplementation(libs.ui.test.junit4)
 
     // Android Test
     androidTestImplementation(platform(libs.androidx.compose.bom))

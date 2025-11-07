@@ -15,12 +15,13 @@ import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.EMPTY
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.ERROR
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.LOADING
 import es.mundodolphins.app.viewmodel.EpisodesViewModel.LoadStatus.SUCCESS
+import es.mundodolphins.app.viewmodel.EpisodesUiModel
 
 @Composable
 fun EpisodesScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    model: EpisodesViewModel = viewModel(),
+    model: EpisodesUiModel = viewModel<EpisodesViewModel>(),
 ) {
     when (model.statusRefresh) {
         SUCCESS -> {

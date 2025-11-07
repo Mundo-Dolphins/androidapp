@@ -14,6 +14,9 @@ class ArticlesServiceMockWebServerTest {
     @Test
     fun `getArticles via MockWebServer returns list and correct path`() =
         runTest {
+            // Ensure OkHttp uses JDK platform in unit tests to avoid android.util.Log calls
+            System.setProperty("okhttp.platform", "jdk")
+
             val server = MockWebServer()
             server.start()
 
