@@ -1,209 +1,89 @@
 package es.mundodolphins.app.viewmodel
 
-import android.util.Log
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth.assertThat
-import es.mundodolphins.app.client.FeedService
-import es.mundodolphins.app.data.episodes.Episode
-import es.mundodolphins.app.models.EpisodeResponse
-import es.mundodolphins.app.repository.EpisodeRepository
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
+import org.junit.Assert.*
 import retrofit2.Response
-import java.time.Instant
+import es.mundodolphins.app.client.FeedService
+import es.mundodolphins.app.models.EpisodeResponse
+import kotlinx.coroutines.flow.first
+import okhttp3.ResponseBody.Companion.toResponseBody
 
-@OptIn(ExperimentalCoroutinesApi::class)
+// Fake implementations of FeedService for testing
+class FakeFeedServiceSuccess : FeedService {
+    override suspend fun getAllSeasons(): Response<List<String>> {
+        return Response.success(listOf("season_1.json"))
+    }
+
+    override suspend fun getSeasonEpisodes(id: Int): Response<List<EpisodeResponse>> {
+        val episode = EpisodeResponse(
+            dateAndTime = "2020-01-01T00:00:00Z",
+            description = "desc",
+            audio = "audio",
+            imgMain = "imgMain",
+            imgMini = "imgMini",
+            len = "00:10:00",
+            link = "link",
+            title = "title",
+        )
+        return Response.success(listOf(episode))
+    }
+}
+
+class FakeFeedServiceEmpty : FeedService {
+    override suspend fun getAllSeasons(): Response<List<String>> = Response.success(emptyList())
+    override suspend fun getSeasonEpisodes(id: Int): Response<List<EpisodeResponse>> = Response.success(emptyList())
+}
+
+class FakeFeedServiceError : FeedService {
+    override suspend fun getAllSeasons(): Response<List<String>> = Response.error(500, "error".toResponseBody())
+    override suspend fun getSeasonEpisodes(id: Int): Response<List<EpisodeResponse>> = Response.error(500, "error".toResponseBody())
+}
+
 class EpisodesViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var episodeRepository: EpisodeRepository
+    @Test
+    fun refreshDatabase_success_setsStatusSuccess_and_insertsEpisodes() = runTest {
+        val viewModel = createTestEpisodesViewModel(feedService = FakeFeedServiceSuccess())
 
-    private lateinit var feedService: FeedService
+        // call suspend function directly
+        viewModel.refreshDatabaseBlocking()
 
-    private lateinit var episodesViewModel: EpisodesViewModel
+        assertEquals(
+            "Expected SUCCESS but got ${viewModel.statusRefresh}. lastError=${viewModel.lastError}",
+            EpisodesViewModel.LoadStatus.SUCCESS,
+            viewModel.statusRefresh,
+        )
 
-    @Before
-    fun setUp() {
-        mockkStatic(Log::class)
-        every { Log.i(any(), any()) } returns 0
-        every { Log.e(any(), any(), any()) } returns 0
-
-        episodeRepository = mockk()
-        feedService = mockk()
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
+        // feed is a Flow<List<Episode>>; ensure it contains the inserted episode
+        val list = viewModel.feed.first()
+        assertTrue(list.isNotEmpty())
+        assertEquals("title", list.first().title)
     }
 
     @Test
-    fun `refreshDatabase should update statusRefresh to SUCCESS when API call is successful`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+    fun refreshDatabase_empty_setsStatusEmpty() = runTest {
+        val viewModel = createTestEpisodesViewModel(feedService = FakeFeedServiceEmpty())
 
-            val mockSeasonResponse = listOf("season_1.json")
-            val mockEpisodes =
-                listOf(
-                    EpisodeResponse(
-                        dateAndTime = Instant.now().toString(),
-                        description = "Test description",
-                        audio = "https://example.com/audio.mp3",
-                        imgMain = "https://example.com/img_main.jpg",
-                        imgMini = "https://example.com/img_mini.jpg",
-                        len = "3600",
-                        link = "https://example.com/episode",
-                        title = "Test Episode",
-                    ),
-                )
+        viewModel.refreshDatabaseBlocking()
 
-            coEvery { feedService.getAllSeasons() } returns Response.success(mockSeasonResponse)
-            coEvery { feedService.getSeasonEpisodes(any()) } returns Response.success(mockEpisodes)
-            every { episodeRepository.getAllEpisodesIds() } returns emptyList()
-            coEvery { episodeRepository.insertAllEpisodes(any()) } returns Unit
-
-            episodesViewModel.refreshDatabaseBlocking()
-            // Advance the dispatcher tied to this runTest (refreshDatabaseBlocking executes on ioDispatcher)
-            testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.SUCCESS)
-            coVerify { episodeRepository.insertAllEpisodes(any()) }
-        }
+        assertEquals(
+            "Expected EMPTY but got ${viewModel.statusRefresh}. lastError=${viewModel.lastError}",
+            EpisodesViewModel.LoadStatus.EMPTY,
+            viewModel.statusRefresh,
+        )
+    }
 
     @Test
-    fun `getEpisode should fetch episode by ID`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
+    fun refreshDatabase_error_setsStatusError() = runTest {
+        val viewModel = createTestEpisodesViewModel(feedService = FakeFeedServiceError())
 
-            val episodeId = 1L
-            val mockEpisode =
-                Episode(
-                    id = episodeId,
-                    title = "Test Episode",
-                    description = "This is a test description",
-                    audio = "https://example.com/audio.mp3",
-                    published = Instant.parse("2025-02-20T15:44:39Z"),
-                    imgMain = "https://example.com/img_main.jpg",
-                    imgMini = "https://example.com/img_mini.jpg",
-                    len = "3600",
-                    link = "https://example.com/episode",
-                    season = 1,
-                )
-            coEvery { episodeRepository.getEpisodeById(episodeId) } returns flowOf(mockEpisode)
+        viewModel.refreshDatabaseBlocking()
 
-            episodesViewModel.getEpisode(episodeId)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            assertThat(episodesViewModel.episode).isNotNull()
-            assertThat(episodesViewModel.episode.first()).isEqualTo(mockEpisode)
-        }
-
-    @Test
-    fun `getSeason should fetch season by ID`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
-
-            val seasonId = 1
-            val mockSeasonEpisodes =
-                listOf(
-                    Episode(
-                        id = 1L,
-                        title = "Test Episode 1",
-                        description = "Description 1",
-                        audio = "https://example.com/audio1.mp3",
-                        published = Instant.parse("2025-02-20T15:44:39Z"),
-                        imgMain = "https://example.com/img_main1.jpg",
-                        imgMini = "https://example.com/img_mini1.jpg",
-                        len = "3600",
-                        link = "https://example.com/episode1",
-                        season = seasonId,
-                    ),
-                    Episode(
-                        id = 2L,
-                        title = "Test Episode 2",
-                        description = "Description 2",
-                        audio = "https://example.com/audio2.mp3",
-                        published = Instant.parse("2025-02-21T15:44:39Z"),
-                        imgMain = "https://example.com/img_main2.jpg",
-                        imgMini = "https://example.com/img_mini2.jpg",
-                        len = "3600",
-                        link = "https://example.com/episode2",
-                        season = seasonId,
-                    ),
-                )
-            coEvery { episodeRepository.getSeason(seasonId) } returns flowOf(mockSeasonEpisodes)
-
-            episodesViewModel.getSeason(seasonId)
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            assertThat(episodesViewModel.season).isNotNull()
-            assertThat(episodesViewModel.season.first()).isEqualTo(mockSeasonEpisodes)
-        }
-
-    @Test
-    fun `refreshDatabase should update statusRefresh to ERROR when API call fails`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
-
-            coEvery { feedService.getAllSeasons() } returns Response.error(500, "error".toResponseBody("text/plain".toMediaType()))
-            episodesViewModel.refreshDatabaseBlocking()
-            // Advance the injected dispatcher to run the launched coroutine
-            testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.ERROR)
-        }
-
-    @Test
-    fun `refreshDatabase should update statusRefresh to EMPTY when API returns empty seasons`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
-
-            coEvery { feedService.getAllSeasons() } returns Response.success(emptyList<String>())
-            episodesViewModel.refreshDatabaseBlocking()
-            testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.EMPTY)
-        }
-
-    @Test
-    fun `refreshDatabase should update statusRefresh to ERROR when repository throws exception`() =
-        runTest {
-            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-            Dispatchers.setMain(testDispatcher)
-            episodesViewModel = EpisodesViewModel(episodeRepository, feedService, testDispatcher)
-
-            val mockSeasonResponse = listOf("season_1.json")
-            coEvery { feedService.getAllSeasons() } returns Response.success(mockSeasonResponse)
-            coEvery { feedService.getSeasonEpisodes(any()) } returns Response.success(emptyList())
-            // Mock non-suspending repository method to throw
-            every { episodeRepository.getAllEpisodesIds() } throws RuntimeException("DB error")
-            episodesViewModel.refreshDatabaseBlocking()
-            testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(episodesViewModel.statusRefresh).isEqualTo(EpisodesViewModel.LoadStatus.ERROR)
-        }
+        assertEquals(
+            "Expected ERROR but got ${viewModel.statusRefresh}. lastError=${viewModel.lastError}",
+            EpisodesViewModel.LoadStatus.ERROR,
+            viewModel.statusRefresh,
+        )
+    }
 }

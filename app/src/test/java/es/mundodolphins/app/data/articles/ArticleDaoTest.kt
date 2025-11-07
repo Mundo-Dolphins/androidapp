@@ -1,5 +1,6 @@
 package es.mundodolphins.app.data.articles
 
+import android.os.Build
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.TypeConverters
@@ -16,12 +17,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 import java.io.IOException
 import java.time.Instant
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.S])
 class ArticleDaoTest {
     // No need to override Dispatchers.Main for DAO tests
 

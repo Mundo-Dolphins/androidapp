@@ -25,22 +25,45 @@ class EpisodesViewModel(
     private val episodeRepository: EpisodeRepository,
     private val feedService: FeedService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : ViewModel() {
-    var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
+    private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+) : ViewModel(), EpisodesUiModel {
+    override var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
         private set
 
-    val feed: Flow<List<Episode>> by lazy { episodeRepository.getFeed() }
+    // Visible for tests to inspect exceptions
+    @VisibleForTesting
+    var lastError: String? = null
+        private set
+
+    override val feed: Flow<List<Episode>> by lazy { episodeRepository.getFeed() }
 
     val seasons: Flow<List<Int>> by lazy { episodeRepository.getSeasons() }
 
-    var season: Flow<List<Episode>> by mutableStateOf(emptyFlow())
+    override var season: Flow<List<Episode>> by mutableStateOf(emptyFlow())
 
-    var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
+    override var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
-    fun refreshDatabase() {
+    override fun refreshDatabase() {
         viewModelScope.launch {
             // Keep launching on viewModelScope, delegate to suspend function
             refreshDatabaseBlocking()
+        }
+    }
+
+    // Simple safe logging helpers to avoid RuntimeException in JVM unit tests where android.util.Log is not mocked
+    private fun safeLogI(tag: String, msg: String) {
+        try {
+            Log.i(tag, msg)
+        } catch (_: Throwable) {
+            // ignore logging failures in unit test environment
+        }
+    }
+
+    private fun safeLogE(tag: String, msg: String, t: Throwable? = null) {
+        try {
+            if (t != null) Log.e(tag, msg, t) else Log.e(tag, msg)
+        } catch (_: Throwable) {
+            // ignore
         }
     }
 
@@ -54,16 +77,16 @@ class EpisodesViewModel(
                 if (response.isSuccessful) {
                     val seasonsBody = response.body()
                     if (seasonsBody == null || seasonsBody.isEmpty()) {
-                        Log.i("Refreshing Database", "No seasons found or body is null")
-                        withContext(Dispatchers.Main) { statusRefresh = LoadStatus.EMPTY }
+                        safeLogI("Refreshing Database", "No seasons found or body is null")
+                        withContext(mainDispatcher) { statusRefresh = LoadStatus.EMPTY }
                     } else {
                         seasonsBody.apply {
-                            Log.i("Refreshing Database", "Found ${this.size} seasons")
+                            safeLogI("Refreshing Database", "Found ${this.size} seasons")
                             val episodes = episodeRepository.getAllEpisodesIds()
                             map { it.convertJsonFilenameToSeason() }.forEach { season ->
                                 val seasonEpisodes = feedService.getSeasonEpisodes(season)
                                 if (seasonEpisodes.isSuccessful) {
-                                    Log.i(
+                                    safeLogI(
                                         "Refreshing Database",
                                         "Found ${seasonEpisodes.body()!!.size} episodes for season $season",
                                     )
@@ -76,13 +99,13 @@ class EpisodesViewModel(
                                 }
                             }
                         }
-                        withContext(Dispatchers.Main) { statusRefresh = LoadStatus.SUCCESS }
+                        withContext(mainDispatcher) { statusRefresh = LoadStatus.SUCCESS }
                     }
                 } else {
-                    // Mark as ERROR first so crash reporting failures don't prevent the state update
-                    withContext(Dispatchers.Main) { statusRefresh = LoadStatus.ERROR }
+                    // Mark as ERROR first so crashlytics failures don't prevent the state update
+                    withContext(mainDispatcher) { statusRefresh = LoadStatus.ERROR }
                     try {
-                        Log.e(
+                        safeLogE(
                             "Refreshing Database",
                             "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
                                 response.raw().request.url
@@ -106,9 +129,19 @@ class EpisodesViewModel(
             }
         } catch (e: Exception) {
             // Ensure status is set to ERROR even if crashlytics logging fails
-            withContext(Dispatchers.Main) { statusRefresh = LoadStatus.ERROR }
+            withContext(mainDispatcher) { statusRefresh = LoadStatus.ERROR }
+            // Store stacktrace for tests
             try {
-                Log.e("Loading Feed", e.message.toString(), e)
+                lastError = e.stackTraceToString()
+            } catch (_: Exception) {
+            }
+            // Debug: print stacktrace so test output captures reason for ERROR
+            try {
+                e.printStackTrace()
+            } catch (_: Exception) {
+            }
+            try {
+                safeLogE("Loading Feed", e.message.toString(), e)
             } catch (_: Exception) {
                 // ignore
             }
@@ -123,14 +156,14 @@ class EpisodesViewModel(
         }
     }
 
-    fun getEpisode(id: Long) {
+    override fun getEpisode(id: Long) {
         viewModelScope.launch(ioDispatcher) {
             // Use injected dispatcher
             episode = episodeRepository.getEpisodeById(id)
         }
     }
 
-    fun getSeason(seasonId: Int) {
+    override fun getSeason(seasonId: Int) {
         viewModelScope.launch(ioDispatcher) {
             // Use injected dispatcher
             season = episodeRepository.getSeason(seasonId)
