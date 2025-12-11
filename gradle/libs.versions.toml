@@ -1,6 +1,6 @@
 [versions]
 activityCompose = "1.12.1"
-agp = "8.13.1"
+agp = "8.13.2"
 assertjCore = "3.27.6"
 awaitilityKotlin = "4.3.0"
 browser = "1.9.0"
