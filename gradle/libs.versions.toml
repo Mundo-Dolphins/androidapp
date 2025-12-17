@@ -1,5 +1,5 @@
 [versions]
-activityCompose = "1.12.1"
+activityCompose = "1.12.2"
 agp = "8.13.2"
 assertjCore = "3.27.6"
 awaitilityKotlin = "4.3.0"
