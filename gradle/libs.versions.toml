@@ -38,7 +38,7 @@ rules = "1.7.0"
 runner = "1.7.0"
 runtimeLivedata = "1.10.0"
 truth = "1.4.5"
-junitJupiter = "6.0.1"
+junitJupiter = "6.0.2"
 ktlint = "14.0.1"
 detekt = "1.23.8"
 
