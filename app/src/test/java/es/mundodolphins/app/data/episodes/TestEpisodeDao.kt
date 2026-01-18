@@ -5,35 +5,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /** In-memory test implementation of EpisodeDao for unit tests */
-class TestEpisodeDao(initial: List<Episode> = emptyList()) : EpisodeDao {
-    private val _episodes = MutableStateFlow<List<Episode>>(initial.toMutableList())
+class TestEpisodeDao(
+    initial: List<Episode> = emptyList(),
+) : EpisodeDao {
+    private val episodesFlow = MutableStateFlow<List<Episode>>(initial.toMutableList())
 
     override suspend fun insertEpisode(episode: Episode) {
-        val current = _episodes.value.toMutableList()
+        val current = episodesFlow.value.toMutableList()
         val idx = current.indexOfFirst { it.id == episode.id }
         if (idx >= 0) current[idx] = episode else current.add(episode)
-        _episodes.value = current
+        episodesFlow.value = current
     }
 
     override suspend fun insertAllEpisodes(episodes: List<Episode>) {
-        val current = _episodes.value.toMutableList()
+        val current = episodesFlow.value.toMutableList()
         for (ep in episodes) {
             val idx = current.indexOfFirst { it.id == ep.id }
             if (idx >= 0) current[idx] = ep else current.add(ep)
         }
-        _episodes.value = current
+        episodesFlow.value = current
     }
 
-    override fun getAllEpisodesIds(): List<Long> = _episodes.value.map { it.id }
+    override fun getAllEpisodesIds(): List<Long> = episodesFlow.value.map { it.id }
 
     override fun getEpisodeById(episodeId: Long): Flow<Episode?> =
-        MutableStateFlow(_episodes.value.firstOrNull { it.id == episodeId }).asStateFlow()
+        MutableStateFlow(episodesFlow.value.firstOrNull { it.id == episodeId }).asStateFlow()
 
-    override fun getFeed(): Flow<List<Episode>> = _episodes.asStateFlow()
+    override fun getFeed(): Flow<List<Episode>> = episodesFlow.asStateFlow()
 
-    override fun getSeasons(): Flow<List<Int>> =
-        MutableStateFlow(_episodes.value.map { it.season }.distinct()).asStateFlow()
+    override fun getSeasons(): Flow<List<Int>> = MutableStateFlow(episodesFlow.value.map { it.season }.distinct()).asStateFlow()
 
     override fun getSeason(seasonId: Int): Flow<List<Episode>> =
-        MutableStateFlow(_episodes.value.filter { it.season == seasonId }).asStateFlow()
+        MutableStateFlow(episodesFlow.value.filter { it.season == seasonId }).asStateFlow()
 }

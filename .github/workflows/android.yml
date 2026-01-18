@@ -95,8 +95,8 @@ jobs:
       - name: Run static analysis, build and tests
         run: |
           chmod +x gradlew
-          # Run static analysis but don't fail the step if it reports issues
-          ./gradlew :app:ktlintCheck :app:detekt --console=plain --info --stacktrace --parallel --build-cache || true
+          # Run static analysis; fail the step if ktlint/detekt report issues
+          ./gradlew :app:ktlintCheck :app:detekt --console=plain --info --stacktrace --parallel --build-cache
 
           # Build and run unit tests (this should fail the job on error)
           ./gradlew clean assembleDebug :app:testDebugUnitTest --console=plain --info --stacktrace --parallel --build-cache

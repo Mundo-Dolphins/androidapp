@@ -3,10 +3,10 @@ package es.mundodolphins.app.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import es.mundodolphins.app.data.episodes.Episode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import es.mundodolphins.app.data.episodes.Episode
 
 /**
  * Test double that exposes the same public properties the UI consumes.
@@ -27,7 +27,7 @@ class FakeEpisodesViewModel(
     override var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
     // No-op for tests
-    override fun refreshDatabase() {}
+    override fun refreshDatabase() = Unit
 
     // Allow tests to simulate selecting an episode/season
     override fun getEpisode(id: Long) {

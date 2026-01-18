@@ -1,7 +1,7 @@
 package es.mundodolphins.app.viewmodel
 
-import kotlinx.coroutines.flow.Flow
 import es.mundodolphins.app.data.episodes.Episode
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Minimal interface representing the pieces of EpisodesViewModel that UI code consumes.
@@ -22,4 +22,3 @@ interface EpisodesUiModel {
 
     fun getSeason(seasonId: Int)
 }
-

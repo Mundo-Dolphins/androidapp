@@ -3,8 +3,8 @@ package es.mundodolphins.app.observer
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.os.Looper
 import android.os.Build
+import android.os.Looper
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import com.google.common.truth.Truth.assertThat

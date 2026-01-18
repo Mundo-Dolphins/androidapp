@@ -26,7 +26,8 @@ class EpisodesViewModel(
     private val feedService: FeedService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
-) : ViewModel(), EpisodesUiModel {
+) : ViewModel(),
+    EpisodesUiModel {
     override var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)
         private set
 
@@ -51,7 +52,10 @@ class EpisodesViewModel(
     }
 
     // Simple safe logging helpers to avoid RuntimeException in JVM unit tests where android.util.Log is not mocked
-    private fun safeLogI(tag: String, msg: String) {
+    private fun safeLogI(
+        tag: String,
+        msg: String,
+    ) {
         try {
             Log.i(tag, msg)
         } catch (_: Throwable) {
@@ -59,7 +63,11 @@ class EpisodesViewModel(
         }
     }
 
-    private fun safeLogE(tag: String, msg: String, t: Throwable? = null) {
+    private fun safeLogE(
+        tag: String,
+        msg: String,
+        t: Throwable? = null,
+    ) {
         try {
             if (t != null) Log.e(tag, msg, t) else Log.e(tag, msg)
         } catch (_: Throwable) {
@@ -137,7 +145,8 @@ class EpisodesViewModel(
             }
             // Debug: print stacktrace so test output captures reason for ERROR
             try {
-                e.printStackTrace()
+                // Avoid direct printStackTrace() usage; use safe logging helper
+                safeLogE("Loading Feed", e.message.toString(), e)
             } catch (_: Exception) {
             }
             try {
