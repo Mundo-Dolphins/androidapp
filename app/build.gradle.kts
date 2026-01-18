@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("jacoco") // Added
     // Static analysis plugins
@@ -57,7 +56,6 @@ android {
     buildFeatures {
         compose = true
     }
-    buildToolsVersion = "35.0.0"
 }
 
 kotlin {
