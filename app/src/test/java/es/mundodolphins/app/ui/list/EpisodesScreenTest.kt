@@ -2,21 +2,20 @@ package es.mundodolphins.app.ui.list
 
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
+import es.mundodolphins.app.R
+import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.ui.views.list.EpisodesScreen
+import es.mundodolphins.app.viewmodel.FakeEpisodesViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import es.mundodolphins.app.R
-import es.mundodolphins.app.data.episodes.Episode
-import es.mundodolphins.app.ui.views.list.EpisodesScreen
-import es.mundodolphins.app.viewmodel.FakeEpisodesViewModel
-import es.mundodolphins.app.viewmodel.EpisodesUiModel
 import java.time.Instant
 
 @RunWith(RobolectricTestRunner::class)
@@ -25,18 +24,19 @@ class EpisodesScreenTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun sampleEpisode(id: Long = 1L) = Episode(
-        id = id,
-        title = "Test Episode",
-        description = "Description",
-        audio = "https://example.com/audio.mp3",
-        published = Instant.ofEpochMilli(1744038703000),
-        imgMain = "",
-        imgMini = "",
-        len = "00:10:00",
-        link = "https://example.com",
-        season = 1,
-    )
+    private fun sampleEpisode(id: Long = 1L) =
+        Episode(
+            id = id,
+            title = "Test Episode",
+            description = "Description",
+            audio = "https://example.com/audio.mp3",
+            published = Instant.ofEpochMilli(1744038703000),
+            imgMain = "",
+            imgMini = "",
+            len = "00:10:00",
+            link = "https://example.com",
+            season = 1,
+        )
 
     @Test
     fun whenStatusSuccess_showsEpisodeTitleAndMoreButton() {
@@ -44,7 +44,7 @@ class EpisodesScreenTest {
 
         composeTestRule.setContent {
             // Provide the fake directly
-            EpisodesScreen(navController = rememberNavController(), model = fake as EpisodesUiModel)
+            EpisodesScreen(navController = rememberNavController(), model = fake)
         }
 
         // Verify title exists

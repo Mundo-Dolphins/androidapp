@@ -4,12 +4,13 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.bar.AppBar
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import es.mundodolphins.app.R
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.S])
@@ -22,7 +23,7 @@ class MundoDolphinsScreenTest {
         // Set the content to the Composable under test
         composeTestRule.setContent {
             // Test the top AppBar directly to avoid heavy ViewModel / Firebase initialization
-            es.mundodolphins.app.ui.bar.AppBar()
+            AppBar()
         }
 
         // Verify that the app name text is displayed

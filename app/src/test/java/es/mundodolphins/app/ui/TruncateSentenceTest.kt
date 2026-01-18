@@ -29,4 +29,3 @@ class TruncateSentenceTest {
         assertEquals(input, out)
     }
 }
-

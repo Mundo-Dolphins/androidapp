@@ -3,8 +3,8 @@ package es.mundodolphins.app.viewmodel
 import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.data.episodes.TestEpisodeDao
 import es.mundodolphins.app.repository.EpisodeRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 /**
@@ -15,9 +15,10 @@ fun createTestEpisodesViewModel(
     feedService: FeedService,
     ioDispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
     mainDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
-): EpisodesViewModel = EpisodesViewModel(
-    EpisodeRepository(TestEpisodeDao(initialEpisodes)),
-    feedService,
-    ioDispatcher,
-    mainDispatcher,
-)
+): EpisodesViewModel =
+    EpisodesViewModel(
+        EpisodeRepository(TestEpisodeDao(initialEpisodes)),
+        feedService,
+        ioDispatcher,
+        mainDispatcher,
+    )
