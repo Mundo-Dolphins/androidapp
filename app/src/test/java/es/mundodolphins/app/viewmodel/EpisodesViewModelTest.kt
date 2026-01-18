@@ -2,7 +2,8 @@ package es.mundodolphins.app.viewmodel
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.junit.Assert.*
+ import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import retrofit2.Response
 import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.models.EpisodeResponse

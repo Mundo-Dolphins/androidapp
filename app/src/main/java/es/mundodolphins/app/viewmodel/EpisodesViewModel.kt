@@ -137,7 +137,8 @@ class EpisodesViewModel(
             }
             // Debug: print stacktrace so test output captures reason for ERROR
             try {
-                e.printStackTrace()
+                // Avoid direct printStackTrace() usage; use safe logging helper
+                safeLogE("Loading Feed", e.message.toString(), e)
             } catch (_: Exception) {
             }
             try {

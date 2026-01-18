@@ -27,7 +27,7 @@ class FakeEpisodesViewModel(
     override var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
     // No-op for tests
-    override fun refreshDatabase() {}
+    override fun refreshDatabase() = Unit
 
     // Allow tests to simulate selecting an episode/season
     override fun getEpisode(id: Long) {
