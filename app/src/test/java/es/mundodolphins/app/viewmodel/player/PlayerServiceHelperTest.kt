@@ -3,7 +3,7 @@ package es.mundodolphins.app.viewmodel.player
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import es.mundodolphins.app.services.AudioPlayerService
 import es.mundodolphins.app.services.AudioPlayerService.AudioPlayerBinder
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper.IntentBuilder
@@ -33,10 +33,10 @@ class PlayerServiceHelperTest {
     fun `should bind and start the service`() {
         val mp3Url = "https://example.com/audio.mp3"
         val currentPosition = 5000L
-        val mockExoPlayer = mockk<ExoPlayer>()
+        val mockPlayer = mockk<Player>()
         val mockAudioPlayerService =
             mockk<AudioPlayerService> {
-                every { getExoPlayer() } returns mockExoPlayer
+                every { getExoPlayer() } returns mockPlayer
             }
         val intent = mockk<Intent>()
 
@@ -55,7 +55,7 @@ class PlayerServiceHelperTest {
             mp3Url,
             currentPosition,
         ) { exoPlayer, service ->
-            assert(exoPlayer == mockExoPlayer)
+            assert(exoPlayer == mockPlayer)
             assert(service == mockAudioPlayerService)
         }
 
@@ -67,10 +67,10 @@ class PlayerServiceHelperTest {
     fun `should unbind and stop the service`() {
         val intent = mockk<Intent>()
         every { intentBuilder.buildIntent(context, any(), any()) } returns intent
-        val mockExoPlayer = mockk<ExoPlayer>()
+        val mockPlayer = mockk<Player>()
         val mockAudioPlayerService =
             mockk<AudioPlayerService> {
-                every { getExoPlayer() } returns mockExoPlayer
+                every { getExoPlayer() } returns mockPlayer
             }
         val audioPlayerBinder =
             mockk<AudioPlayerBinder> {

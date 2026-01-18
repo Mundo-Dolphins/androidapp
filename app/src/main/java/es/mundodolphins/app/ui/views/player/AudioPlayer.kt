@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.viewmodel.player.PlayerViewModel
@@ -77,7 +77,7 @@ fun AudioPlayerView(
 
 @Composable
 private fun PlayerControls(
-    player: ExoPlayer?,
+    player: Player?,
     playerViewModel: PlayerViewModel,
 ) {
     val isPlaying = remember { mutableStateOf(false) }
