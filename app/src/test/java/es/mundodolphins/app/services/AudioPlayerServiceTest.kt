@@ -1,7 +1,13 @@
 package es.mundodolphins.app.services
 
 import android.app.Service.START_STICKY
+import androidx.media3.exoplayer.ExoPlayer
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -12,6 +18,20 @@ import org.robolectric.shadows.ShadowLooper
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 class AudioPlayerServiceTest {
+    private lateinit var mockExoPlayer: ExoPlayer
+
+    @Before
+    fun setUp() {
+        mockExoPlayer = mockk(relaxed = true)
+        every { mockExoPlayer.isPlaying } returns false
+        AudioPlayerService.exoPlayerFactory = { mockExoPlayer }
+    }
+
+    @After
+    fun tearDown() {
+        AudioPlayerService.resetExoPlayerFactory()
+    }
+
     @Test
     fun `should start the player service`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
@@ -59,9 +79,7 @@ class AudioPlayerServiceTest {
     fun `should release exoPlayer on service destroy`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
         val service = serviceController.create().get()
-        val exoPlayer = service.getExoPlayer()
         serviceController.destroy()
-        assertThat(exoPlayer.isPlaying).isFalse()
-        assertThat(exoPlayer.isReleased).isTrue()
+        verify { mockExoPlayer.release() }
     }
 }

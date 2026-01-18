@@ -32,17 +32,7 @@ class AudioPlayerService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        exoPlayer =
-            ExoPlayer
-                .Builder(this)
-                .setMediaSourceFactory(
-                    DefaultMediaSourceFactory(
-                        DefaultHttpDataSource
-                            .Factory()
-                            .setUserAgent(USER_AGENT)
-                            .setAllowCrossProtocolRedirects(true),
-                    ),
-                ).build()
+        exoPlayer = exoPlayerFactory(this)
 
         exoPlayer.addListener(
             object : Player.Listener {
@@ -100,7 +90,7 @@ class AudioPlayerService : Service() {
         fun getService(): AudioPlayerService = this@AudioPlayerService
     }
 
-    fun getExoPlayer() = exoPlayer
+    fun getExoPlayer(): Player = exoPlayer
 
     private fun createNotification(): Notification {
         val channelId = "audio_playback"
@@ -149,5 +139,28 @@ class AudioPlayerService : Service() {
     companion object {
         private const val USER_AGENT =
             "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0"
+
+        @OptIn(UnstableApi::class)
+        private val defaultExoPlayerFactory: (AudioPlayerService) -> ExoPlayer =
+            { service ->
+                ExoPlayer
+                    .Builder(service)
+                    .setMediaSourceFactory(
+                        DefaultMediaSourceFactory(
+                            DefaultHttpDataSource
+                                .Factory()
+                                .setUserAgent(USER_AGENT)
+                                .setAllowCrossProtocolRedirects(true),
+                        ),
+                    ).build()
+            }
+
+        @VisibleForTesting
+        var exoPlayerFactory: (AudioPlayerService) -> ExoPlayer = defaultExoPlayerFactory
+
+        @VisibleForTesting
+        internal fun resetExoPlayerFactory() {
+            exoPlayerFactory = defaultExoPlayerFactory
+        }
     }
 }

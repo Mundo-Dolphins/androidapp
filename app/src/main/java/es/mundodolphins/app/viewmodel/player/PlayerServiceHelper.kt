@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import es.mundodolphins.app.services.AudioPlayerService
 
 class PlayerServiceHelper(
@@ -18,7 +18,7 @@ class PlayerServiceHelper(
         context: Context,
         mp3Url: String,
         currentPosition: Long,
-        onServiceConnected: (ExoPlayer, AudioPlayerService) -> Unit,
+        onServiceConnected: (Player, AudioPlayerService) -> Unit,
     ) {
         if (!isServiceBound) {
             val intent = intentBuilder.buildIntent(context, mp3Url, currentPosition)

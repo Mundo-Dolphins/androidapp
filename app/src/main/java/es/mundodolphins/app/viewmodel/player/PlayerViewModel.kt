@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import es.mundodolphins.app.repository.EpisodeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +17,8 @@ class PlayerViewModel(
     private val episodeRepository: EpisodeRepository,
     private val playerServiceHelper: PlayerServiceHelper,
 ) : ViewModel() {
-    private val _playerState = MutableStateFlow<ExoPlayer?>(null)
-    val playerState: StateFlow<ExoPlayer?> = _playerState
+    private val _playerState = MutableStateFlow<Player?>(null)
+    val playerState: StateFlow<Player?> = _playerState
 
     private var currentPosition: Long = 0L
     private var audioID: Long = 0L
@@ -76,7 +76,7 @@ class PlayerViewModel(
             episodeRepository.updateEpisodePosition(
                 audioID,
                 position,
-                _playerStatus.value == ExoPlayer.STATE_ENDED,
+                _playerStatus.value == Player.STATE_ENDED,
             )
         }
     }
