@@ -1,7 +1,7 @@
 [versions]
 activityCompose = "1.12.2"
 agp = "9.0.0"
-assertjCore = "3.27.6"
+assertjCore = "3.27.7"
 awaitilityKotlin = "4.3.0"
 browser = "1.9.0"
 coilCompose = "3.3.0"
