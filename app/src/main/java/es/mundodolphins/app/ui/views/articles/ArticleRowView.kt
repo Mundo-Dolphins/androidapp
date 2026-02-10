@@ -53,13 +53,13 @@ fun ArticleRow(
                 Markwon
                     .create(LocalContext.current)
                     .toMarkdown(
-                        article.content.let {
-                            if (it.length > 100) {
-                                truncateSentence(it) + "..."
+                        article.content?.let { content ->
+                            if (content.length > 100) {
+                                truncateSentence(content) + "..."
                             } else {
-                                it
+                                content
                             }
-                        },
+                        } ?: "",
                     ).toString(),
             fontSize = 18.sp,
             color = Color.DarkGray,
