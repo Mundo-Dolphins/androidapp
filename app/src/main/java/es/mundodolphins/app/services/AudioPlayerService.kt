@@ -9,8 +9,9 @@ import android.os.Binder
 import androidx.annotation.OptIn
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
+import androidx.media3.common.C
 import androidx.lifecycle.MutableLiveData
-import androidx.media3.common.C.WAKE_MODE_NETWORK
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -33,6 +34,15 @@ class AudioPlayerService : Service() {
         super.onCreate()
 
         exoPlayer = exoPlayerFactory(this)
+        exoPlayer.setAudioAttributes(
+            AudioAttributes
+                .Builder()
+                .setUsage(C.USAGE_MEDIA)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                .build(),
+            true,
+        )
+        exoPlayer.setHandleAudioBecomingNoisy(true)
 
         exoPlayer.addListener(
             object : Player.Listener {
@@ -61,7 +71,7 @@ class AudioPlayerService : Service() {
         val currentPosition = intent.getLongExtra("CURRENT_POSITION", 0L)
         exoPlayer.setMediaItem(MediaItem.fromUri(mp3Url))
         exoPlayer.prepare()
-        exoPlayer.setWakeMode(WAKE_MODE_NETWORK)
+        exoPlayer.setWakeMode(C.WAKE_MODE_NETWORK)
         exoPlayer.playWhenReady = true
         exoPlayer.seekTo(currentPosition)
 

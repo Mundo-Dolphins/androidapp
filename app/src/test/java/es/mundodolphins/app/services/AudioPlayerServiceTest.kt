@@ -1,6 +1,7 @@
 package es.mundodolphins.app.services
 
 import android.app.Service.START_STICKY
+import androidx.media3.common.AudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
@@ -81,5 +82,16 @@ class AudioPlayerServiceTest {
         val service = serviceController.create().get()
         serviceController.destroy()
         verify { mockExoPlayer.release() }
+    }
+
+    @Test
+    fun `should configure audio focus handling on create`() {
+        val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
+        serviceController.create()
+
+        verify { mockExoPlayer.setAudioAttributes(any<AudioAttributes>(), true) }
+        verify { mockExoPlayer.setHandleAudioBecomingNoisy(true) }
+
+        serviceController.destroy()
     }
 }

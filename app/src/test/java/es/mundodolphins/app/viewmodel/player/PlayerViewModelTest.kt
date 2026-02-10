@@ -33,7 +33,7 @@ class PlayerViewModelTest {
         Dispatchers.setMain(testDispatcher)
         episodeRepository = mockk()
         playerServiceHelper = mockk()
-        playerViewModel = PlayerViewModel(episodeRepository, playerServiceHelper)
+        playerViewModel = PlayerViewModel(episodeRepository, playerServiceHelper, testDispatcher)
     }
 
     @After
