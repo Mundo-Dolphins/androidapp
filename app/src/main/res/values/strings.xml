@@ -13,4 +13,8 @@
     <string name="back">Atrás</string>
     <string name="news">Noticias</string>
     <string name="author">Autor:  %1$s</string>
+    <string name="videos">Vídeos</string>
+    <string name="videos_empty">No hay vídeos disponibles</string>
+    <string name="videos_error">No se pudieron cargar los vídeos</string>
+    <string name="retry">Reintentar</string>
 </resources>

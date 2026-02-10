@@ -19,8 +19,10 @@ import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsListScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsView
+import es.mundodolphins.app.ui.views.videos.VideosScreen
 import es.mundodolphins.app.viewmodel.ArticlesViewModel
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
+import es.mundodolphins.app.viewmodel.VideosViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -28,6 +30,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     episodesViewModel: EpisodesViewModel = viewModel(),
     articlesViewModel: ArticlesViewModel = viewModel(),
+    videosViewModel: VideosViewModel = viewModel(),
     navController: NavHostController,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -85,6 +88,14 @@ fun MainScreen(
                     article = articlesViewModel.getArticleByPublishedDate(publishedTimestamp),
                     modifier = modifier,
                     navController = navController,
+                )
+            }
+
+            composable(route = Routes.Videos.route) {
+                videosViewModel.fetchVideos()
+                VideosScreen(
+                    modifier = modifier,
+                    model = videosViewModel,
                 )
             }
         }
