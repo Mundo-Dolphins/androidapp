@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import es.mundodolphins.app.repository.EpisodeRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     private val episodeRepository: EpisodeRepository,
     private val playerServiceHelper: PlayerServiceHelper,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
     private val _playerState = MutableStateFlow<Player?>(null)
     val playerState: StateFlow<Player?> = _playerState
@@ -37,7 +39,7 @@ class PlayerViewModel(
         episodeId: Long,
         mp3Url: String,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             audioID = episodeId
             currentPosition = episodeRepository.getEpisodeById(audioID).first()?.listenedProgress ?: 0L
 
@@ -72,7 +74,7 @@ class PlayerViewModel(
     }
 
     private fun savePlayerPosition(position: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             episodeRepository.updateEpisodePosition(
                 audioID,
                 position,
