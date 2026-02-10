@@ -46,6 +46,11 @@ private val navigationItems =
             drawable = R.drawable.newspaper,
             label = R.string.news,
         ),
+        BottomBarButton(
+            Routes.Videos.route,
+            drawable = R.drawable.play_arrow,
+            label = R.string.videos,
+        ),
     )
 
 @Composable

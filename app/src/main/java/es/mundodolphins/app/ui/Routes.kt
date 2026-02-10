@@ -16,4 +16,6 @@ sealed class Routes(
     data object Articles : Routes("articles")
 
     data object Article : Routes("article")
+
+    data object Videos : Routes("videos")
 }
