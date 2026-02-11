@@ -3,21 +3,26 @@ package es.mundodolphins.app
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,7 +46,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
@@ -118,6 +123,15 @@ fun MundoDolphinsScreen(
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
 
+    var latestVersionCode by remember { mutableLongStateOf(0L) }
+    val currentVersionCode =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getPackageInfo(context.packageName, 0).versionCode.toLong()
+        }
+
     // Firebase Remote Config is not available in Compose Previews.
     // We wrap it in a LocalInspectionMode check to avoid IllegalStateException.
     if (!LocalInspectionMode.current) {
@@ -128,6 +142,13 @@ fun MundoDolphinsScreen(
             },
         )
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+        LaunchedEffect(Unit) {
+            remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    latestVersionCode = remoteConfig.getLong("latest_version_code")
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -179,6 +200,41 @@ fun MundoDolphinsScreen(
                     )
                 }
             }
+
+            if (latestVersionCode > currentVersionCode) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+                            .clickable {
+                                val intent =
+                                    Intent(Intent.ACTION_VIEW).apply {
+                                        data = Uri.parse("market://details?id=${context.packageName}")
+                                        setPackage("com.android.vending")
+                                    }
+                                context.startActivity(intent)
+                            }
+                            .padding(16.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        )
+                        Text(
+                            text = "¡Nueva versión disponible! Toca para actualizar.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 8.dp),
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        )
+                    }
+                }
+            }
+
             MainScreen(
                 episodesViewModel = viewModel,
                 modifier = Modifier.padding(innerPadding),
