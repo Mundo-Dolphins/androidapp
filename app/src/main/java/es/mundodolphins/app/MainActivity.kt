@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,26 +36,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import es.mundodolphins.app.client.MundoDolphinsClient
-import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.notifications.PushNotificationData
 import es.mundodolphins.app.observer.ConnectivityObserver
-import es.mundodolphins.app.repository.EpisodeRepository
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.bar.AppBar
 import es.mundodolphins.app.ui.bar.AppBottomBar
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.main.MainScreen
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
-import es.mundodolphins.app.viewmodel.EpisodesViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var pendingPushTarget by mutableStateOf<PushNotificationData.Target?>(null)
 
@@ -102,33 +98,40 @@ fun MundoDolphinsScreen(
     onPushTargetHandled: () -> Unit = {},
 ) {
     val navController = rememberNavController()
-    val viewModel: EpisodesViewModel =
-        viewModel(
-            factory =
-                EpisodesViewModelFactory(
-                    EpisodeRepository(
-                        AppDatabase
-                            .getDatabase(context = LocalContext.current.applicationContext)
-                            .episodeDao(),
-                    ),
-                    MundoDolphinsClient.feedService,
-                ),
-        )
+    val isPreview = LocalInspectionMode.current
+    if (isPreview) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = { AppBar() },
+            bottomBar = { AppBottomBar(navController) },
+        ) { innerPadding ->
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = "Mundo Dolphins Preview")
+            }
+        }
+        return
+    }
+
+    val viewModel: EpisodesViewModel = hiltViewModel()
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
 
     // Firebase Remote Config is not available in Compose Previews.
     // We wrap it in a LocalInspectionMode check to avoid IllegalStateException.
-    if (!LocalInspectionMode.current) {
-        val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-        remoteConfig.setConfigSettingsAsync(
-            remoteConfigSettings {
-                minimumFetchIntervalInSeconds = 3600
-            },
-        )
-        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-    }
+    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    remoteConfig.setConfigSettingsAsync(
+        remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+        },
+    )
+    remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

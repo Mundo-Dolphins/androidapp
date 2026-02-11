@@ -3,16 +3,19 @@ package es.mundodolphins.app.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import es.mundodolphins.app.client.MundoDolphinsClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import es.mundodolphins.app.repository.VideosRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class VideosViewModel(
-    private val videosRepositoryProvided: VideosRepository? = null,
-) : ViewModel() {
-    private val videosRepository = videosRepositoryProvided ?: VideosRepository(MundoDolphinsClient.videosService)
+@HiltViewModel
+class VideosViewModel
+    @Inject
+    constructor(
+        private val videosRepository: VideosRepository,
+    ) : ViewModel() {
 
     private val _videos = MutableStateFlow<List<VideoUiModel>>(emptyList())
     val videos: StateFlow<List<VideoUiModel>> = _videos

@@ -6,13 +6,16 @@ import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENED
 import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.LISTENING
 import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.NOT_LISTENED
 import es.mundodolphins.app.data.episodes.EpisodeDao
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull // Added import
 
-class EpisodeRepository(
+class EpisodeRepository
+    @Inject
+    constructor(
     private val episodeDao: EpisodeDao,
-) {
+    ) {
     suspend fun insertAllEpisodes(episodes: List<Episode>) = episodeDao.insertAllEpisodes(episodes)
 
     fun getAllEpisodesIds() = episodeDao.getAllEpisodesIds()

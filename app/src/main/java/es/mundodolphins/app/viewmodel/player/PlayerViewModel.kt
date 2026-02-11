@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import es.mundodolphins.app.di.IoDispatcher
 import es.mundodolphins.app.repository.EpisodeRepository
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +18,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class PlayerViewModel(
+@HiltViewModel
+class PlayerViewModel
+    @Inject
+    constructor(
     private val episodeRepository: EpisodeRepository,
     private val playerServiceHelper: PlayerServiceHelper,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
     private val _playerState = MutableStateFlow<Player?>(null)
     val playerState: StateFlow<Player?> = _playerState
