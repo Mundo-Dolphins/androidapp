@@ -3,18 +3,20 @@ package es.mundodolphins.app.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import es.mundodolphins.app.client.MundoDolphinsClient
+import dagger.hilt.android.lifecycle.HiltViewModel
+import es.mundodolphins.app.client.ArticlesService
 import es.mundodolphins.app.models.ArticlesResponse
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ArticlesViewModel(
-    private val articlesServiceProvided: es.mundodolphins.app.client.ArticlesService? = null,
-) : ViewModel() {
-    // Use provided service in tests; fall back to client in production.
-    private val articlesService: es.mundodolphins.app.client.ArticlesService =
-        articlesServiceProvided ?: MundoDolphinsClient.articlesService
+@HiltViewModel
+class ArticlesViewModel
+    @Inject
+    constructor(
+        private val articlesService: ArticlesService,
+    ) : ViewModel() {
     private val _articles = MutableStateFlow<List<ArticlesResponse>>(emptyList())
     val articles: StateFlow<List<ArticlesResponse>> = _articles
 

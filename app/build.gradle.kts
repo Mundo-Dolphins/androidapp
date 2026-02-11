@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
     id("jacoco") // Added
@@ -73,6 +74,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
@@ -97,6 +99,7 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.hilt.android)
 
     // Networking
     implementation(libs.converter.gson)
@@ -113,6 +116,7 @@ dependencies {
 
     // KSP
     ksp(libs.androidx.room.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // Markwon
     implementation(libs.markwon)
