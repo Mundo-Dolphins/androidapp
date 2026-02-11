@@ -22,19 +22,23 @@ class VideosViewModel
 
     private val _status = MutableStateFlow(LoadStatus.LOADING)
     val status: StateFlow<LoadStatus> = _status
+    private var hasLoadedOnce = false
 
-    fun fetchVideos() {
+    fun fetchVideos(force: Boolean = false) {
+        if (!force && hasLoadedOnce) return
         viewModelScope.launch {
-            fetchVideosSuspend()
+            fetchVideosSuspend(force)
         }
     }
 
-    suspend fun fetchVideosSuspend(): Boolean {
+    suspend fun fetchVideosSuspend(force: Boolean = false): Boolean {
+        if (!force && hasLoadedOnce) return true
         _status.value = LoadStatus.LOADING
         return try {
             val response = videosRepository.getVideos()
             _videos.value = response
             _status.value = if (response.isEmpty()) LoadStatus.EMPTY else LoadStatus.SUCCESS
+            hasLoadedOnce = true
             true
         } catch (e: Exception) {
             Log.e("VideosViewModel", "Error fetching videos", e)

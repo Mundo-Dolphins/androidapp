@@ -171,7 +171,7 @@ class ArticlesViewModelTest {
         }
 
     @Test
-    fun `fetchArticles should update articles on subsequent calls`() =
+    fun `fetchArticles should use cached articles on subsequent calls`() =
         runTest {
             val testDispatcher = UnconfinedTestDispatcher(testScheduler)
             Dispatchers.setMain(testDispatcher)
@@ -204,11 +204,39 @@ class ArticlesViewModelTest {
                 viewModel.articles.value
                     .first()
                     .title,
-            ).isEqualTo("B")
+            ).isEqualTo("A")
+            coVerify(exactly = 1) { mockService.getArticles() }
         }
 
     @Test
-    fun `fetchArticles on exception should not clear existing articles`() =
+    fun `fetchArticles should update articles when force is true`() =
+        runTest {
+            val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+            Dispatchers.setMain(testDispatcher)
+
+            val mockService = mockk<ArticlesService>()
+            val a = ArticlesResponse("A", "AuthA", "2025-01-01T00:00:00Z", "cA")
+            val b = ArticlesResponse("B", "AuthB", "2025-01-02T00:00:00Z", "cB")
+
+            val counter = AtomicInteger(0)
+            coEvery { mockService.getArticles() } answers {
+                if (counter.incrementAndGet() == 1) listOf(a) else listOf(b)
+            }
+
+            val viewModel = ArticlesViewModel(mockService)
+
+            viewModel.fetchArticles()
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertThat(viewModel.articles.value.first().title).isEqualTo("A")
+
+            viewModel.fetchArticles(force = true)
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertThat(viewModel.articles.value.first().title).isEqualTo("B")
+            coVerify(exactly = 2) { mockService.getArticles() }
+        }
+
+    @Test
+    fun `fetchArticles on forced exception should not clear existing articles`() =
         runTest {
             val testDispatcher = UnconfinedTestDispatcher(testScheduler)
             Dispatchers.setMain(testDispatcher)
@@ -231,7 +259,7 @@ class ArticlesViewModelTest {
             assertThat(viewModel.articles.value).hasSize(1)
 
             // second call throws, ensure previous content remains
-            viewModel.fetchArticles()
+            viewModel.fetchArticles(force = true)
             testDispatcher.scheduler.advanceUntilIdle()
             assertThat(viewModel.articles.value).hasSize(1)
             assertThat(

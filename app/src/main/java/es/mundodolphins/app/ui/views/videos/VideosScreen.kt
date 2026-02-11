@@ -91,7 +91,7 @@ fun VideosScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = stringResource(R.string.videos_error))
                     Button(
-                        onClick = { model.fetchVideos() },
+                        onClick = { model.fetchVideos(force = true) },
                         modifier = Modifier.padding(top = 12.dp),
                     ) {
                         Text(text = stringResource(R.string.retry))
