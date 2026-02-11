@@ -20,9 +20,11 @@ import es.mundodolphins.app.ui.views.links.UsefulLinksScreen
 import es.mundodolphins.app.ui.views.list.EpisodesScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsListScreen
 import es.mundodolphins.app.ui.views.seasons.SeasonsView
+import es.mundodolphins.app.ui.views.social.SocialScreen
 import es.mundodolphins.app.ui.views.videos.VideosScreen
 import es.mundodolphins.app.viewmodel.ArticlesViewModel
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
+import es.mundodolphins.app.viewmodel.SocialViewModel
 import es.mundodolphins.app.viewmodel.VideosViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)

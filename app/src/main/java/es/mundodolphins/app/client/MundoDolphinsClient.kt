@@ -23,4 +23,8 @@ object MundoDolphinsClient {
     val videosService: VideosService by lazy {
         retrofit.create(VideosService::class.java)
     }
+
+    val socialService: SocialService by lazy {
+        retrofit.create(SocialService::class.java)
+    }
 }

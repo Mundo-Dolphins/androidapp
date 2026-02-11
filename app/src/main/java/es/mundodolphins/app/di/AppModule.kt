@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import es.mundodolphins.app.client.ArticlesService
 import es.mundodolphins.app.client.FeedService
+import es.mundodolphins.app.client.SocialService
 import es.mundodolphins.app.client.VideosService
 import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.data.InstantConverter
@@ -43,6 +44,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideVideosService(retrofit: Retrofit): VideosService = retrofit.create(VideosService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSocialService(retrofit: Retrofit): SocialService = retrofit.create(SocialService::class.java)
 
     @Provides
     @Singleton

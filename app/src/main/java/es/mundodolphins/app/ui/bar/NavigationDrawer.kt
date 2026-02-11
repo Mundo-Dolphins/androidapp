@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -46,6 +47,11 @@ private val drawerItems =
             route = Routes.Videos.route,
             drawable = R.drawable.play_arrow,
             label = R.string.videos,
+        ),
+        DrawerItem(
+            route = Routes.Social.route,
+            icon = Icons.Filled.Share,
+            label = R.string.social,
         ),
     )
 
