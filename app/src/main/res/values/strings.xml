@@ -24,4 +24,6 @@
     <string name="notification_channel_news_name">Novedades Mundo Dolphins</string>
     <string name="notification_channel_news_description">Avisos de nuevos episodios y artículos</string>
     <string name="notification_new_content_default_body">Hay contenido nuevo disponible</string>
+    <string name="text_size_decrease">A-</string>
+    <string name="text_size_increase">A+</string>
 </resources>
