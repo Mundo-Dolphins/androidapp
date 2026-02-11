@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -48,7 +49,10 @@ fun MainScreen(
                 )
             }
             composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
-                episodesViewModel.getEpisode(backStackEntry.arguments?.getString("id")?.toLong() ?: 0)
+                val episodeId = backStackEntry.arguments?.getString("id")?.toLong() ?: 0L
+                LaunchedEffect(episodeId) {
+                    episodesViewModel.getEpisode(episodeId)
+                }
                 EpisodeScreen(
                     episode = episodesViewModel.episode.collectAsState(null).value,
                     navController = navController,
@@ -75,7 +79,9 @@ fun MainScreen(
             }
 
             composable(route = Routes.Articles.route) {
-                articlesViewModel.fetchArticles()
+                LaunchedEffect(Unit) {
+                    articlesViewModel.fetchArticles()
+                }
                 ListArticlesView(
                     articles = articlesViewModel.articles.collectAsState(emptyList()).value,
                     modifier = modifier,
@@ -86,7 +92,8 @@ fun MainScreen(
             composable(route = Routes.Article.route + "/{publishedTimestamp}") { backStackEntry ->
                 val publishedTimestamp = backStackEntry.arguments?.getString("publishedTimestamp")?.toLong() ?: Long.MIN_VALUE
                 val articles = articlesViewModel.articles.collectAsState(emptyList()).value
-                if (articles.isEmpty()) {
+                LaunchedEffect(articles.isEmpty()) {
+                    if (articles.isNotEmpty()) return@LaunchedEffect
                     articlesViewModel.fetchArticles()
                 }
 
@@ -101,7 +108,9 @@ fun MainScreen(
             }
 
             composable(route = Routes.Videos.route) {
-                videosViewModel.fetchVideos()
+                LaunchedEffect(Unit) {
+                    videosViewModel.fetchVideos()
+                }
                 VideosScreen(
                     modifier = modifier,
                     model = videosViewModel,
@@ -110,7 +119,9 @@ fun MainScreen(
 
             composable(route = Routes.Social.route) {
                 val socialViewModel: SocialViewModel = hiltViewModel()
-                socialViewModel.fetchSocialPosts()
+                LaunchedEffect(Unit) {
+                    socialViewModel.fetchSocialPosts()
+                }
                 SocialScreen(
                     modifier = modifier,
                     model = socialViewModel,

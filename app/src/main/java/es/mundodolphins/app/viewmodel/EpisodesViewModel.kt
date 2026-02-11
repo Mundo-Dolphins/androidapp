@@ -42,6 +42,8 @@ class EpisodesViewModel
     @VisibleForTesting
     var lastError: String? = null
         private set
+    private var hasRefreshedOnce = false
+    private var isRefreshInFlight = false
 
     override val feed: Flow<List<Episode>> by lazy { episodeRepository.getFeed() }
 
@@ -52,9 +54,15 @@ class EpisodesViewModel
     override var episode: Flow<Episode?> by mutableStateOf(emptyFlow())
 
     override fun refreshDatabase() {
+        if (hasRefreshedOnce || isRefreshInFlight) return
+        isRefreshInFlight = true
         viewModelScope.launch {
             // Keep launching on viewModelScope, delegate to suspend function
             refreshDatabaseBlocking()
+            isRefreshInFlight = false
+            if (statusRefresh == LoadStatus.SUCCESS || statusRefresh == LoadStatus.EMPTY) {
+                hasRefreshedOnce = true
+            }
         }
     }
 

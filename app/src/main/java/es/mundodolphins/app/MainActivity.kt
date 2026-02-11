@@ -59,7 +59,10 @@ import es.mundodolphins.app.ui.bar.AppBar
 import es.mundodolphins.app.ui.bar.AppNavigationDrawer
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.main.MainScreen
+import es.mundodolphins.app.viewmodel.ArticlesViewModel
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
+import es.mundodolphins.app.viewmodel.SocialViewModel
+import es.mundodolphins.app.viewmodel.VideosViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
@@ -132,6 +135,9 @@ fun MundoDolphinsScreen(
     }
 
     val viewModel: EpisodesViewModel = hiltViewModel()
+    val articlesViewModel: ArticlesViewModel = hiltViewModel()
+    val videosViewModel: VideosViewModel = hiltViewModel()
+    val socialViewModel: SocialViewModel = hiltViewModel()
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
     val isConnected by connectivityObserver.isConnected.observeAsState(initial = true)
@@ -192,8 +198,12 @@ fun MundoDolphinsScreen(
                     }
                 },
             )
-
-            viewModel.refreshDatabase()
+            PrefetchAppContent(
+                episodesViewModel = viewModel,
+                articlesViewModel = articlesViewModel,
+                videosViewModel = videosViewModel,
+                socialViewModel = socialViewModel,
+            )
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -235,6 +245,21 @@ fun MundoDolphinsScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun PrefetchAppContent(
+    episodesViewModel: EpisodesViewModel,
+    articlesViewModel: ArticlesViewModel,
+    videosViewModel: VideosViewModel,
+    socialViewModel: SocialViewModel,
+) {
+    LaunchedEffect(Unit) {
+        episodesViewModel.refreshDatabase()
+        articlesViewModel.fetchArticles()
+        videosViewModel.fetchVideos()
+        socialViewModel.fetchSocialPosts()
     }
 }
 
