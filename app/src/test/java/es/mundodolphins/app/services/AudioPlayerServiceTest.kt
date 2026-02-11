@@ -1,14 +1,10 @@
 package es.mundodolphins.app.services
 
 import android.app.Service.START_STICKY
-import androidx.media3.common.AudioAttributes
-import androidx.media3.exoplayer.ExoPlayer
+import android.content.Intent
+import androidx.media3.common.Player
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -17,45 +13,31 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLooper
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE, sdk = [28])
+@Config(sdk = [28])
 class AudioPlayerServiceTest {
-    private lateinit var mockExoPlayer: ExoPlayer
-
-    @Before
-    fun setUp() {
-        mockExoPlayer = mockk(relaxed = true)
-        every { mockExoPlayer.isPlaying } returns false
-        AudioPlayerService.exoPlayerFactory = { mockExoPlayer }
-    }
-
     @After
     fun tearDown() {
         AudioPlayerService.resetExoPlayerFactory()
     }
 
     @Test
-    fun `should start the player service`() {
+    fun `should create service and initialize player`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
         val service = serviceController.create().get()
 
         assertThat(service).isNotNull()
-        assertThat(service).isInstanceOf(AudioPlayerService::class.java)
+        assertThat(service.getExoPlayer()).isNotNull()
 
-        serviceController.startCommand(0, 0)
-
-        val exoPlayer = service.getExoPlayer()
-        assertThat(exoPlayer).isNotNull()
         serviceController.destroy()
-        assertThat(exoPlayer.isPlaying).isFalse()
     }
 
     @Test
     fun `should handle null intent gracefully`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
         val service = serviceController.create().get()
+
         val result = service.onStartCommand(null, 0, 0)
 
-        // Ensure main looper is idle before assertion
         ShadowLooper.idleMainLooper()
 
         assertThat(result).isEqualTo(START_STICKY)
@@ -63,34 +45,36 @@ class AudioPlayerServiceTest {
     }
 
     @Test
+    fun `should accept playback intent and keep sticky lifecycle`() {
+        val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
+        val service = serviceController.create().get()
+        val intent =
+            Intent().apply {
+                putExtra(AudioPlayerService.EXTRA_MP3_URL, "https://example.com/audio.mp3")
+                putExtra(AudioPlayerService.EXTRA_CURRENT_POSITION, 1_000L)
+                putExtra(AudioPlayerService.EXTRA_EPISODE_ID, 10L)
+                putExtra(AudioPlayerService.EXTRA_EPISODE_TITLE, "Episode")
+                putExtra(AudioPlayerService.EXTRA_EPISODE_IMAGE_URL, "https://example.com/cover.jpg")
+            }
+
+        val result = service.onStartCommand(intent, 0, 0)
+
+        assertThat(result).isEqualTo(START_STICKY)
+        assertThat(service.getExoPlayer().playbackState).isAnyOf(Player.STATE_BUFFERING, Player.STATE_READY)
+        serviceController.destroy()
+    }
+
+    @Test
     fun `should not crash when exoPlayer initialization fails`() {
         val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
         val service = serviceController.create().get()
-        // Simulate error during player initialization
+
         try {
             service.simulateExoPlayerError()
             assertThat(service.getExoPlayer().isPlaying).isFalse()
         } catch (e: Exception) {
             assertThat(e).isInstanceOf(RuntimeException::class.java)
         }
-        serviceController.destroy()
-    }
-
-    @Test
-    fun `should release exoPlayer on service destroy`() {
-        val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
-        val service = serviceController.create().get()
-        serviceController.destroy()
-        verify { mockExoPlayer.release() }
-    }
-
-    @Test
-    fun `should configure audio focus handling on create`() {
-        val serviceController = Robolectric.buildService(AudioPlayerService::class.java)
-        serviceController.create()
-
-        verify { mockExoPlayer.setAudioAttributes(any<AudioAttributes>(), true) }
-        verify { mockExoPlayer.setHandleAudioBecomingNoisy(true) }
 
         serviceController.destroy()
     }

@@ -108,7 +108,13 @@ fun EpisodeScreen(
                     )
                 }
 
-                AudioPlayerView(episode?.id ?: 0, episode?.audio ?: "", playerViewModel)
+                AudioPlayerView(
+                    episodeId = episode?.id ?: 0,
+                    mp3Url = episode?.audio ?: "",
+                    title = episode?.title ?: "",
+                    artworkUrl = episode?.imgMain,
+                    playerViewModel = playerViewModel,
+                )
             }
         }
     }

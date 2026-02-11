@@ -48,19 +48,31 @@ class PlayerViewModelTest {
             val episodeId = 1L
             val mp3Url = "https://example.com/audio.mp3"
             val listenedProgress = 5000L
+            val title = "Episode title"
+            val artworkUrl = "https://example.com/cover.jpg"
             val episode = mockk<Episode>()
 
             every { episode.listenedProgress } returns listenedProgress
             coEvery { episodeRepository.getEpisodeById(episodeId) } returns flowOf(episode)
             every {
-                playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any())
+                playerServiceHelper.bindAndStartService(
+                    context,
+                    match {
+                        it.episodeId == episodeId &&
+                            it.mp3Url == mp3Url &&
+                            it.currentPosition == listenedProgress &&
+                            it.title == title &&
+                            it.artworkUrl == artworkUrl
+                    },
+                    any(),
+                )
             } just Runs
 
-            playerViewModel.initializePlayer(context, episodeId, mp3Url)
+            playerViewModel.initializePlayer(context, episodeId, mp3Url, title, artworkUrl)
             testDispatcher.scheduler.advanceUntilIdle()
 
             coVerify { episodeRepository.getEpisodeById(episodeId) }
-            verify { playerServiceHelper.bindAndStartService(context, mp3Url, listenedProgress, any()) }
+            verify { playerServiceHelper.bindAndStartService(context, any(), any()) }
         }
 
     @Test

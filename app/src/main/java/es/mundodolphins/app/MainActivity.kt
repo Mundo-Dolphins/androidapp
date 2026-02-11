@@ -17,9 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,28 +42,44 @@ import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.repository.EpisodeRepository
 import es.mundodolphins.app.ui.bar.AppBar
 import es.mundodolphins.app.ui.bar.AppBottomBar
+import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.main.MainScreen
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 import es.mundodolphins.app.viewmodel.EpisodesViewModelFactory
+import es.mundodolphins.app.services.AudioPlayerService
 
 class MainActivity : ComponentActivity() {
+    private var targetEpisodeId by mutableStateOf<Long?>(null)
+
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        targetEpisodeId = extractEpisodeId(intent)
 
         setContent {
             MundoDolphinsTheme {
-                MundoDolphinsScreen()
+                MundoDolphinsScreen(targetEpisodeId = targetEpisodeId)
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        targetEpisodeId = extractEpisodeId(intent)
+    }
+
+    private fun extractEpisodeId(intent: android.content.Intent?): Long? {
+        val episodeId = intent?.getLongExtra(AudioPlayerService.EXTRA_EPISODE_ID, -1L) ?: -1L
+        return if (episodeId > 0L) episodeId else null
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MundoDolphinsScreen() {
+fun MundoDolphinsScreen(targetEpisodeId: Long? = null) {
     val navController = rememberNavController()
     val viewModel: EpisodesViewModel =
         viewModel(
@@ -90,6 +109,12 @@ fun MundoDolphinsScreen() {
         topBar = { AppBar() },
         bottomBar = { AppBottomBar(navController) },
     ) { innerPadding ->
+        LaunchedEffect(targetEpisodeId) {
+            if (targetEpisodeId != null) {
+                navController.navigate("${Routes.EpisodeView.route}/$targetEpisodeId")
+            }
+        }
+
         viewModel.refreshDatabase()
         Column(
             modifier = Modifier.fillMaxSize(),
