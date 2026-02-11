@@ -16,6 +16,9 @@
     <string name="videos">Vídeos</string>
     <string name="videos_empty">No hay vídeos disponibles</string>
     <string name="videos_error">No se pudieron cargar los vídeos</string>
+    <string name="social">Social</string>
+    <string name="social_empty">No hay publicaciones disponibles</string>
+    <string name="social_error">No se pudieron cargar las publicaciones</string>
     <string name="retry">Reintentar</string>
     <string name="seek_back_15">Retroceder 15 segundos</string>
     <string name="play_pause">Reproducir/Pausar</string>
