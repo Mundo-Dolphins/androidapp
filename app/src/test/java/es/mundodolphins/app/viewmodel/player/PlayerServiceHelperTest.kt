@@ -1,101 +1,106 @@
 package es.mundodolphins.app.viewmodel.player
 
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import androidx.media3.common.Player
-import es.mundodolphins.app.services.AudioPlayerService
-import es.mundodolphins.app.services.AudioPlayerService.AudioPlayerBinder
-import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper.IntentBuilder
-import io.mockk.Runs
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import com.google.common.util.concurrent.ListenableFuture
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
 class PlayerServiceHelperTest {
     private lateinit var playerServiceHelper: PlayerServiceHelper
-
     private lateinit var context: Context
-
-    private lateinit var intentBuilder: IntentBuilder
+    private lateinit var intentBuilder: PlayerServiceHelper.IntentBuilder
+    private lateinit var mediaControllerFactory: PlayerServiceHelper.MediaControllerFactory
+    private lateinit var foregroundStarter: PlayerServiceHelper.ForegroundStarter
+    private lateinit var sessionTokenFactory: PlayerServiceHelper.SessionTokenFactory
+    private lateinit var controllerReleaser: PlayerServiceHelper.ControllerReleaser
 
     @Before
     fun setUp() {
         intentBuilder = mockk()
-        context = mockk<Context>()
-        playerServiceHelper = PlayerServiceHelper(intentBuilder)
-    }
-
-    @Test
-    fun `should bind and start the service`() {
-        val mp3Url = "https://example.com/audio.mp3"
-        val currentPosition = 5000L
-        val mockPlayer = mockk<Player>()
-        val mockAudioPlayerService =
-            mockk<AudioPlayerService> {
-                every { getExoPlayer() } returns mockPlayer
-            }
-        val intent = mockk<Intent>()
-
-        every { intentBuilder.buildIntent(context, mp3Url, currentPosition) } returns intent
-        every {
-            context.bindService(
-                intent,
-                any(),
-                Context.BIND_AUTO_CREATE,
+        context = mockk(relaxed = true)
+        mediaControllerFactory = mockk()
+        foregroundStarter = mockk()
+        sessionTokenFactory = mockk()
+        controllerReleaser = mockk()
+        playerServiceHelper =
+            PlayerServiceHelper(
+                intentBuilder,
+                mediaControllerFactory,
+                foregroundStarter,
+                sessionTokenFactory,
+                controllerReleaser,
             )
-        } returns true
-        every { context.startForegroundService(intent) } returns mockk()
-
-        playerServiceHelper.bindAndStartService(
-            context,
-            mp3Url,
-            currentPosition,
-        ) { exoPlayer, service ->
-            assert(exoPlayer == mockPlayer)
-            assert(service == mockAudioPlayerService)
-        }
-
-        verify { context.startForegroundService(intent) }
-        verify { context.bindService(intent, any(), Context.BIND_AUTO_CREATE) }
     }
 
     @Test
-    fun `should unbind and stop the service`() {
-        val intent = mockk<Intent>()
-        every { intentBuilder.buildIntent(context, any(), any()) } returns intent
-        val mockPlayer = mockk<Player>()
-        val mockAudioPlayerService =
-            mockk<AudioPlayerService> {
-                every { getExoPlayer() } returns mockPlayer
-            }
-        val audioPlayerBinder =
-            mockk<AudioPlayerBinder> {
-                every { getService() } returns mockAudioPlayerService
-            }
+    fun `should build media controller and connect`() {
+        val request =
+            PlayerServiceHelper.PlaybackRequest(
+                episodeId = 1L,
+                mp3Url = "https://example.com/audio.mp3",
+                currentPosition = 5000L,
+                title = "Episode",
+                artworkUrl = "https://example.com/cover.jpg",
+            )
+        val intent = mockk<android.content.Intent>()
+        val controller = mockk<MediaController>()
+        val future = mockk<ListenableFuture<MediaController>>()
+        val sessionToken = mockk<SessionToken>()
 
-        every { context.bindService(intent, any(), Context.BIND_AUTO_CREATE) } answers {
-            val serviceConnection = arg<ServiceConnection>(1)
-            serviceConnection.onServiceConnected(mockk(), audioPlayerBinder)
-            true
+        every { intentBuilder.buildIntent(context, request) } returns intent
+        every { foregroundStarter.start(context, intent) } just runs
+        every { sessionTokenFactory.build(context) } returns sessionToken
+        every { mediaControllerFactory.build(context, sessionToken) } returns future
+        every { controllerReleaser.release(any()) } just runs
+        every { future.addListener(any(), any()) } answers {
+            firstArg<Runnable>().run()
         }
-        every { context.startForegroundService(intent) } returns mockk()
+        every { future.isDone } returns true
+        every { future.get() } returns controller
 
-        playerServiceHelper.bindAndStartService(
-            context,
-            "https://example.com/audio.mp3",
-            0L,
-        ) { _, _ -> }
+        playerServiceHelper.bindAndStartService(context, request) {}
 
-        every { context.unbindService(any()) } just Runs
-        every { context.stopService(any<Intent>()) } returns true
+        verify { intentBuilder.buildIntent(context, request) }
+        verify { foregroundStarter.start(context, intent) }
+        verify { sessionTokenFactory.build(context) }
+        verify { mediaControllerFactory.build(context, sessionToken) }
+        verify { future.get() }
+    }
 
+    @Test
+    fun `should release controller and stop service`() {
+        val request =
+            PlayerServiceHelper.PlaybackRequest(
+                episodeId = 1L,
+                mp3Url = "https://example.com/audio.mp3",
+                currentPosition = 0L,
+                title = "Episode",
+                artworkUrl = null,
+            )
+        val intent = mockk<android.content.Intent>()
+        val future = mockk<ListenableFuture<MediaController>>()
+        val sessionToken = mockk<SessionToken>()
+
+        every { intentBuilder.buildIntent(context, request) } returns intent
+        every { foregroundStarter.start(context, intent) } just runs
+        every { sessionTokenFactory.build(context) } returns sessionToken
+        every { mediaControllerFactory.build(context, sessionToken) } returns future
+        every { future.addListener(any(), any()) } just runs
+        every { future.isDone } returns false
+        every { controllerReleaser.release(future) } just runs
+        every { context.stopService(any()) } returns true
+
+        playerServiceHelper.bindAndStartService(context, request) {}
         playerServiceHelper.unbindAndStopService(context)
 
-        verify { context.unbindService(any()) }
+        verify { controllerReleaser.release(future) }
         verify { context.stopService(any()) }
     }
 }

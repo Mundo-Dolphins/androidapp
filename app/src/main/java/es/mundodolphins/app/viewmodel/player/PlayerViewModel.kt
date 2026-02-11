@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.C
 import androidx.media3.common.Player
 import es.mundodolphins.app.repository.EpisodeRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,29 +35,44 @@ class PlayerViewModel(
     private val _playerStatus = MutableLiveData<Int>()
     val playerStatus: LiveData<Int> get() = _playerStatus
 
+    private val playerListener =
+        object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                _isPlaying.postValue(isPlaying)
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                _playerStatus.postValue(playbackState)
+                _duration.postValue(sanitizeDuration(_playerState.value?.duration))
+            }
+        }
+
     fun initializePlayer(
         context: Context,
         episodeId: Long,
         mp3Url: String,
+        title: String,
+        artworkUrl: String?,
     ) {
         viewModelScope.launch(ioDispatcher) {
             audioID = episodeId
             currentPosition = episodeRepository.getEpisodeById(audioID).first()?.listenedProgress ?: 0L
+            val request =
+                PlayerServiceHelper.PlaybackRequest(
+                    episodeId = episodeId,
+                    mp3Url = mp3Url,
+                    currentPosition = currentPosition,
+                    title = title,
+                    artworkUrl = artworkUrl,
+                )
 
-            playerServiceHelper.bindAndStartService(context, mp3Url, currentPosition) { exoPlayer, audioPlayerService ->
-                _playerState.value = exoPlayer
-
-                audioPlayerService.playerState.observeForever { state ->
-                    _isPlaying.postValue(state)
-                }
-
-                audioPlayerService.playerDuration.observeForever { duration ->
-                    _duration.postValue(duration)
-                }
-
-                audioPlayerService.playerStatus.observeForever { status ->
-                    _playerStatus.postValue(status)
-                }
+            playerServiceHelper.bindAndStartService(context, request) { mediaController ->
+                _playerState.value?.removeListener(playerListener)
+                _playerState.value = mediaController
+                mediaController.addListener(playerListener)
+                _isPlaying.postValue(mediaController.isPlaying)
+                _duration.postValue(sanitizeDuration(mediaController.duration))
+                _playerStatus.postValue(mediaController.playbackState)
             }
         }
     }
@@ -69,6 +85,7 @@ class PlayerViewModel(
     }
 
     fun releasePlayer(context: Context) {
+        _playerState.value?.removeListener(playerListener)
         playerServiceHelper.unbindAndStopService(context)
         savePlayerPosition(currentPosition)
     }
@@ -81,5 +98,10 @@ class PlayerViewModel(
                 _playerStatus.value == Player.STATE_ENDED,
             )
         }
+    }
+
+    private fun sanitizeDuration(durationMs: Long?): Long {
+        val duration = durationMs ?: 0L
+        return if (duration <= 0L || duration == C.TIME_UNSET) 0L else duration
     }
 }

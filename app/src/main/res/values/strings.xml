@@ -17,4 +17,8 @@
     <string name="videos_empty">No hay vídeos disponibles</string>
     <string name="videos_error">No se pudieron cargar los vídeos</string>
     <string name="retry">Reintentar</string>
+    <string name="seek_back_15">Retroceder 15 segundos</string>
+    <string name="play_pause">Reproducir/Pausar</string>
+    <string name="seek_forward_30">Avanzar 30 segundos</string>
+    <string name="stop">Detener</string>
 </resources>

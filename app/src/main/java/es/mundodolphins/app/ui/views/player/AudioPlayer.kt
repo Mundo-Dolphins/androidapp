@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.media3.common.Player
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
@@ -52,6 +53,8 @@ import kotlinx.coroutines.delay
 fun AudioPlayerView(
     episodeId: Long,
     mp3Url: String,
+    title: String,
+    artworkUrl: String?,
     playerViewModel: PlayerViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -59,7 +62,7 @@ fun AudioPlayerView(
 
     LaunchedEffect(mp3Url) {
         if (mp3Url.isNotEmpty()) {
-            playerViewModel.initializePlayer(context, episodeId, mp3Url)
+            playerViewModel.initializePlayer(context, episodeId, mp3Url, title, artworkUrl)
         }
     }
 
@@ -80,17 +83,19 @@ private fun PlayerControls(
     player: Player?,
     playerViewModel: PlayerViewModel,
 ) {
-    val isPlaying = remember { mutableStateOf(false) }
+    val isPlaying by playerViewModel.isPlaying.observeAsState(false)
+    val totalDurationFromVm by playerViewModel.duration.observeAsState(0L)
     val currentPosition = remember { mutableLongStateOf(0) }
     val sliderPosition = remember { mutableLongStateOf(0) }
     val totalDuration = remember { mutableLongStateOf(0) }
 
-    playerViewModel.isPlaying.observeForever { isPlaying.value = it }
-    playerViewModel.duration.observeForever { totalDuration.longValue = it }
-
     LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
         delay(1000)
         currentPosition.longValue = player?.currentPosition ?: 0
+    }
+
+    LaunchedEffect(totalDurationFromVm) {
+        totalDuration.longValue = totalDurationFromVm.coerceAtLeast(0L)
     }
 
     LaunchedEffect(currentPosition.longValue) {
@@ -115,15 +120,19 @@ private fun PlayerControls(
                         .padding(horizontal = 32.dp),
             ) {
                 TrackSlider(
-                    value = sliderPosition.longValue.toFloat(),
+                    value = sliderPosition.longValue.coerceAtLeast(0L).toFloat(),
                     onValueChange = {
                         sliderPosition.longValue = it.toLong()
                     },
                     onValueChangeFinished = {
-                        currentPosition.longValue = sliderPosition.longValue
-                        player?.seekTo(sliderPosition.longValue)
+                        val safeDuration = totalDuration.longValue.coerceAtLeast(0L)
+                        val safePosition = sliderPosition.longValue.coerceIn(0L, safeDuration)
+                        currentPosition.longValue = safePosition
+                        if (safeDuration > 0L) {
+                            player?.seekTo(safePosition)
+                        }
                     },
-                    songDuration = totalDuration.longValue.toFloat(),
+                    songDuration = totalDuration.longValue.coerceAtLeast(0L).toFloat(),
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -155,11 +164,10 @@ private fun PlayerControls(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 ControlButton(
-                    isPlaying = isPlaying.value,
+                    isPlaying = isPlaying,
                     size = 80.dp,
                     onClick = {
-                        if (isPlaying.value) player?.pause() else player?.play()
-                        isPlaying.value = player?.isPlaying == true
+                        if (isPlaying) player?.pause() else player?.play()
                     },
                 )
                 Spacer(modifier = Modifier.width(20.dp))
@@ -179,11 +187,14 @@ fun TrackSlider(
     onValueChangeFinished: () -> Unit,
     songDuration: Float,
 ) {
+    val safeMax = songDuration.coerceAtLeast(0f)
+    val safeValue = value.coerceIn(0f, safeMax)
+
     Slider(
-        value = value,
+        value = safeValue,
         onValueChange = { onValueChange(it) },
         onValueChangeFinished = { onValueChangeFinished() },
-        valueRange = 0f..songDuration,
+        valueRange = 0f..safeMax,
         colors =
             SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
@@ -260,6 +271,8 @@ fun AudioPlayerViewPreview() {
         AudioPlayerView(
             1234567,
             "https://www.ivoox.com/carta-a-reyes-magos_mf_137429858_feed_1.mp3",
+            "Preview Episode",
+            null,
         )
     }
 }
