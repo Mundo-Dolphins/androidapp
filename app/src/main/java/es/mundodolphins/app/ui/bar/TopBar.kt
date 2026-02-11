@@ -58,7 +58,7 @@ fun AppBar(
                             .fillMaxWidth(0.9f)
                             .padding(start = 5.dp),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp,
+                    fontSize = 22.sp,
                     textAlign = TextAlign.Center,
                 )
             }
