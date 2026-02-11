@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,9 +28,9 @@ import es.mundodolphins.app.viewmodel.VideosViewModel
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    episodesViewModel: EpisodesViewModel = viewModel(),
-    articlesViewModel: ArticlesViewModel = viewModel(),
-    videosViewModel: VideosViewModel = viewModel(),
+    episodesViewModel: EpisodesViewModel = hiltViewModel(),
+    articlesViewModel: ArticlesViewModel = hiltViewModel(),
+    videosViewModel: VideosViewModel = hiltViewModel(),
     navController: NavHostController,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {

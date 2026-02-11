@@ -10,10 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
+import dagger.hilt.android.lifecycle.HiltViewModel
 import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.data.episodes.Episode
+import es.mundodolphins.app.di.IoDispatcher
+import es.mundodolphins.app.di.MainDispatcher
 import es.mundodolphins.app.models.EpisodeResponse
 import es.mundodolphins.app.repository.EpisodeRepository
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,11 +25,14 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class EpisodesViewModel(
+@HiltViewModel
+class EpisodesViewModel
+    @Inject
+    constructor(
     private val episodeRepository: EpisodeRepository,
     private val feedService: FeedService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @param:MainDispatcher private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel(),
     EpisodesUiModel {
     override var statusRefresh: LoadStatus by mutableStateOf(LoadStatus.LOADING)

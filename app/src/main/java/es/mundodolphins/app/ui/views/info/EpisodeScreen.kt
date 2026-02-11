@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -27,18 +28,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import es.mundodolphins.app.R
-import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.data.episodes.Episode
 import es.mundodolphins.app.data.episodes.Episode.ListeningStatus.NOT_LISTENED
-import es.mundodolphins.app.repository.EpisodeRepository
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.player.AudioPlayerView
 import es.mundodolphins.app.viewmodel.player.PlayerViewModel
-import es.mundodolphins.app.viewmodel.player.PlayerViewModelFactory
 import java.time.Instant
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -48,17 +46,8 @@ fun EpisodeScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val playerViewModel: PlayerViewModel =
-        viewModel(
-            factory =
-                PlayerViewModelFactory(
-                    EpisodeRepository(
-                        AppDatabase
-                            .getDatabase(context = LocalContext.current.applicationContext)
-                            .episodeDao(),
-                    ),
-                ),
-        )
+    val isPreview = LocalInspectionMode.current
+    val playerViewModel: PlayerViewModel? = if (isPreview) null else hiltViewModel()
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -108,13 +97,15 @@ fun EpisodeScreen(
                     )
                 }
 
-                AudioPlayerView(
-                    episodeId = episode?.id ?: 0,
-                    mp3Url = episode?.audio ?: "",
-                    title = episode?.title ?: "",
-                    artworkUrl = episode?.imgMain,
-                    playerViewModel = playerViewModel,
-                )
+                if (playerViewModel != null) {
+                    AudioPlayerView(
+                        episodeId = episode?.id ?: 0,
+                        mp3Url = episode?.audio ?: "",
+                        title = episode?.title ?: "",
+                        artworkUrl = episode?.imgMain,
+                        playerViewModel = playerViewModel,
+                    )
+                }
             }
         }
     }
