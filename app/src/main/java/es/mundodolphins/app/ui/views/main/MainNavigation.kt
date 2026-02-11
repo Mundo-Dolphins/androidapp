@@ -83,9 +83,16 @@ fun MainScreen(
 
             composable(route = Routes.Article.route + "/{publishedTimestamp}") { backStackEntry ->
                 val publishedTimestamp = backStackEntry.arguments?.getString("publishedTimestamp")?.toLong() ?: Long.MIN_VALUE
+                val articles = articlesViewModel.articles.collectAsState(emptyList()).value
+                if (articles.isEmpty()) {
+                    articlesViewModel.fetchArticles()
+                }
 
                 ArticleScreen(
-                    article = articlesViewModel.getArticleByPublishedDate(publishedTimestamp),
+                    article =
+                        articles.find {
+                            it.publishedTimestamp == publishedTimestamp
+                        },
                     modifier = modifier,
                     navController = navController,
                 )
