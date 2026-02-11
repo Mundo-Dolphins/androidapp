@@ -21,9 +21,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +35,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -51,12 +56,13 @@ import es.mundodolphins.app.notifications.PushNotificationData
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.bar.AppBar
-import es.mundodolphins.app.ui.bar.AppBottomBar
+import es.mundodolphins.app.ui.bar.AppNavigationDrawer
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.main.MainScreen
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -104,12 +110,13 @@ fun MundoDolphinsScreen(
     onPushTargetHandled: () -> Unit = {},
 ) {
     val navController = rememberNavController()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerScope = rememberCoroutineScope()
     val isPreview = LocalInspectionMode.current
     if (isPreview) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = { AppBar() },
-            bottomBar = { AppBottomBar(navController) },
         ) { innerPadding ->
             Box(
                 modifier =
@@ -151,104 +158,150 @@ fun MundoDolphinsScreen(
             }
         }
     }
-    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-    remoteConfig.setConfigSettingsAsync(
-        remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 3600
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val selectedRoute = mapToDrawerRoute(currentBackStackEntry?.destination?.route)
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppNavigationDrawer(
+                selectedRoute = selectedRoute,
+                onItemClick = { route ->
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
+                    drawerScope.launch { drawerState.close() }
+                },
+            )
         },
-    )
-    remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = { AppBar() },
-        bottomBar = { AppBottomBar(navController) },
-    ) { innerPadding ->
-        LaunchedEffect(pushTarget) {
-            when (pushTarget) {
-                is PushNotificationData.Target.Episode -> {
-                    navController.navigate("${Routes.EpisodeView.route}/${pushTarget.episodeId}") {
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                AppBar(
+                    onMenuClick = { drawerScope.launch { drawerState.open() } },
+                )
+            },
+        ) { innerPadding ->
+            HandlePushNavigation(
+                pushTarget = pushTarget,
+                onPushTargetHandled = onPushTargetHandled,
+                navigate = { route ->
+                    navController.navigate(route) {
                         launchSingleTop = true
                     }
-                    onPushTargetHandled()
+                },
+            )
+
+            viewModel.refreshDatabase()
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (!isConnected) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(100.dp)
+                                .background(color = MaterialTheme.colorScheme.error)
+                                .statusBarsPadding(),
+                    ) {
+                        Text(
+                            text = "No internet connection",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.onError,
+                        )
+                    }
                 }
 
-                is PushNotificationData.Target.Article -> {
-                    navController.navigate(Routes.Articles.route) {
-                        launchSingleTop = true
-                    }
-                    navController.navigate("${Routes.Article.route}/${pushTarget.publishedTimestamp}") {
-                        launchSingleTop = true
-                    }
-                    onPushTargetHandled()
-                }
+                UpdateAvailableBanner(
+                    latestVersionCode = latestVersionCode,
+                    currentVersionCode = currentVersionCode,
+                    onClick = {
+                        val intent =
+                            Intent(Intent.ACTION_VIEW).apply {
+                                data = "market://details?id=${context.packageName}".toUri()
+                                setPackage("com.android.vending")
+                            }
+                        context.startActivity(intent)
+                    },
+                )
 
-                null -> Unit
+                MainScreen(
+                    episodesViewModel = viewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    navController = navController,
+                )
             }
         }
+    }
+}
 
-        viewModel.refreshDatabase()
-        Column(
-            modifier = Modifier.fillMaxSize(),
+@Composable
+private fun HandlePushNavigation(
+    pushTarget: PushNotificationData.Target?,
+    onPushTargetHandled: () -> Unit,
+    navigate: (String) -> Unit,
+) {
+    LaunchedEffect(pushTarget) {
+        when (pushTarget) {
+            is PushNotificationData.Target.Episode -> {
+                navigate("${Routes.EpisodeView.route}/${pushTarget.episodeId}")
+                onPushTargetHandled()
+            }
+
+            is PushNotificationData.Target.Article -> {
+                navigate(Routes.Articles.route)
+                navigate("${Routes.Article.route}/${pushTarget.publishedTimestamp}")
+                onPushTargetHandled()
+            }
+
+            null -> Unit
+        }
+    }
+}
+
+@Composable
+private fun UpdateAvailableBanner(
+    latestVersionCode: Long,
+    currentVersionCode: Long,
+    onClick: () -> Unit,
+) {
+    if (latestVersionCode <= currentVersionCode) return
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+                .clickable(onClick = onClick)
+                .padding(16.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (!isConnected) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(color = MaterialTheme.colorScheme.error)
-                            .statusBarsPadding(),
-                ) {
-                    Text(
-                        text = "No internet connection",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.onError,
-                    )
-                }
-            }
-
-            if (latestVersionCode > currentVersionCode) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-                            .clickable {
-                                val intent =
-                                    Intent(Intent.ACTION_VIEW).apply {
-                                        data = "market://details?id=${context.packageName}".toUri()
-                                        setPackage("com.android.vending")
-                                    }
-                                context.startActivity(intent)
-                            }
-                            .padding(16.dp),
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                        Text(
-                            text = "¡Nueva versión disponible! Toca para actualizar.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp),
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                    }
-                }
-            }
-
-            MainScreen(
-                episodesViewModel = viewModel,
-                modifier = Modifier.padding(innerPadding),
-                navController = navController,
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+            Text(
+                text = "¡Nueva versión disponible! Toca para actualizar.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp),
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
             )
         }
+    }
+}
+
+private fun mapToDrawerRoute(route: String?): String {
+    return when {
+        route == null -> Routes.Feed.route
+        route.startsWith(Routes.EpisodeView.route) -> Routes.Feed.route
+        route.startsWith(Routes.SeasonView.route) -> Routes.SeasonsList.route
+        route.startsWith(Routes.Article.route) -> Routes.Articles.route
+        else -> route
     }
 }
 
