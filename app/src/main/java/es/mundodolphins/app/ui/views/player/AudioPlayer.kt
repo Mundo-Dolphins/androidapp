@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -143,7 +142,7 @@ private fun PlayerControls(
                             Modifier
                                 .weight(1f)
                                 .padding(8.dp),
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = TextStyle(fontWeight = FontWeight.Bold),
                     )
 
@@ -153,7 +152,7 @@ private fun PlayerControls(
                         modifier =
                             Modifier
                                 .padding(8.dp),
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = TextStyle(fontWeight = FontWeight.Bold),
                     )
                 }
@@ -199,7 +198,7 @@ fun TrackSlider(
             SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = Color.LightGray,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
             ),
         thumb = {
             SliderDefaults.Thumb(
@@ -235,7 +234,7 @@ fun ControlButton(
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause_icon else R.drawable.play_arrow),
             modifier = Modifier.size(size / 1.5f),
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.onSecondary,
             contentDescription = null,
         )
     }

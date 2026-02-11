@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -62,7 +61,7 @@ fun ArticleRow(
                         } ?: "",
                     ).toString(),
             fontSize = 18.sp,
-            color = Color.DarkGray,
+            color = colorScheme.onSurface,
             textAlign = TextAlign.Justify,
             modifier = Modifier.padding(6.dp),
         )
@@ -83,13 +82,13 @@ private fun ArticleHeader(article: ArticlesResponse) {
             fontSize = 24.sp,
             fontWeight = Bold,
             modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
-            color = Color.White,
+            color = colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Left,
         )
         Text(
             text = article.publishedDate,
             fontSize = 14.sp,
-            color = Color.White,
+            color = colorScheme.onSecondaryContainer,
             modifier =
                 Modifier
                     .fillMaxWidth(0.9f)
@@ -122,7 +121,7 @@ private fun ColumnScope.ArticleBottom(
         ) {
             Text(
                 text = stringResource(R.string.more),
-                color = Color.White,
+                color = colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 fontWeight = Bold,
                 fontSize = 16.sp,

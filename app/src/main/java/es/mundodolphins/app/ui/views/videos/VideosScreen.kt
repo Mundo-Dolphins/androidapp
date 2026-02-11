@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -120,6 +121,10 @@ private fun VideoCard(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = colorScheme.secondaryContainer,
+            ),
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -144,6 +149,7 @@ private fun VideoCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.Bold,
+                color = colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(top = 8.dp),
             )
             Row(
@@ -153,11 +159,13 @@ private fun VideoCard(
                 if (!video.duration.isNullOrBlank()) {
                     Text(
                         text = video.duration,
+                        color = colorScheme.onSecondaryContainer,
                         style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
                     )
                 }
                 Text(
                     text = video.publishedOn,
+                    color = colorScheme.onSecondaryContainer,
                     style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
                 )
             }
