@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -75,7 +74,7 @@ fun AppBottomBar(navController: NavHostController) {
                 label = {
                     Text(
                         stringResource(item.label),
-                        color = if (index == selectedNavigationIndex.intValue) Color.Black else Color.Gray,
+                        color = if (index == selectedNavigationIndex.intValue) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 colors =

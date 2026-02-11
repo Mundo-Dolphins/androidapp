@@ -3,7 +3,6 @@ package es.mundodolphins.app
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -36,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +56,7 @@ import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
 import es.mundodolphins.app.ui.views.main.MainScreen
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -132,12 +131,7 @@ fun MundoDolphinsScreen(
 
     var latestVersionCode by remember { mutableLongStateOf(0L) }
     val currentVersionCode =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageInfo(context.packageName, 0).versionCode.toLong()
-        }
+        context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
 
     // Firebase Remote Config is not available in Compose Previews.
     // We wrap it in a LocalInspectionMode check to avoid IllegalStateException.
@@ -203,14 +197,14 @@ fun MundoDolphinsScreen(
                         Modifier
                             .fillMaxWidth()
                             .height(100.dp)
-                            .background(color = Color.Red)
+                            .background(color = MaterialTheme.colorScheme.error)
                             .statusBarsPadding(),
                 ) {
                     Text(
                         text = "No internet connection",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Yellow,
+                        color = MaterialTheme.colorScheme.onError,
                     )
                 }
             }
@@ -224,7 +218,7 @@ fun MundoDolphinsScreen(
                             .clickable {
                                 val intent =
                                     Intent(Intent.ACTION_VIEW).apply {
-                                        data = Uri.parse("market://details?id=${context.packageName}")
+                                        data = "market://details?id=${context.packageName}".toUri()
                                         setPackage("com.android.vending")
                                     }
                                 context.startActivity(intent)
