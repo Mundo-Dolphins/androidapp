@@ -1,13 +1,19 @@
 package es.mundodolphins.app.client
 
+import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.S])
 class VideosServiceMockWebServerTest {
     @Test
     fun `getVideos via MockWebServer parses response and hits correct path`() =
