@@ -5,11 +5,14 @@ import java.time.OffsetDateTime
 
 @Keep
 data class ArticlesResponse(
-    val title: String,
-    val author: String,
-    val publishedDate: String,
+    val title: String?,
+    val author: String?,
+    val publishedDate: String?,
     val content: String?,
 ) {
-    val publishedTimestamp: Long
-        get() = OffsetDateTime.parse(publishedDate).toInstant().toEpochMilli()
+    val publishedTimestamp: Long?
+        get() =
+            publishedDate?.let {
+                runCatching { OffsetDateTime.parse(it).toInstant().toEpochMilli() }.getOrNull()
+            }
 }

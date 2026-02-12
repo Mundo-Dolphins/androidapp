@@ -122,7 +122,8 @@ class ArticlesViewModelTest {
             viewModel.fetchArticles()
             testDispatcher.scheduler.advanceUntilIdle()
 
-            val found = viewModel.getArticleByPublishedDate(articleB.publishedTimestamp)
+            val articleBTimestamp = requireNotNull(articleB.publishedTimestamp)
+            val found = viewModel.getArticleByPublishedDate(articleBTimestamp)
             assertThat(found).isNotNull()
             assertThat(found?.title).isEqualTo("Title B")
         }
@@ -149,7 +150,7 @@ class ArticlesViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             // Query for a timestamp that doesn't exist
-            val missingTimestamp = article.publishedTimestamp + 1000L
+            val missingTimestamp = requireNotNull(article.publishedTimestamp) + 1000L
             val result = viewModel.getArticleByPublishedDate(missingTimestamp)
             assertThat(result).isNull()
         }
@@ -285,7 +286,8 @@ class ArticlesViewModelTest {
             viewModel.fetchArticles()
             testDispatcher.scheduler.advanceUntilIdle()
 
-            val found = viewModel.getArticleByPublishedDate(a1.publishedTimestamp)
+            val a1Timestamp = requireNotNull(a1.publishedTimestamp)
+            val found = viewModel.getArticleByPublishedDate(a1Timestamp)
             assertThat(found).isNotNull()
             // should return first matching article
             assertThat(found?.title).isEqualTo("A1")

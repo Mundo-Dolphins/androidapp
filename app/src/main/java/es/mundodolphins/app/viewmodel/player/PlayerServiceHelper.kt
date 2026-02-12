@@ -119,7 +119,13 @@ class PlayerServiceHelper(
 
     private class DefaultSessionTokenFactory : SessionTokenFactory {
         override fun build(context: Context): SessionToken =
-            SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
+            SessionToken(
+                context.applicationContext,
+                ComponentName(
+                    context.applicationContext.packageName,
+                    AudioPlayerService::class.java.name,
+                ),
+            )
     }
 
     private class DefaultControllerReleaser : ControllerReleaser {
