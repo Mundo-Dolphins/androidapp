@@ -1,5 +1,6 @@
 package es.mundodolphins.app.client
 
+import android.os.Build
 import com.google.gson.Gson
 import es.mundodolphins.app.models.EpisodeResponse
 import kotlinx.coroutines.test.runTest
@@ -7,9 +8,14 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.S])
 class FeedServiceMockWebServerTest {
     @Test
     fun `getAllSeasons via MockWebServer returns list and correct path`() =

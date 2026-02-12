@@ -36,6 +36,16 @@ fun ArticleRow(
     article: ArticlesResponse,
     navController: NavController,
 ) {
+    val title = article.title.orEmpty()
+    val publishedDate = article.publishedDate.orEmpty()
+    val content = article.content.orEmpty()
+    val preview =
+        if (content.length > 100) {
+            truncateSentence(content) + "..."
+        } else {
+            content
+        }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
@@ -46,31 +56,33 @@ fun ArticleRow(
                 .clip(shape = RoundedCornerShape(20.dp))
                 .shadow(elevation = 2.dp, clip = true),
     ) {
-        ArticleHeader(article)
+        ArticleHeader(
+            title = title,
+            publishedDate = publishedDate,
+        )
         Text(
             text =
                 Markwon
                     .create(LocalContext.current)
-                    .toMarkdown(
-                        article.content?.let { content ->
-                            if (content.length > 100) {
-                                truncateSentence(content) + "..."
-                            } else {
-                                content
-                            }
-                        } ?: "",
-                    ).toString(),
+                    .toMarkdown(preview)
+                    .toString(),
             fontSize = 18.sp,
             color = colorScheme.onSurface,
             textAlign = TextAlign.Justify,
             modifier = Modifier.padding(6.dp),
         )
-        ArticleBottom(article, navController)
+        ArticleBottom(
+            publishedTimestamp = article.publishedTimestamp,
+            navController = navController,
+        )
     }
 }
 
 @Composable
-private fun ArticleHeader(article: ArticlesResponse) {
+private fun ArticleHeader(
+    title: String,
+    publishedDate: String,
+) {
     Column(
         modifier =
             Modifier
@@ -78,7 +90,7 @@ private fun ArticleHeader(article: ArticlesResponse) {
                 .fillMaxWidth(),
     ) {
         Text(
-            text = article.title,
+            text = title,
             fontSize = 24.sp,
             fontWeight = Bold,
             modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
@@ -86,7 +98,7 @@ private fun ArticleHeader(article: ArticlesResponse) {
             textAlign = TextAlign.Left,
         )
         Text(
-            text = article.publishedDate,
+            text = publishedDate,
             fontSize = 14.sp,
             color = colorScheme.onSecondaryContainer,
             modifier =
@@ -100,7 +112,7 @@ private fun ArticleHeader(article: ArticlesResponse) {
 
 @Composable
 private fun ColumnScope.ArticleBottom(
-    article: ArticlesResponse,
+    publishedTimestamp: Long?,
     navController: NavController,
 ) {
     Row(
@@ -115,8 +127,11 @@ private fun ColumnScope.ArticleBottom(
         )
         Button(
             modifier = Modifier.padding(bottom = 6.dp),
+            enabled = publishedTimestamp != null,
             onClick = {
-                navController.navigate(Routes.Article.route + "/${article.publishedTimestamp}")
+                publishedTimestamp?.let {
+                    navController.navigate(Routes.Article.route + "/$it")
+                }
             },
         ) {
             Text(

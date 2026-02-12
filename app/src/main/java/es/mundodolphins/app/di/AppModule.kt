@@ -12,7 +12,6 @@ import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.client.SocialService
 import es.mundodolphins.app.client.VideosService
 import es.mundodolphins.app.data.AppDatabase
-import es.mundodolphins.app.data.InstantConverter
 import es.mundodolphins.app.data.episodes.EpisodeDao
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper
 import retrofit2.Retrofit
@@ -51,20 +50,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideInstantConverter(): InstantConverter = InstantConverter()
-
-    @Provides
-    @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context,
-        instantConverter: InstantConverter,
     ): AppDatabase =
         Room
             .databaseBuilder(
                 context,
                 AppDatabase::class.java,
                 "mundodolphins_database",
-            ).addTypeConverter(instantConverter)
+            )
             .build()
 
     @Provides

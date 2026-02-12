@@ -90,7 +90,7 @@ fun MainScreen(
             }
 
             composable(route = Routes.Article.route + "/{publishedTimestamp}") { backStackEntry ->
-                val publishedTimestamp = backStackEntry.arguments?.getString("publishedTimestamp")?.toLong() ?: Long.MIN_VALUE
+                val publishedTimestamp = backStackEntry.arguments?.getString("publishedTimestamp")?.toLongOrNull() ?: Long.MIN_VALUE
                 val articles = articlesViewModel.articles.collectAsState(emptyList()).value
                 LaunchedEffect(articles.isEmpty()) {
                     if (articles.isNotEmpty()) return@LaunchedEffect

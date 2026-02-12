@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.media3.common.C
 import androidx.media3.common.Player
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
@@ -90,11 +91,11 @@ private fun PlayerControls(
 
     LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
         delay(1000)
-        currentPosition.longValue = player?.currentPosition ?: 0
+        currentPosition.longValue = sanitizePlayerTimestamp(player?.currentPosition)
     }
 
     LaunchedEffect(totalDurationFromVm) {
-        totalDuration.longValue = totalDurationFromVm.coerceAtLeast(0L)
+        totalDuration.longValue = sanitizePlayerTimestamp(totalDurationFromVm)
     }
 
     LaunchedEffect(currentPosition.longValue) {
@@ -102,8 +103,9 @@ private fun PlayerControls(
     }
 
     LaunchedEffect(player?.duration) {
-        if (player?.duration != null && player.duration > 0) {
-            totalDuration.longValue = player.duration
+        val safeDuration = sanitizePlayerTimestamp(player?.duration)
+        if (safeDuration > 0L) {
+            totalDuration.longValue = safeDuration
         }
     }
 
@@ -119,19 +121,19 @@ private fun PlayerControls(
                         .padding(horizontal = 32.dp),
             ) {
                 TrackSlider(
-                    value = sliderPosition.longValue.coerceAtLeast(0L).toFloat(),
+                    value = sanitizePlayerTimestamp(sliderPosition.longValue).toFloat(),
                     onValueChange = {
                         sliderPosition.longValue = it.toLong()
                     },
                     onValueChangeFinished = {
-                        val safeDuration = totalDuration.longValue.coerceAtLeast(0L)
+                        val safeDuration = sanitizePlayerTimestamp(totalDuration.longValue)
                         val safePosition = sliderPosition.longValue.coerceIn(0L, safeDuration)
                         currentPosition.longValue = safePosition
                         if (safeDuration > 0L) {
                             player?.seekTo(safePosition)
                         }
                     },
-                    songDuration = totalDuration.longValue.coerceAtLeast(0L).toFloat(),
+                    songDuration = sanitizePlayerTimestamp(totalDuration.longValue).toFloat(),
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -186,8 +188,8 @@ fun TrackSlider(
     onValueChangeFinished: () -> Unit,
     songDuration: Float,
 ) {
-    val safeMax = songDuration.coerceAtLeast(0f)
-    val safeValue = value.coerceIn(0f, safeMax)
+    val safeMax = sanitizeSliderValue(songDuration)
+    val safeValue = sanitizeSliderValue(value).coerceIn(0f, safeMax)
 
     Slider(
         value = safeValue,
@@ -211,6 +213,16 @@ fun TrackSlider(
             )
         },
     )
+}
+
+private fun sanitizePlayerTimestamp(value: Long?): Long {
+    val safeValue = value ?: 0L
+    return if (safeValue <= 0L || safeValue == C.TIME_UNSET) 0L else safeValue
+}
+
+private fun sanitizeSliderValue(value: Float): Float {
+    if (!value.isFinite() || value <= 0f) return 0f
+    return value
 }
 
 /***

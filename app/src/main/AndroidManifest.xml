@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".services.AudioPlayerService"
+            android:name="es.mundodolphins.app.services.AudioPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>

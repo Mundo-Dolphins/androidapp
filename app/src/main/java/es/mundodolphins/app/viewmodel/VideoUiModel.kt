@@ -3,7 +3,6 @@ package es.mundodolphins.app.viewmodel
 import es.mundodolphins.app.models.VideoResponse
 import java.net.URI
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.format.DateTimeFormatter.ofPattern
@@ -81,8 +80,11 @@ private fun getQueryParam(
         .split("&")
         .firstOrNull { it.substringBefore("=") == key }
         ?.substringAfter("=", "")
-        ?.let { URLDecoder.decode(it, StandardCharsets.UTF_8) }
+        ?.let { decodeUrlComponent(it) }
 }
+
+private fun decodeUrlComponent(value: String): String =
+    runCatching { URLDecoder.decode(value, "UTF-8") }.getOrDefault(value)
 
 private fun sanitizeVideoId(candidate: String?): String? {
     if (candidate.isNullOrBlank()) {
