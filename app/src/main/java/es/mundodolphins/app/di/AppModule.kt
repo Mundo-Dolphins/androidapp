@@ -12,6 +12,7 @@ import es.mundodolphins.app.client.FeedService
 import es.mundodolphins.app.client.SocialService
 import es.mundodolphins.app.client.VideosService
 import es.mundodolphins.app.data.AppDatabase
+import es.mundodolphins.app.data.InstantConverter
 import es.mundodolphins.app.data.episodes.EpisodeDao
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper
 import retrofit2.Retrofit
@@ -59,6 +60,7 @@ object AppModule {
                 AppDatabase::class.java,
                 "mundodolphins_database",
             )
+            .addTypeConverter(InstantConverter())
             .build()
 
     @Provides
