@@ -193,7 +193,9 @@ private fun BlueSkyPostWebView(
 }
 
 private fun SocialUiModel.preferredEmbedHeight(): androidx.compose.ui.unit.Dp {
-    if (imageUrls.isNotEmpty()) return 560.dp
-    if (description.length > 220) return 480.dp
-    return 380.dp
+    return when {
+        imageUrls.isNotEmpty() -> 560.dp
+        description.length > 220 -> 480.dp
+        else -> 380.dp
+    }
 }
