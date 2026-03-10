@@ -90,9 +90,21 @@ class PlayerViewModel
             }
         }
 
+        fun disconnectPlayer() {
+            detachFromPlayer()
+            playerServiceHelper.disconnectController()
+        }
+
         fun releasePlayer(context: Context) {
-            _playerState.value?.removeListener(playerListener)
+            detachFromPlayer()
             playerServiceHelper.unbindAndStopService(context)
+        }
+
+        private fun detachFromPlayer() {
+            _playerState.value?.let {
+                it.removeListener(playerListener)
+                currentPosition = it.currentPosition
+            }
             savePlayerPosition(currentPosition)
         }
 

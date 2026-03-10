@@ -48,9 +48,13 @@ class PlayerServiceHelper(
         )
     }
 
-    fun unbindAndStopService(context: Context) {
+    fun disconnectController() {
         mediaControllerFuture?.let { controllerReleaser.release(it) }
         mediaControllerFuture = null
+    }
+
+    fun unbindAndStopService(context: Context) {
+        disconnectController()
         val intent = Intent(context, AudioPlayerService::class.java)
         context.stopService(intent)
     }

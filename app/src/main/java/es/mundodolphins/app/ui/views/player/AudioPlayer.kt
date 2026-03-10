@@ -67,8 +67,7 @@ fun AudioPlayerView(
 
     DisposableEffect(Unit) {
         onDispose {
-            playerViewModel.savePlayerState()
-            playerViewModel.releasePlayer(context)
+            playerViewModel.disconnectPlayer()
         }
     }
 

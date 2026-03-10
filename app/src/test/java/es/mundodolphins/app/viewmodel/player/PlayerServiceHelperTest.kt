@@ -103,4 +103,33 @@ class PlayerServiceHelperTest {
         verify { controllerReleaser.release(future) }
         verify { context.stopService(any()) }
     }
+
+    @Test
+    fun `should release controller without stopping service on disconnect`() {
+        val request =
+            PlayerServiceHelper.PlaybackRequest(
+                episodeId = 1L,
+                mp3Url = "https://example.com/audio.mp3",
+                currentPosition = 0L,
+                title = "Episode",
+                artworkUrl = null,
+            )
+        val intent = mockk<android.content.Intent>()
+        val future = mockk<ListenableFuture<MediaController>>()
+        val sessionToken = mockk<SessionToken>()
+
+        every { intentBuilder.buildIntent(context, request) } returns intent
+        every { foregroundStarter.start(context, intent) } just runs
+        every { sessionTokenFactory.build(context) } returns sessionToken
+        every { mediaControllerFactory.build(context, sessionToken) } returns future
+        every { future.addListener(any(), any()) } just runs
+        every { future.isDone } returns false
+        every { controllerReleaser.release(future) } just runs
+
+        playerServiceHelper.bindAndStartService(context, request) {}
+        playerServiceHelper.disconnectController()
+
+        verify { controllerReleaser.release(future) }
+        verify(exactly = 0) { context.stopService(any()) }
+    }
 }
