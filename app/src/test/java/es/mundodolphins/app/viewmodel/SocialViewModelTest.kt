@@ -41,7 +41,11 @@ class SocialViewModelTest {
             assertThat(ok).isTrue()
             assertThat(viewModel.status.value).isEqualTo(SocialViewModel.LoadStatus.SUCCESS)
             assertThat(viewModel.posts.value).hasSize(1)
-            assertThat(viewModel.posts.value.first().id).isEqualTo("new")
+            assertThat(
+                viewModel.posts.value
+                    .first()
+                    .id,
+            ).isEqualTo("new")
         }
 
     @Test

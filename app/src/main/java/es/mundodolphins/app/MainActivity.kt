@@ -26,8 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -52,6 +53,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
+import dagger.hilt.android.AndroidEntryPoint
 import es.mundodolphins.app.notifications.PushNotificationData
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
@@ -63,8 +65,6 @@ import es.mundodolphins.app.viewmodel.ArticlesViewModel
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 import es.mundodolphins.app.viewmodel.SocialViewModel
 import es.mundodolphins.app.viewmodel.VideosViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -320,15 +320,14 @@ private fun UpdateAvailableBanner(
     }
 }
 
-private fun mapToDrawerRoute(route: String?): String {
-    return when {
+private fun mapToDrawerRoute(route: String?): String =
+    when {
         route == null -> Routes.Feed.route
         route.startsWith(Routes.EpisodeView.route) -> Routes.Feed.route
         route.startsWith(Routes.SeasonView.route) -> Routes.SeasonsList.route
         route.startsWith(Routes.Article.route) -> Routes.Articles.route
         else -> route
     }
-}
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable

@@ -8,11 +8,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
-import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.time.Instant
 
 class VideosViewModelTest {
     @Before
@@ -41,7 +41,11 @@ class VideosViewModelTest {
             assertThat(ok).isTrue()
             assertThat(viewModel.status.value).isEqualTo(VideosViewModel.LoadStatus.SUCCESS)
             assertThat(viewModel.videos.value).hasSize(1)
-            assertThat(viewModel.videos.value.first().title).isEqualTo("Video 1")
+            assertThat(
+                viewModel.videos.value
+                    .first()
+                    .title,
+            ).isEqualTo("Video 1")
         }
 
     @Test

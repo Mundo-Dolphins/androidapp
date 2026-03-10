@@ -83,8 +83,7 @@ private fun getQueryParam(
         ?.let { decodeUrlComponent(it) }
 }
 
-private fun decodeUrlComponent(value: String): String =
-    runCatching { URLDecoder.decode(value, "UTF-8") }.getOrDefault(value)
+private fun decodeUrlComponent(value: String): String = runCatching { URLDecoder.decode(value, "UTF-8") }.getOrDefault(value)
 
 private fun sanitizeVideoId(candidate: String?): String? {
     if (candidate.isNullOrBlank()) {

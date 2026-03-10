@@ -8,12 +8,12 @@ import javax.inject.Inject
 class VideosRepository
     @Inject
     constructor(
-    private val videosService: VideosService,
+        private val videosService: VideosService,
     ) {
-    suspend fun getVideos(): List<VideoUiModel> =
-        videosService
-            .getVideos()
-            .videos
-            .map { it.toVideoUiModel() }
-            .sortedByDescending { it.publishedTimestamp }
-}
+        suspend fun getVideos(): List<VideoUiModel> =
+            videosService
+                .getVideos()
+                .videos
+                .map { it.toVideoUiModel() }
+                .sortedByDescending { it.publishedTimestamp }
+    }
