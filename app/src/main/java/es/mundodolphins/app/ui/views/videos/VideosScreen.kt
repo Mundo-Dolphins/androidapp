@@ -30,11 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import es.mundodolphins.app.R
@@ -59,7 +59,9 @@ fun VideosScreen(
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 180.dp),
                 modifier = modifier.background(color = colorScheme.background),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp),
+                contentPadding =
+                    androidx.compose.foundation.layout
+                        .PaddingValues(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

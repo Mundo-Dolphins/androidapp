@@ -68,14 +68,13 @@ class PlayerServiceHelper(
         fun buildIntent(
             context: Context,
             request: PlaybackRequest,
-        ) =
-            Intent(context, AudioPlayerService::class.java).apply {
-                putExtra(AudioPlayerService.EXTRA_EPISODE_ID, request.episodeId)
-                putExtra(AudioPlayerService.EXTRA_MP3_URL, request.mp3Url)
-                putExtra(AudioPlayerService.EXTRA_CURRENT_POSITION, request.currentPosition)
-                putExtra(AudioPlayerService.EXTRA_EPISODE_TITLE, request.title)
-                putExtra(AudioPlayerService.EXTRA_EPISODE_IMAGE_URL, request.artworkUrl)
-            }
+        ) = Intent(context, AudioPlayerService::class.java).apply {
+            putExtra(AudioPlayerService.EXTRA_EPISODE_ID, request.episodeId)
+            putExtra(AudioPlayerService.EXTRA_MP3_URL, request.mp3Url)
+            putExtra(AudioPlayerService.EXTRA_CURRENT_POSITION, request.currentPosition)
+            putExtra(AudioPlayerService.EXTRA_EPISODE_TITLE, request.title)
+            putExtra(AudioPlayerService.EXTRA_EPISODE_IMAGE_URL, request.artworkUrl)
+        }
     }
 
     interface MediaControllerFactory {
@@ -104,8 +103,7 @@ class PlayerServiceHelper(
         override fun build(
             context: Context,
             sessionToken: SessionToken,
-        ): ListenableFuture<MediaController> =
-            MediaController.Builder(context, sessionToken).buildAsync()
+        ): ListenableFuture<MediaController> = MediaController.Builder(context, sessionToken).buildAsync()
     }
 
     private class DefaultForegroundStarter : ForegroundStarter {

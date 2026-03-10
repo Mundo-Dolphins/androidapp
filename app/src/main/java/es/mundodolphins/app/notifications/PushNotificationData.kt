@@ -24,8 +24,8 @@ object PushNotificationData {
         ) : Target
     }
 
-    fun parseTarget(data: Map<String, String>): Target? {
-        return when (data[DATA_KEY_TYPE]?.trim()?.lowercase()) {
+    fun parseTarget(data: Map<String, String>): Target? =
+        when (data[DATA_KEY_TYPE]?.trim()?.lowercase()) {
             TYPE_EPISODE -> {
                 data[DATA_KEY_EPISODE_ID]
                     ?.toLongOrNull()
@@ -40,7 +40,6 @@ object PushNotificationData {
 
             else -> null
         }
-    }
 
     fun parseTarget(intent: Intent?): Target? {
         if (intent == null) return null
@@ -59,7 +58,10 @@ object PushNotificationData {
         }
     }
 
-    fun applyTarget(intent: Intent, target: Target?) {
+    fun applyTarget(
+        intent: Intent,
+        target: Target?,
+    ) {
         if (target == null) return
         when (target) {
             is Target.Episode -> {

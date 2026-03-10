@@ -17,8 +17,8 @@ data class SocialUiModel(
     val publishedTimestamp: Long,
 )
 
-fun SocialPostResponse.toSocialUiModel(): SocialUiModel? {
-    return blueSkyPost
+fun SocialPostResponse.toSocialUiModel(): SocialUiModel? =
+    blueSkyPost
         ?.takeIf { it.bskyPost.isNotBlank() && it.description.isNotBlank() }
         ?.let { post ->
             val publishedInstant = Instant.ofEpochMilli(publishedTimestamp)
@@ -51,4 +51,3 @@ fun SocialPostResponse.toSocialUiModel(): SocialUiModel? {
                 publishedTimestamp = publishedTimestamp,
             )
         }
-}

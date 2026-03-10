@@ -248,9 +248,7 @@ class AudioPlayerService : MediaSessionService() {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun simulateExoPlayerError() {
-        throw RuntimeException("Simulated ExoPlayer error")
-    }
+    fun simulateExoPlayerError(): Unit = throw RuntimeException("Simulated ExoPlayer error")
 
     private inner class SessionCallback : MediaSession.Callback
 

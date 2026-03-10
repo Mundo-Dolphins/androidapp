@@ -3,11 +3,11 @@ package es.mundodolphins.app.ui.views.social
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,13 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,7 +58,9 @@ fun SocialScreen(
         SUCCESS -> {
             LazyColumn(
                 modifier = modifier.background(color = MaterialTheme.colorScheme.background),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                contentPadding =
+                    androidx.compose.foundation.layout
+                        .PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(posts) { post ->
@@ -192,10 +191,9 @@ private fun BlueSkyPostWebView(
     )
 }
 
-private fun SocialUiModel.preferredEmbedHeight(): androidx.compose.ui.unit.Dp {
-    return when {
+private fun SocialUiModel.preferredEmbedHeight(): androidx.compose.ui.unit.Dp =
+    when {
         imageUrls.isNotEmpty() -> 560.dp
         description.length > 220 -> 480.dp
         else -> 380.dp
     }
-}

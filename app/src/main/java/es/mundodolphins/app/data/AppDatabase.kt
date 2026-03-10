@@ -25,8 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                             context.applicationContext,
                             AppDatabase::class.java,
                             "mundodolphins_database",
-                        )
-                        .addTypeConverter(InstantConverter())
+                        ).addTypeConverter(InstantConverter())
                         .build()
                 INSTANCE = instance
                 instance

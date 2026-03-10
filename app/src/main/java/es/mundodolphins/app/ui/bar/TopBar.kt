@@ -26,9 +26,7 @@ import es.mundodolphins.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(
-    onMenuClick: () -> Unit = {},
-) {
+fun AppBar(onMenuClick: () -> Unit = {}) {
     TopAppBar(
         colors =
             TopAppBarDefaults.topAppBarColors(

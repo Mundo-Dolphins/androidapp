@@ -15,6 +15,11 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+val isCoverageBuild =
+    gradle.startParameter.taskNames.any { taskName ->
+        taskName.contains("Coverage", ignoreCase = true)
+    }
+
 // Import types to avoid fully-qualified names and remove warnings
 
 android {
@@ -46,8 +51,8 @@ android {
             )
         }
         getByName("debug") {
-            // This will access/create the debug build type
-            enableUnitTestCoverage = true // Ensures coverage is enabled for debug builds
+            // Coverage instrumentation adds noticeable overhead; enable it only for dedicated coverage tasks.
+            enableUnitTestCoverage = isCoverageBuild
         }
     }
     compileOptions {

@@ -59,8 +59,7 @@ object AppModule {
                 context,
                 AppDatabase::class.java,
                 "mundodolphins_database",
-            )
-            .addTypeConverter(InstantConverter())
+            ).addTypeConverter(InstantConverter())
             .build()
 
     @Provides
@@ -68,6 +67,5 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlayerServiceHelper(): PlayerServiceHelper =
-        PlayerServiceHelper(PlayerServiceHelper.IntentBuilder())
+    fun providePlayerServiceHelper(): PlayerServiceHelper = PlayerServiceHelper(PlayerServiceHelper.IntentBuilder())
 }

@@ -10,9 +10,9 @@ class SocialRepository
     constructor(
         private val socialService: SocialService,
     ) {
-    suspend fun getSocialPosts(): List<SocialUiModel> =
-        socialService
-            .getSocialPosts()
-            .mapNotNull { it.toSocialUiModel() }
-            .sortedByDescending { it.publishedTimestamp }
-}
+        suspend fun getSocialPosts(): List<SocialUiModel> =
+            socialService
+                .getSocialPosts()
+                .mapNotNull { it.toSocialUiModel() }
+                .sortedByDescending { it.publishedTimestamp }
+    }

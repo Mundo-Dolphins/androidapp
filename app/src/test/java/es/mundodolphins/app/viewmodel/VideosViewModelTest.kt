@@ -32,7 +32,8 @@ class VideosViewModelTest {
     fun `fetchVideosSuspend sets SUCCESS when repository returns videos`() =
         runTest {
             val repository = mockk<VideosRepository>()
-            coEvery { repository.getVideos() } returns listOf(sampleVideoUiModel("Video 1"))
+            coEvery { repository.getVideos() } returns
+                listOf(sampleVideoUiModel("Video 1"))
             val viewModel = VideosViewModel(repository)
 
             val ok = viewModel.fetchVideosSuspend()
@@ -40,7 +41,11 @@ class VideosViewModelTest {
             assertThat(ok).isTrue()
             assertThat(viewModel.status.value).isEqualTo(VideosViewModel.LoadStatus.SUCCESS)
             assertThat(viewModel.videos.value).hasSize(1)
-            assertThat(viewModel.videos.value.first().title).isEqualTo("Video 1")
+            assertThat(
+                viewModel.videos.value
+                    .first()
+                    .title,
+            ).isEqualTo("Video 1")
         }
 
     @Test
