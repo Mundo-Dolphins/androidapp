@@ -8,11 +8,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
-import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.time.Instant
 
 class SocialViewModelTest {
     @Before
@@ -32,7 +32,8 @@ class SocialViewModelTest {
     fun `fetchSocialPostsSuspend sets SUCCESS when repository returns posts`() =
         runTest {
             val repository = mockk<SocialRepository>()
-            coEvery { repository.getSocialPosts() } returns listOf(samplePost("new"))
+            coEvery { repository.getSocialPosts() } returns
+                listOf(samplePost("new"))
             val viewModel = SocialViewModel(repository)
 
             val ok = viewModel.fetchSocialPostsSuspend()

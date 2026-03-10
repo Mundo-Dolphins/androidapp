@@ -8,11 +8,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.time.Instant
 
 class VideosViewModelTest {
     @Before
@@ -32,7 +32,8 @@ class VideosViewModelTest {
     fun `fetchVideosSuspend sets SUCCESS when repository returns videos`() =
         runTest {
             val repository = mockk<VideosRepository>()
-            coEvery { repository.getVideos() } returns listOf(sampleVideoUiModel("Video 1"))
+            coEvery { repository.getVideos() } returns
+                listOf(sampleVideoUiModel("Video 1"))
             val viewModel = VideosViewModel(repository)
 
             val ok = viewModel.fetchVideosSuspend()

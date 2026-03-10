@@ -228,11 +228,13 @@ class ArticlesViewModelTest {
 
             viewModel.fetchArticles()
             testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(viewModel.articles.value.first().title).isEqualTo("A")
+            assertThat(viewModel.articles.value.first().title)
+                .isEqualTo("A")
 
             viewModel.fetchArticles(force = true)
             testDispatcher.scheduler.advanceUntilIdle()
-            assertThat(viewModel.articles.value.first().title).isEqualTo("B")
+            assertThat(viewModel.articles.value.first().title)
+                .isEqualTo("B")
             coVerify(exactly = 2) { mockService.getArticles() }
         }
 
