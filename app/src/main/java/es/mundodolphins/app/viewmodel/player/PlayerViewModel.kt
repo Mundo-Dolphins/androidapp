@@ -122,4 +122,9 @@ class PlayerViewModel
             val duration = durationMs ?: 0L
             return if (duration <= 0L || duration == C.TIME_UNSET) 0L else duration
         }
+
+        override fun onCleared() {
+            super.onCleared()
+            disconnectPlayer()
+        }
     }

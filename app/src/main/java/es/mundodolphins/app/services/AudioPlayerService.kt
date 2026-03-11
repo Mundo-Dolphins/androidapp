@@ -81,6 +81,7 @@ class AudioPlayerService : MediaSessionService() {
         flags: Int,
         startId: Int,
     ): Int {
+        super.onStartCommand(intent, flags, startId)
         val mp3Url = intent?.getStringExtra(EXTRA_MP3_URL) ?: return START_STICKY
         val episodeId = intent.getLongExtra(EXTRA_EPISODE_ID, 0L)
 

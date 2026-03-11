@@ -30,6 +30,15 @@ class PlayerServiceHelper(
         if (currentFuture != null) {
             if (currentFuture.isDone) {
                 onServiceConnected(currentFuture.get())
+            } else {
+                currentFuture.addListener(
+                    {
+                        if (currentFuture.isDone) {
+                            onServiceConnected(currentFuture.get())
+                        }
+                    },
+                    ContextCompat.getMainExecutor(context),
+                )
             }
             return
         }
