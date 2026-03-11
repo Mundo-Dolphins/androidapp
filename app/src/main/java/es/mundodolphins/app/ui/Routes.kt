@@ -5,7 +5,11 @@ sealed class Routes(
 ) {
     data object Feed : Routes("feed")
 
-    data object EpisodeView : Routes("more_information")
+    data object EpisodeView : Routes("more_information") {
+        const val DEEP_LINK_URI_PATTERN = "mundodolphins://episode/{id}"
+
+        fun deepLinkUri(episodeId: Long) = "mundodolphins://episode/$episodeId"
+    }
 
     data object UsefulLinks : Routes("useful_links")
 

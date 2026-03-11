@@ -12,6 +12,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.views.articles.ArticleScreen
 import es.mundodolphins.app.ui.views.articles.ListArticlesView
@@ -48,7 +49,10 @@ fun MainScreen(
                     model = episodesViewModel,
                 )
             }
-            composable(route = Routes.EpisodeView.route + "/{id}") { backStackEntry ->
+            composable(
+                route = Routes.EpisodeView.route + "/{id}",
+                deepLinks = listOf(navDeepLink { uriPattern = Routes.EpisodeView.DEEP_LINK_URI_PATTERN }),
+            ) { backStackEntry ->
                 val episodeId = backStackEntry.arguments?.getString("id")?.toLong() ?: 0L
                 LaunchedEffect(episodeId) {
                     episodesViewModel.getEpisode(episodeId)
