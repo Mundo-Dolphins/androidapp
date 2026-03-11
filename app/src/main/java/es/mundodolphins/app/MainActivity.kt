@@ -70,6 +70,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var pendingPushTarget by mutableStateOf<PushNotificationData.Target?>(null)
+    private var pendingNavIntent by mutableStateOf<Intent?>(null)
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -86,6 +87,8 @@ class MainActivity : ComponentActivity() {
                 MundoDolphinsScreen(
                     pushTarget = pendingPushTarget,
                     onPushTargetHandled = { pendingPushTarget = null },
+                    navDeepLinkIntent = pendingNavIntent,
+                    onNavDeepLinkHandled = { pendingNavIntent = null },
                 )
             }
         }
@@ -94,7 +97,12 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        pendingPushTarget = PushNotificationData.parseTarget(intent)
+        val parsedTarget = PushNotificationData.parseTarget(intent)
+        if (parsedTarget != null) {
+            pendingPushTarget = parsedTarget
+        } else {
+            pendingNavIntent = intent
+        }
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -111,11 +119,29 @@ class MainActivity : ComponentActivity() {
 fun MundoDolphinsScreen(
     pushTarget: PushNotificationData.Target? = null,
     onPushTargetHandled: () -> Unit = {},
+    navDeepLinkIntent: Intent? = null,
+    onNavDeepLinkHandled: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val drawerScope = rememberCoroutineScope()
     val isPreview = LocalInspectionMode.current
+
+    LaunchedEffect(navDeepLinkIntent) {
+        if (navDeepLinkIntent == null) return@LaunchedEffect
+        val episodeId =
+            navDeepLinkIntent.data
+                ?.takeIf { it.scheme == "mundodolphins" && it.host == "episode" }
+                ?.lastPathSegment
+                ?.toLongOrNull()
+        if (episodeId != null) {
+            navController.navigate("${Routes.EpisodeView.route}/$episodeId") {
+                launchSingleTop = true
+                popUpTo(Routes.Feed.route) { inclusive = false }
+            }
+        }
+        onNavDeepLinkHandled()
+    }
     if (isPreview) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),

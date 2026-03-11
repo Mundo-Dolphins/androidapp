@@ -25,6 +25,7 @@ import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
 import es.mundodolphins.app.MainActivity
 import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.Routes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -229,9 +230,17 @@ class AudioPlayerService : MediaSessionService() {
 
     private fun buildSessionActivityIntent(episodeId: Long?): PendingIntent {
         val intent =
-            Intent(this, MainActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(EXTRA_EPISODE_ID, episodeId ?: -1L)
+            if (episodeId != null && episodeId > 0L) {
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(Routes.EpisodeView.deepLinkUri(episodeId)),
+                    this,
+                    MainActivity::class.java,
+                ).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            } else {
+                Intent(this, MainActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
 
         return PendingIntent.getActivity(
             this,

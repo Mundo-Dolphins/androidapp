@@ -87,9 +87,11 @@ private fun PlayerControls(
     val sliderPosition = remember { mutableLongStateOf(0) }
     val totalDuration = remember { mutableLongStateOf(0) }
 
-    LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
-        delay(1000)
-        currentPosition.longValue = sanitizePlayerTimestamp(player?.currentPosition)
+    LaunchedEffect(player) {
+        while (true) {
+            currentPosition.longValue = sanitizePlayerTimestamp(player?.currentPosition)
+            delay(1000)
+        }
     }
 
     LaunchedEffect(totalDurationFromVm) {
