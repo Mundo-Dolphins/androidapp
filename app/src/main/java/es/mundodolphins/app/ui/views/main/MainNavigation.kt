@@ -51,7 +51,11 @@ fun MainScreen(
             }
             composable(
                 route = Routes.EpisodeView.route + "/{id}",
-                deepLinks = listOf(navDeepLink { uriPattern = Routes.EpisodeView.DEEP_LINK_URI_PATTERN }),
+                deepLinks =
+                    listOf(
+                        navDeepLink { uriPattern = Routes.EpisodeView.DEEP_LINK_URI_PATTERN },
+                        navDeepLink { uriPattern = Routes.EpisodeView.APP_LINK_URI_PATTERN },
+                    ),
             ) { backStackEntry ->
                 val episodeId = backStackEntry.arguments?.getString("id")?.toLong() ?: 0L
                 LaunchedEffect(episodeId) {
