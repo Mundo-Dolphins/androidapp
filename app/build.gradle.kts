@@ -105,6 +105,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
     implementation(libs.hilt.android)
+    implementation(libs.install.referrer)
 
     // Networking
     implementation(libs.converter.gson)
