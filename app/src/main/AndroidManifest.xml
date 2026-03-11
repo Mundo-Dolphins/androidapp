@@ -38,6 +38,17 @@
                     android:host="episode"
                     android:scheme="mundodolphins" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="mundodolphins.es"
+                    android:pathPrefix="/app/episode/" />
+            </intent-filter>
         </activity>
         <service
             android:name="es.mundodolphins.app.services.AudioPlayerService"

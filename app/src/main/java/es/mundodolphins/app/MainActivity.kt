@@ -129,11 +129,7 @@ fun MundoDolphinsScreen(
 
     LaunchedEffect(navDeepLinkIntent) {
         if (navDeepLinkIntent == null) return@LaunchedEffect
-        val episodeId =
-            navDeepLinkIntent.data
-                ?.takeIf { it.scheme == "mundodolphins" && it.host == "episode" }
-                ?.lastPathSegment
-                ?.toLongOrNull()
+        val episodeId = Routes.EpisodeView.episodeIdFromUri(navDeepLinkIntent.data)
         if (episodeId != null) {
             navController.navigate("${Routes.EpisodeView.route}/$episodeId") {
                 launchSingleTop = true
