@@ -89,4 +89,18 @@ class PlayerViewModelTest {
             verify { playerServiceHelper.unbindAndStopService(context) }
             coVerify { episodeRepository.updateEpisodePosition(any(), any(), false) }
         }
+
+    @Test
+    fun `should disconnect controller and save position without stopping service`() =
+        runTest {
+            coEvery { episodeRepository.updateEpisodePosition(any(), any(), any()) } just Runs
+            every { playerServiceHelper.disconnectController() } just Runs
+
+            playerViewModel.disconnectPlayer()
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            verify { playerServiceHelper.disconnectController() }
+            verify(exactly = 0) { playerServiceHelper.unbindAndStopService(any()) }
+            coVerify { episodeRepository.updateEpisodePosition(any(), any(), false) }
+        }
 }

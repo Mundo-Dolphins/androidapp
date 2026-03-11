@@ -30,6 +30,15 @@ class PlayerServiceHelper(
         if (currentFuture != null) {
             if (currentFuture.isDone) {
                 onServiceConnected(currentFuture.get())
+            } else {
+                currentFuture.addListener(
+                    {
+                        if (currentFuture.isDone) {
+                            onServiceConnected(currentFuture.get())
+                        }
+                    },
+                    ContextCompat.getMainExecutor(context),
+                )
             }
             return
         }
@@ -48,9 +57,13 @@ class PlayerServiceHelper(
         )
     }
 
-    fun unbindAndStopService(context: Context) {
+    fun disconnectController() {
         mediaControllerFuture?.let { controllerReleaser.release(it) }
         mediaControllerFuture = null
+    }
+
+    fun unbindAndStopService(context: Context) {
+        disconnectController()
         val intent = Intent(context, AudioPlayerService::class.java)
         context.stopService(intent)
     }

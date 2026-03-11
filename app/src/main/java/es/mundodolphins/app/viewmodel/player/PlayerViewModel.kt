@@ -90,9 +90,21 @@ class PlayerViewModel
             }
         }
 
+        fun disconnectPlayer() {
+            detachFromPlayer()
+            playerServiceHelper.disconnectController()
+        }
+
         fun releasePlayer(context: Context) {
-            _playerState.value?.removeListener(playerListener)
+            detachFromPlayer()
             playerServiceHelper.unbindAndStopService(context)
+        }
+
+        private fun detachFromPlayer() {
+            _playerState.value?.let {
+                it.removeListener(playerListener)
+                currentPosition = it.currentPosition
+            }
             savePlayerPosition(currentPosition)
         }
 
@@ -109,5 +121,10 @@ class PlayerViewModel
         private fun sanitizeDuration(durationMs: Long?): Long {
             val duration = durationMs ?: 0L
             return if (duration <= 0L || duration == C.TIME_UNSET) 0L else duration
+        }
+
+        override fun onCleared() {
+            super.onCleared()
+            disconnectPlayer()
         }
     }

@@ -41,6 +41,7 @@ class AudioPlayerService : MediaSessionService() {
     private lateinit var mediaSession: MediaSession
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val artworkCache = mutableMapOf<Long, ByteArray>()
+    private var currentEpisodeId = -1L
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
@@ -80,11 +81,25 @@ class AudioPlayerService : MediaSessionService() {
         flags: Int,
         startId: Int,
     ): Int {
+        super.onStartCommand(intent, flags, startId)
         val mp3Url = intent?.getStringExtra(EXTRA_MP3_URL) ?: return START_STICKY
         val episodeId = intent.getLongExtra(EXTRA_EPISODE_ID, 0L)
+
+        if (episodeId != currentEpisodeId) {
+            startNewEpisode(intent, episodeId)
+        }
+
+        return START_STICKY
+    }
+
+    private fun startNewEpisode(
+        intent: Intent,
+        episodeId: Long,
+    ) {
         val currentPosition = intent.getLongExtra(EXTRA_CURRENT_POSITION, 0L)
         val mediaItem = buildMediaItem(intent)
 
+        currentEpisodeId = episodeId
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
         exoPlayer.setWakeMode(WAKE_MODE_NETWORK)
@@ -93,11 +108,10 @@ class AudioPlayerService : MediaSessionService() {
 
         mediaSession.setSessionActivity(buildSessionActivityIntent(episodeId))
         loadAndCacheArtwork(episodeId, intent.getStringExtra(EXTRA_EPISODE_IMAGE_URL))
-
-        return START_STICKY
     }
 
     override fun onDestroy() {
+        currentEpisodeId = -1L
         mediaSession.release()
         exoPlayer.release()
         serviceScope.cancel()
