@@ -47,6 +47,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
@@ -54,6 +55,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
+import es.mundodolphins.app.install.InstallReferrerHelper
 import es.mundodolphins.app.notifications.PushNotificationData
 import es.mundodolphins.app.observer.ConnectivityObserver
 import es.mundodolphins.app.ui.Routes
@@ -71,6 +73,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private var pendingPushTarget by mutableStateOf<PushNotificationData.Target?>(null)
     private var pendingNavIntent by mutableStateOf<Intent?>(null)
+    private var pendingReferrerEpisodeId by mutableStateOf<Long?>(null)
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -82,6 +85,20 @@ class MainActivity : ComponentActivity() {
         pendingPushTarget = PushNotificationData.parseTarget(intent)
         requestNotificationPermissionIfNeeded()
 
+        // Query the Play Install Referrer once per install, but only when there is no higher-
+        // priority navigation target already present (App Link or push notification).
+        if (pendingPushTarget == null && intent.data == null) {
+            lifecycleScope.launch {
+                if (!InstallReferrerHelper.isAlreadyProcessed(this@MainActivity)) {
+                    val episodeId = InstallReferrerHelper.queryEpisodeId(this@MainActivity)
+                    InstallReferrerHelper.markProcessed(this@MainActivity)
+                    if (episodeId != null) {
+                        pendingReferrerEpisodeId = episodeId
+                    }
+                }
+            }
+        }
+
         setContent {
             MundoDolphinsTheme {
                 MundoDolphinsScreen(
@@ -89,6 +106,8 @@ class MainActivity : ComponentActivity() {
                     onPushTargetHandled = { pendingPushTarget = null },
                     navDeepLinkIntent = pendingNavIntent,
                     onNavDeepLinkHandled = { pendingNavIntent = null },
+                    referrerEpisodeId = pendingReferrerEpisodeId,
+                    onReferrerEpisodeHandled = { pendingReferrerEpisodeId = null },
                 )
             }
         }
@@ -121,6 +140,8 @@ fun MundoDolphinsScreen(
     onPushTargetHandled: () -> Unit = {},
     navDeepLinkIntent: Intent? = null,
     onNavDeepLinkHandled: () -> Unit = {},
+    referrerEpisodeId: Long? = null,
+    onReferrerEpisodeHandled: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -137,6 +158,14 @@ fun MundoDolphinsScreen(
             }
         }
         onNavDeepLinkHandled()
+    }
+    LaunchedEffect(referrerEpisodeId) {
+        if (referrerEpisodeId == null) return@LaunchedEffect
+        navController.navigate("${Routes.EpisodeView.route}/$referrerEpisodeId") {
+            launchSingleTop = true
+            popUpTo(Routes.Feed.route) { inclusive = false }
+        }
+        onReferrerEpisodeHandled()
     }
     if (isPreview) {
         Scaffold(
