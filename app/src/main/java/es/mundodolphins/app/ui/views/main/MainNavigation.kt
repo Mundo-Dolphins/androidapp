@@ -10,8 +10,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.views.articles.ArticleScreen
@@ -51,13 +53,18 @@ fun MainScreen(
             }
             composable(
                 route = Routes.EpisodeView.route + "/{id}",
+                arguments =
+                    listOf(
+                        navArgument("id") { type = NavType.LongType },
+                    ),
                 deepLinks =
                     listOf(
                         navDeepLink { uriPattern = Routes.EpisodeView.DEEP_LINK_URI_PATTERN },
                         navDeepLink { uriPattern = Routes.EpisodeView.APP_LINK_URI_PATTERN },
+                        navDeepLink { uriPattern = Routes.EpisodeView.APP_LINK_URI_PATTERN_WWW },
                     ),
             ) { backStackEntry ->
-                val episodeId = backStackEntry.arguments?.getString("id")?.toLong() ?: 0L
+                val episodeId = backStackEntry.arguments?.getLong("id") ?: 0L
                 LaunchedEffect(episodeId) {
                     episodesViewModel.getEpisode(episodeId)
                 }
