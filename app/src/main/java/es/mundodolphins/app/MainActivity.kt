@@ -2,9 +2,11 @@ package es.mundodolphins.app
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -69,11 +71,12 @@ import es.mundodolphins.app.viewmodel.SocialViewModel
 import es.mundodolphins.app.viewmodel.VideosViewModel
 import kotlinx.coroutines.launch
 
+private const val TAG = "MundoDolphinsDeepLink"
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var pendingPushTarget by mutableStateOf<PushNotificationData.Target?>(null)
-    private var pendingNavIntent by mutableStateOf<Intent?>(null)
-    private var pendingReferrerEpisodeId by mutableStateOf<Long?>(null)
+    private var pendingEpisodeId by mutableStateOf<Long?>(null)
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -83,17 +86,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         pendingPushTarget = PushNotificationData.parseTarget(intent)
+        logDeepLinkIntent("cold-start", intent)
+        if (isDebugBuild()) {
+            logManifestResolution("manifest deep-link capability probe")
+        }
         requestNotificationPermissionIfNeeded()
 
-        // Query the Play Install Referrer once per install, but only when there is no higher-
-        // priority navigation target already present (App Link or push notification).
-        if (pendingPushTarget == null && intent.data == null) {
+        // Parse the incoming deep link (if any) into a pending episode ID before setContent,
+        // so the first composition already has the correct navigation target.
+        if (pendingPushTarget == null) {
+            pendingEpisodeId = parseEpisodeIdFromIntent("cold-start", intent)
+        }
+
+        // Query the Play Install Referrer once per install, only when no higher-priority
+        // navigation target (App Link or push notification) is already present.
+        if (pendingPushTarget == null && pendingEpisodeId == null) {
             lifecycleScope.launch {
                 if (!InstallReferrerHelper.isAlreadyProcessed(this@MainActivity)) {
-                    val episodeId = InstallReferrerHelper.queryEpisodeId(this@MainActivity)
+                    val referrerId = InstallReferrerHelper.queryEpisodeId(this@MainActivity)
                     InstallReferrerHelper.markProcessed(this@MainActivity)
-                    if (episodeId != null) {
-                        pendingReferrerEpisodeId = episodeId
+                    if (referrerId != null) {
+                        Log.i(TAG, "[cold-start] install referrer resolved to episodeId=$referrerId")
+                        pendingEpisodeId = referrerId
                     }
                 }
             }
@@ -104,10 +118,8 @@ class MainActivity : ComponentActivity() {
                 MundoDolphinsScreen(
                     pushTarget = pendingPushTarget,
                     onPushTargetHandled = { pendingPushTarget = null },
-                    navDeepLinkIntent = pendingNavIntent,
-                    onNavDeepLinkHandled = { pendingNavIntent = null },
-                    referrerEpisodeId = pendingReferrerEpisodeId,
-                    onReferrerEpisodeHandled = { pendingReferrerEpisodeId = null },
+                    pendingEpisodeId = pendingEpisodeId,
+                    onPendingEpisodeHandled = { pendingEpisodeId = null },
                 )
             }
         }
@@ -116,11 +128,73 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        logDeepLinkIntent("warm-start", intent)
         val parsedTarget = PushNotificationData.parseTarget(intent)
         if (parsedTarget != null) {
+            Log.i(TAG, "[warm-start] push notification target=$parsedTarget")
             pendingPushTarget = parsedTarget
+            pendingEpisodeId = null
         } else {
-            pendingNavIntent = intent
+            pendingEpisodeId = parseEpisodeIdFromIntent("warm-start", intent)
+        }
+    }
+
+    private fun parseEpisodeIdFromIntent(
+        source: String,
+        inputIntent: Intent,
+    ): Long? {
+        if (inputIntent.data == null) {
+            Log.d(TAG, "[$source] no URI in intent, deep-link skipped")
+            return null
+        }
+        val episodeId = Routes.EpisodeView.episodeIdFromUri(inputIntent.data)
+        return if (episodeId != null) {
+            Log.i(TAG, "[$source] episodeId=$episodeId from uri=${inputIntent.dataString}")
+            episodeId
+        } else {
+            Log.w(TAG, "[$source] URI does not match episode pattern: ${inputIntent.dataString}")
+            null
+        }
+    }
+
+    private fun logDeepLinkIntent(
+        source: String,
+        inputIntent: Intent?,
+    ) {
+        Log.i(
+            TAG,
+            "[$source] incoming intent action=${inputIntent?.action} data=${inputIntent?.dataString}",
+        )
+    }
+
+    private fun logManifestResolution(contextLabel: String) {
+        val testUris =
+            listOf(
+                "https://mundodolphins.es/app/episode/1769624287000/?appAttempt=1",
+                "https://www.mundodolphins.es/app/episode/1769624287000/?appAttempt=1",
+            )
+        testUris.forEach { uriString ->
+            val testIntent =
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = uriString.toUri()
+                }
+            val candidates =
+                packageManager.queryIntentActivities(
+                    testIntent,
+                    0,
+                )
+            val topName =
+                packageManager.resolveActivity(testIntent, 0)?.activityInfo?.name
+            Log.i(
+                TAG,
+                "[$contextLabel] uri=$uriString resolveCount=${candidates.size} top=$topName",
+            )
+            candidates.forEachIndexed { index, resolveInfo ->
+                Log.i(
+                    TAG,
+                    "[$contextLabel] candidate[$index]=${resolveInfo.activityInfo.packageName}/${resolveInfo.activityInfo.name}",
+                )
+            }
         }
     }
 
@@ -131,6 +205,8 @@ class MainActivity : ComponentActivity() {
         }
         requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
+
+    private fun isDebugBuild(): Boolean = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -138,35 +214,14 @@ class MainActivity : ComponentActivity() {
 fun MundoDolphinsScreen(
     pushTarget: PushNotificationData.Target? = null,
     onPushTargetHandled: () -> Unit = {},
-    navDeepLinkIntent: Intent? = null,
-    onNavDeepLinkHandled: () -> Unit = {},
-    referrerEpisodeId: Long? = null,
-    onReferrerEpisodeHandled: () -> Unit = {},
+    pendingEpisodeId: Long? = null,
+    onPendingEpisodeHandled: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val drawerScope = rememberCoroutineScope()
     val isPreview = LocalInspectionMode.current
 
-    LaunchedEffect(navDeepLinkIntent) {
-        if (navDeepLinkIntent == null) return@LaunchedEffect
-        val episodeId = Routes.EpisodeView.episodeIdFromUri(navDeepLinkIntent.data)
-        if (episodeId != null) {
-            navController.navigate("${Routes.EpisodeView.route}/$episodeId") {
-                launchSingleTop = true
-                popUpTo(Routes.Feed.route) { inclusive = false }
-            }
-        }
-        onNavDeepLinkHandled()
-    }
-    LaunchedEffect(referrerEpisodeId) {
-        if (referrerEpisodeId == null) return@LaunchedEffect
-        navController.navigate("${Routes.EpisodeView.route}/$referrerEpisodeId") {
-            launchSingleTop = true
-            popUpTo(Routes.Feed.route) { inclusive = false }
-        }
-        onReferrerEpisodeHandled()
-    }
     if (isPreview) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -249,6 +304,16 @@ fun MundoDolphinsScreen(
                     }
                 },
             )
+            HandleDeepLinkNavigation(
+                pendingEpisodeId = pendingEpisodeId,
+                onPendingEpisodeHandled = onPendingEpisodeHandled,
+                navigate = { route ->
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                        popUpTo(Routes.Feed.route) { inclusive = false }
+                    }
+                },
+            )
             PrefetchAppContent(
                 episodesViewModel = viewModel,
                 articlesViewModel = articlesViewModel,
@@ -311,6 +376,21 @@ private fun PrefetchAppContent(
         articlesViewModel.fetchArticles()
         videosViewModel.fetchVideos()
         socialViewModel.fetchSocialPosts()
+    }
+}
+
+@Composable
+private fun HandleDeepLinkNavigation(
+    pendingEpisodeId: Long?,
+    onPendingEpisodeHandled: () -> Unit,
+    navigate: (String) -> Unit,
+) {
+    LaunchedEffect(pendingEpisodeId) {
+        if (pendingEpisodeId == null) return@LaunchedEffect
+        val route = "${Routes.EpisodeView.route}/$pendingEpisodeId"
+        Log.i(TAG, "compose deep-link navigation: episodeId=$pendingEpisodeId route=$route")
+        navigate(route)
+        onPendingEpisodeHandled()
     }
 }
 
