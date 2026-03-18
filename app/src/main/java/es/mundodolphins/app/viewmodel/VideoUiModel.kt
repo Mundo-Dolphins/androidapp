@@ -18,10 +18,7 @@ data class VideoUiModel(
     val thumbnailUrl: String?,
     val thumbnailFallbackUrl: String?,
     val publishedTimestamp: Long,
-) {
-    val embedUrl: String?
-        get() = videoId?.let { "https://www.youtube.com/embed/$it?autoplay=1&playsinline=1" }
-}
+)
 
 fun VideoResponse.toVideoUiModel(): VideoUiModel {
     val publishedInstant = Instant.ofEpochMilli(publishedTimestamp)
@@ -41,6 +38,8 @@ fun VideoResponse.toVideoUiModel(): VideoUiModel {
     )
 }
 
+private const val ID_PARAM = "v"
+
 fun extractYoutubeVideoId(url: String): String? {
     val uri = runCatching { URI(url.trim()) }.getOrNull()
     val host = uri?.host?.lowercase()?.removePrefix("www.")
@@ -51,7 +50,7 @@ fun extractYoutubeVideoId(url: String): String? {
             host == "youtu.be" -> uri.path.trim('/')
             host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com") -> {
                 when {
-                    uri.path == "/watch" -> getQueryParam(uri.rawQuery, "v")
+                    uri.path == "/watch" -> getQueryParam(uri.rawQuery)
                     uri.path.startsWith("/embed/") -> uri.path.removePrefix("/embed/").substringBefore('/')
                     uri.path.startsWith("/shorts/") -> uri.path.removePrefix("/shorts/").substringBefore('/')
                     else -> null
@@ -68,17 +67,14 @@ fun buildMaxResThumbnailUrl(videoId: String): String = "https://img.youtube.com/
 
 fun buildHqThumbnailUrl(videoId: String): String = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
 
-private fun getQueryParam(
-    query: String?,
-    key: String,
-): String? {
+private fun getQueryParam(query: String?): String? {
     if (query.isNullOrBlank()) {
         return null
     }
 
     return query
         .split("&")
-        .firstOrNull { it.substringBefore("=") == key }
+        .firstOrNull { it.substringBefore("=") == ID_PARAM }
         ?.substringAfter("=", "")
         ?.let { decodeUrlComponent(it) }
 }

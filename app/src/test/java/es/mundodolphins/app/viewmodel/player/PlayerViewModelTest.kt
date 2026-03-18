@@ -42,6 +42,7 @@ class PlayerViewModelTest {
     }
 
     @Test
+    @Suppress("CheckResult")
     fun `should bind and start service and update player state`() =
         runTest {
             val context = mockk<Context>(relaxed = true)

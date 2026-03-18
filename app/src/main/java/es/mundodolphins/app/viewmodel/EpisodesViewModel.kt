@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+private const val REFRESHING_DATABASE = "Refreshing Database"
+
 @HiltViewModel
 class EpisodesViewModel
     @Inject
@@ -67,12 +69,9 @@ class EpisodesViewModel
         }
 
         // Simple safe logging helpers to avoid RuntimeException in JVM unit tests where android.util.Log is not mocked
-        private fun safeLogI(
-            tag: String,
-            msg: String,
-        ) {
+        private fun safeLogI(msg: String) {
             try {
-                Log.i(tag, msg)
+                Log.i(REFRESHING_DATABASE, msg)
             } catch (_: Throwable) {
                 // ignore logging failures in unit test environment
             }
@@ -99,18 +98,17 @@ class EpisodesViewModel
                     val response = feedService.getAllSeasons()
                     if (response.isSuccessful) {
                         val seasonsBody = response.body()
-                        if (seasonsBody == null || seasonsBody.isEmpty()) {
-                            safeLogI("Refreshing Database", "No seasons found or body is null")
+                        if (seasonsBody.isNullOrEmpty()) {
+                            safeLogI("No seasons found or body is null")
                             withContext(mainDispatcher) { statusRefresh = LoadStatus.EMPTY }
                         } else {
                             seasonsBody.apply {
-                                safeLogI("Refreshing Database", "Found ${this.size} seasons")
+                                safeLogI("Found ${this.size} seasons")
                                 val episodes = episodeRepository.getAllEpisodesIds()
                                 map { it.convertJsonFilenameToSeason() }.forEach { season ->
                                     val seasonEpisodes = feedService.getSeasonEpisodes(season)
                                     if (seasonEpisodes.isSuccessful) {
                                         safeLogI(
-                                            "Refreshing Database",
                                             "Found ${seasonEpisodes.body()!!.size} episodes for season $season",
                                         )
                                         episodeRepository.insertAllEpisodes(
@@ -129,7 +127,7 @@ class EpisodesViewModel
                         withContext(mainDispatcher) { statusRefresh = LoadStatus.ERROR }
                         try {
                             safeLogE(
-                                "Refreshing Database",
+                                REFRESHING_DATABASE,
                                 "Status: ${response.code()}, Body: ${response.errorBody()}, Message: ${response.message()}, URL: ${
                                     response.raw().request.url
                                 }",

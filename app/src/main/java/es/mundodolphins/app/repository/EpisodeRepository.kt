@@ -27,7 +27,7 @@ class EpisodeRepository
                 episodeDao.getFeed()
             } catch (e: Exception) {
                 Log.e("EpisodeRepository", "Error getting feed", e)
-                emptyFlow<List<Episode>>()
+                emptyFlow()
             }
 
         fun getSeason(seasonId: Int) = episodeDao.getSeason(seasonId)

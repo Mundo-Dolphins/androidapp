@@ -4,9 +4,9 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.WAKE_MODE_NETWORK
@@ -83,7 +83,7 @@ class AudioPlayerService : MediaSessionService() {
         startId: Int,
     ): Int {
         super.onStartCommand(intent, flags, startId)
-        val mp3Url = intent?.getStringExtra(EXTRA_MP3_URL) ?: return START_STICKY
+        intent?.getStringExtra(EXTRA_MP3_URL) ?: return START_STICKY
         val episodeId = intent.getLongExtra(EXTRA_EPISODE_ID, 0L)
 
         if (episodeId != currentEpisodeId) {
@@ -129,11 +129,11 @@ class AudioPlayerService : MediaSessionService() {
         val mediaMetadata =
             MediaMetadata
                 .Builder()
-                .setTitle(if (title.isBlank()) getString(R.string.app_name) else title)
+                .setTitle(title.ifBlank { getString(R.string.app_name) })
                 .setArtist(getString(R.string.app_name))
                 .apply {
                     if (!artworkUrl.isNullOrBlank()) {
-                        setArtworkUri(Uri.parse(artworkUrl))
+                        setArtworkUri(artworkUrl.toUri())
                     }
                 }.build()
 
@@ -233,7 +233,7 @@ class AudioPlayerService : MediaSessionService() {
             if (episodeId != null && episodeId > 0L) {
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse(Routes.EpisodeView.deepLinkUri(episodeId)),
+                    Routes.EpisodeView.deepLinkUri(episodeId).toUri(),
                     this,
                     MainActivity::class.java,
                 ).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -273,7 +273,7 @@ class AudioPlayerService : MediaSessionService() {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun simulateExoPlayerError(): Unit = throw RuntimeException("Simulated ExoPlayer error")
 
-    private inner class SessionCallback : MediaSession.Callback
+    private class SessionCallback : MediaSession.Callback
 
     companion object {
         private const val USER_AGENT =

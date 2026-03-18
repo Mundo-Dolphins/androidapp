@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.C
 import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import es.mundodolphins.app.di.IoDispatcher
@@ -38,8 +37,7 @@ class PlayerViewModel
         private val _duration = MutableLiveData<Long>()
         val duration: LiveData<Long> get() = _duration
 
-        private val _playerStatus = MutableLiveData<Int>()
-        val playerStatus: LiveData<Int> get() = _playerStatus
+        private val playerStatus = MutableLiveData<Int>()
 
         private val playerListener =
             object : Player.Listener {
@@ -48,7 +46,7 @@ class PlayerViewModel
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
-                    _playerStatus.postValue(playbackState)
+                    playerStatus.postValue(playbackState)
                     _duration.postValue(sanitizeDuration(_playerState.value?.duration))
                 }
             }
@@ -78,15 +76,8 @@ class PlayerViewModel
                     mediaController.addListener(playerListener)
                     _isPlaying.postValue(mediaController.isPlaying)
                     _duration.postValue(sanitizeDuration(mediaController.duration))
-                    _playerStatus.postValue(mediaController.playbackState)
+                    playerStatus.postValue(mediaController.playbackState)
                 }
-            }
-        }
-
-        fun savePlayerState() {
-            _playerState.value?.let {
-                currentPosition = it.currentPosition
-                savePlayerPosition(currentPosition)
             }
         }
 
@@ -113,14 +104,14 @@ class PlayerViewModel
                 episodeRepository.updateEpisodePosition(
                     audioID,
                     position,
-                    _playerStatus.value == Player.STATE_ENDED,
+                    playerStatus.value == Player.STATE_ENDED,
                 )
             }
         }
 
         private fun sanitizeDuration(durationMs: Long?): Long {
             val duration = durationMs ?: 0L
-            return if (duration <= 0L || duration == C.TIME_UNSET) 0L else duration
+            return if (duration <= 0L) 0L else duration
         }
 
         override fun onCleared() {

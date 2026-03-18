@@ -1,6 +1,7 @@
 package es.mundodolphins.app.install
 
 import android.content.Context
+import androidx.core.content.edit
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import kotlinx.coroutines.CancellationException
@@ -26,9 +27,9 @@ object InstallReferrerHelper {
     fun markProcessed(context: Context) {
         context
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_PROCESSED, true)
-            .apply()
+            .edit {
+                putBoolean(KEY_PROCESSED, true)
+            }
     }
 
     /**
@@ -44,7 +45,7 @@ object InstallReferrerHelper {
             InstallReferrerParser.parseEpisodeId(referrer)
         } catch (e: CancellationException) {
             throw e
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             null
         }
 
