@@ -52,6 +52,7 @@ class EpisodeRepositoryTest {
     }
 
     @Test
+    @Suppress("CheckResult")
     fun `should return the episode by given ID`() {
         val episodeId = 1L
         val episode = getTestEpisodes(1).first()
@@ -66,6 +67,7 @@ class EpisodeRepositoryTest {
     }
 
     @Test
+    @Suppress("CheckResult")
     fun `should return null when episode ID does not exist`() {
         val episodeId = 999L
         every { episodeDao.getEpisodeById(episodeId) } returns flowOf(null as Episode?)
@@ -77,6 +79,7 @@ class EpisodeRepositoryTest {
     }
 
     @Test
+    @Suppress("CheckResult")
     fun `should return the feed of episodes`() {
         val episodes = getTestEpisodes(2)
         every { episodeDao.getFeed() } returns flowOf(episodes)
@@ -90,6 +93,7 @@ class EpisodeRepositoryTest {
     }
 
     @Test
+    @Suppress("CheckResult")
     fun `should return empty feed when no episodes exist`() {
         every { episodeDao.getFeed() } returns flowOf(emptyList())
         runBlocking {
@@ -124,6 +128,7 @@ class EpisodeRepositoryTest {
         }
 
     @Test
+    @Suppress("CheckResult")
     fun `should handle DAO exception gracefully`() {
         val episodeId = 1L
         every { episodeDao.getEpisodeById(episodeId) } throws RuntimeException("DB error")

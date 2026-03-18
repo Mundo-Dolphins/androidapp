@@ -2,7 +2,6 @@ package es.mundodolphins.app.ui.views.social
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -28,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import es.mundodolphins.app.R
 import es.mundodolphins.app.viewmodel.SocialUiModel
@@ -67,7 +66,7 @@ fun SocialScreen(
                     SocialPostCard(
                         post = post,
                         onClick = {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(post.postUrl)))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, post.postUrl.toUri()))
                         },
                     )
                 }

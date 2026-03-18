@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.C
 import androidx.media3.common.Player
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
@@ -217,7 +216,7 @@ fun TrackSlider(
 
 private fun sanitizePlayerTimestamp(value: Long?): Long {
     val safeValue = value ?: 0L
-    return if (safeValue <= 0L || safeValue == C.TIME_UNSET) 0L else safeValue
+    return if (safeValue <= 0L) 0L else safeValue
 }
 
 private fun sanitizeSliderValue(value: Float): Float {

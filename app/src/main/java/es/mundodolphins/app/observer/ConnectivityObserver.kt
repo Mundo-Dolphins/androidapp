@@ -14,8 +14,8 @@ import androidx.lifecycle.MutableLiveData
  * a Context for production usage.
  */
 class ConnectivityObserver(
-    private val connectivityManager: ConnectivityManager,
-    private val providedRequest: NetworkRequest? = null,
+    connectivityManager: ConnectivityManager,
+    providedRequest: NetworkRequest? = null,
 ) {
     constructor(context: Context) : this(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager,
