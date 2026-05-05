@@ -71,12 +71,14 @@ class PlayerViewModel
                     )
 
                 playerServiceHelper.bindAndStartService(context, request) { mediaController ->
-                    _playerState.value?.removeListener(playerListener)
-                    _playerState.value = mediaController
-                    mediaController.addListener(playerListener)
-                    _isPlaying.postValue(mediaController.isPlaying)
-                    _duration.postValue(sanitizeDuration(mediaController.duration))
-                    playerStatus.postValue(mediaController.playbackState)
+                    viewModelScope.launch(Dispatchers.Main.immediate) {
+                        _playerState.value?.removeListener(playerListener)
+                        _playerState.value = mediaController
+                        mediaController.addListener(playerListener)
+                        _isPlaying.value = mediaController.isPlaying
+                        _duration.value = sanitizeDuration(mediaController.duration)
+                        playerStatus.value = mediaController.playbackState
+                    }
                 }
             }
         }

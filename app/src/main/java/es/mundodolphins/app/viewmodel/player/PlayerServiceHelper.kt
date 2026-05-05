@@ -23,13 +23,18 @@ class PlayerServiceHelper(
         request: PlaybackRequest,
         onServiceConnected: (MediaController) -> Unit,
     ) {
+        val mainExecutor = ContextCompat.getMainExecutor(context)
         val intent = intentBuilder.buildIntent(context, request)
         foregroundStarter.start(context, intent)
 
         val currentFuture = mediaControllerFuture
         if (currentFuture != null) {
             if (currentFuture.isDone) {
-                onServiceConnected(currentFuture.get())
+                mainExecutor.execute {
+                    if (currentFuture.isDone) {
+                        onServiceConnected(currentFuture.get())
+                    }
+                }
             } else {
                 currentFuture.addListener(
                     {
@@ -37,7 +42,7 @@ class PlayerServiceHelper(
                             onServiceConnected(currentFuture.get())
                         }
                     },
-                    ContextCompat.getMainExecutor(context),
+                    mainExecutor,
                 )
             }
             return
@@ -53,7 +58,7 @@ class PlayerServiceHelper(
                     onServiceConnected(future.get())
                 }
             },
-            ContextCompat.getMainExecutor(context),
+            mainExecutor,
         )
     }
 
