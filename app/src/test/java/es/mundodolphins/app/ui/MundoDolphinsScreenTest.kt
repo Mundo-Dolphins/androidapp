@@ -2,7 +2,7 @@ package es.mundodolphins.app.ui
 
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.bar.AppBar
