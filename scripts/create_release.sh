@@ -18,7 +18,7 @@ Behavior:
   - Creates branch: release_X.Y.Z
   - Updates versionName and versionCode (+1) in app/build.gradle.kts
   - Creates commit: "Release X.Y.Z"
-  - Pushes branch and creates PR with same title via gh CLI
+  - Pushes branch and creates PR via gh CLI including commit messages since last release
 EOF
 }
 
@@ -70,6 +70,47 @@ default_base_branch() {
   else
     echo "main"
   fi
+}
+
+get_last_release_ref() {
+  local last_tag
+  last_tag="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags | grep -E '^(v)?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+  if [[ -n "$last_tag" ]]; then
+    echo "$last_tag"
+    return
+  fi
+
+  git log --all --grep='^Release [0-9]+\.[0-9]+\.[0-9]+$' --format='%H' -n1 || true
+}
+
+build_pr_body_file() {
+  local target_version="$1"
+  local from_ref="$2"
+  local to_ref="$3"
+  local out_file="$4"
+  local changelog
+
+  if [[ -n "$from_ref" ]]; then
+    changelog="$(git log --no-merges --pretty=format:'- %s (%h)' "${from_ref}..${to_ref}" || true)"
+  else
+    changelog="$(git log --no-merges --pretty=format:'- %s (%h)' "$to_ref" || true)"
+  fi
+
+  {
+    echo "Release ${target_version}"
+    echo
+    if [[ -n "$from_ref" ]]; then
+      echo "Changes since ${from_ref}:"
+    else
+      echo "Changes since project start (no previous release found):"
+    fi
+    echo
+    if [[ -n "$changelog" ]]; then
+      echo "$changelog"
+    else
+      echo "- No user-facing commits found in this range"
+    fi
+  } >"$out_file"
 }
 
 update_build_file() {
@@ -195,10 +236,15 @@ main() {
 
   new_code=$((current_code + 1))
 
-  local branch_name commit_title base_branch
+  local branch_name commit_title base_branch previous_release_ref release_start_ref pr_body_file
   branch_name="release_${target_version}"
   commit_title="Release ${target_version}"
   base_branch="$(default_base_branch)"
+  previous_release_ref="$(get_last_release_ref)"
+  release_start_ref="$(git rev-parse HEAD)"
+  pr_body_file="$(mktemp)"
+
+  trap 'rm -f "$pr_body_file"' EXIT
 
   if git rev-parse --verify "$branch_name" >/dev/null 2>&1; then
     echo "Error: local branch already exists: $branch_name" >&2
@@ -215,8 +261,9 @@ main() {
 
   git add "$BUILD_FILE"
   git commit -m "$commit_title"
+  build_pr_body_file "$target_version" "$previous_release_ref" "$release_start_ref" "$pr_body_file"
   git push -u origin "$branch_name"
-  gh pr create --base "$base_branch" --head "$branch_name" --title "$commit_title" --body "$commit_title"
+  gh pr create --base "$base_branch" --head "$branch_name" --title "$commit_title" --body-file "$pr_body_file"
 
   echo "Done:"
   echo "  Branch: $branch_name"
