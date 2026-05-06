@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import es.mundodolphins.app.ui.historical.historicalNavigation
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.views.articles.ArticleScreen
 import es.mundodolphins.app.ui.views.articles.ListArticlesView
@@ -142,6 +143,11 @@ fun MainScreen(
                     model = socialViewModel,
                 )
             }
+
+            historicalNavigation(
+                navController = navController,
+                modifier = modifier,
+            )
         }
     }
 }

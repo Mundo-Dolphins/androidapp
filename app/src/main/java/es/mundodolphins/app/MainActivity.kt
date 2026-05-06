@@ -1,6 +1,7 @@
 package es.mundodolphins.app
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -88,7 +90,7 @@ class MainActivity : ComponentActivity() {
         pendingPushTarget = PushNotificationData.parseTarget(intent)
         logDeepLinkIntent("cold-start", intent)
         if (isDebugBuild()) {
-            logManifestResolution("manifest deep-link capability probe")
+            logManifestResolution()
         }
         requestNotificationPermissionIfNeeded()
 
@@ -167,7 +169,9 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun logManifestResolution(contextLabel: String) {
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun logManifestResolution() {
+        val contextLabel = "manifest deep-link capability probe"
         val testUris =
             listOf(
                 "https://mundodolphins.es/app/episode/1769624287000/?appAttempt=1",
@@ -234,7 +238,7 @@ fun MundoDolphinsScreen(
                         .padding(innerPadding),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = "Mundo Dolphins Preview")
+                Text(text = stringResource(R.string.preview_title))
             }
         }
         return
@@ -333,7 +337,7 @@ fun MundoDolphinsScreen(
                                 .statusBarsPadding(),
                     ) {
                         Text(
-                            text = "No internet connection",
+                            text = stringResource(R.string.no_internet_connection),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.onError,
@@ -442,7 +446,7 @@ private fun UpdateAvailableBanner(
                 tint = MaterialTheme.colorScheme.onTertiaryContainer,
             )
             Text(
-                text = "¡Nueva versión disponible! Toca para actualizar.",
+                text = stringResource(R.string.update_available_banner),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(start = 8.dp),
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -457,6 +461,7 @@ private fun mapToDrawerRoute(route: String?): String =
         route.startsWith(Routes.EpisodeView.route) -> Routes.Feed.route
         route.startsWith(Routes.SeasonView.route) -> Routes.SeasonsList.route
         route.startsWith(Routes.Article.route) -> Routes.Articles.route
+        route.startsWith(Routes.HistoricalSeasons.route) -> Routes.HistoricalSeasons.route
         else -> route
     }
 
