@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
@@ -176,6 +177,14 @@ tasks.withType<Test> {
             )
         },
     )
+    // Robolectric/Jacoco can append to bootstrap classpath and trigger noisy CDS warning in CI logs.
+    jvmArgs("-Xshare:off")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    // Hilt passes -A options for annotation processors; when a Java compilation unit has no matching processor,
+    // javac emits "options were not recognized" warnings. This keeps CI logs clean without affecting bytecode.
+    options.compilerArgs.add("-Xlint:-processing")
 }
 
 // Register Jacoco report task for debug unit tests
