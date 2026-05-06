@@ -73,14 +73,23 @@ default_base_branch() {
 }
 
 get_last_release_ref() {
+  local base_branch="$1"
+  local history_ref="HEAD"
   local last_tag
-  last_tag="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags | grep -E '^(v)?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+
+  if git rev-parse --verify "origin/${base_branch}" >/dev/null 2>&1; then
+    history_ref="origin/${base_branch}"
+  elif git rev-parse --verify "${base_branch}" >/dev/null 2>&1; then
+    history_ref="${base_branch}"
+  fi
+
+  last_tag="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags | grep -E '^(v)?[0-9]+\.[0-9]+\.[0-9]+$|^release_[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
   if [[ -n "$last_tag" ]]; then
     echo "$last_tag"
     return
   fi
 
-  git log --all --grep='^Release [0-9]+\.[0-9]+\.[0-9]+$' --format='%H' -n1 || true
+  git log "$history_ref" --first-parent --extended-regexp --grep='^Release [0-9]+\.[0-9]+\.[0-9]+([[:space:]]|$)' --format='%H' -n1 || true
 }
 
 build_pr_body_file() {
@@ -240,7 +249,7 @@ main() {
   branch_name="release_${target_version}"
   commit_title="Release ${target_version}"
   base_branch="$(default_base_branch)"
-  previous_release_ref="$(get_last_release_ref)"
+  previous_release_ref="$(get_last_release_ref "$base_branch")"
   release_start_ref="$(git rev-parse HEAD)"
   pr_body_file="$(mktemp)"
 
