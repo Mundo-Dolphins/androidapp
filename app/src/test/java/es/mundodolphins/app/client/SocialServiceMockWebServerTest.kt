@@ -2,8 +2,8 @@ package es.mundodolphins.app.client
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import com.google.gson.GsonBuilder
+import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -126,9 +126,10 @@ class SocialServiceMockWebServerTest {
                     .addHeader("Content-Type", "application/json"),
             )
 
-            val gson = GsonBuilder()
-                .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
-                .create()
+            val gson =
+                GsonBuilder()
+                    .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
+                    .create()
 
             val retrofit =
                 Retrofit
