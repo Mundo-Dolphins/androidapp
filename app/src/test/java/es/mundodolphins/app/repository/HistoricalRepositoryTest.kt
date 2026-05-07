@@ -26,7 +26,14 @@ class HistoricalRepositoryTest {
             assertThat(seasonDetail.draftPlayers).hasSize(1)
             assertThat(seasonDetail.draftPlayers.first().valueFor("Nombre")).isEqualTo("Jaylen Wright")
             assertThat(seasonDetail.statsSections).hasSize(1)
-            assertThat(seasonDetail.statsSections.first().tables.first().rows.first()["Yds"]).isEqualTo("249")
+            val firstRowYds =
+                seasonDetail.statsSections
+                    .first()
+                    .tables
+                    .first()
+                    .rows
+                    .first()["Yds"]
+            assertThat(firstRowYds).isEqualTo("249")
             assertThat(seasonDetail.games).hasSize(1)
             val linescore = seasonDetail.games.first().linescore
             assertThat(linescore).hasSize(2)
@@ -45,7 +52,13 @@ class HistoricalRepositoryTest {
 
             assertThat(game).isNotNull()
             assertThat(game?.linescore).hasSize(2)
-            assertThat(game?.linescore?.first()?.periods?.get("1")).isEqualTo("7")
+            val firstPeriodScore =
+                game
+                    ?.linescore
+                    ?.first()
+                    ?.periods
+                    ?.get("1")
+            assertThat(firstPeriodScore).isEqualTo("7")
             assertThat(game?.scoringSummary).hasSize(1)
             assertThat(game?.scoringSummary?.first()?.description)
                 .contains("Travis Etienne carrera de 1 yarda")
@@ -77,8 +90,7 @@ class HistoricalRepositoryTest {
     }
 
     private class ErrorHistoricalService : HistoricalService {
-        override suspend fun getHistoricalSeasons(): Response<HistoricalSeasonsResponse> =
-            Response.error(500, "boom".toResponseBody())
+        override suspend fun getHistoricalSeasons(): Response<HistoricalSeasonsResponse> = Response.error(500, "boom".toResponseBody())
 
         override suspend fun getHistoricalSeason(year: Int): Response<HistoricalSeasonResponse> =
             Response.error(500, "boom".toResponseBody())
