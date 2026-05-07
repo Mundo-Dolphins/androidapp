@@ -33,10 +33,10 @@ import es.mundodolphins.app.R
 import es.mundodolphins.app.models.historical.HistoricalSeasonDetail
 import es.mundodolphins.app.ui.historical.components.DraftTable
 import es.mundodolphins.app.ui.historical.components.HistoricalErrorView
-import es.mundodolphins.app.ui.historical.components.rememberGameResultSummary
 import es.mundodolphins.app.ui.historical.components.HistoricalLoadingView
 import es.mundodolphins.app.ui.historical.components.SeasonStatsTables
 import es.mundodolphins.app.ui.historical.components.SeasonSummaryTable
+import es.mundodolphins.app.ui.historical.components.rememberGameResultSummary
 import es.mundodolphins.app.ui.theme.TableBorder
 import es.mundodolphins.app.ui.theme.TealPrimary
 import es.mundodolphins.app.ui.theme.TextDark

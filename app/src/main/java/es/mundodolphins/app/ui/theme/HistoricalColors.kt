@@ -14,4 +14,3 @@ val TableBorder = Color(0xFFD3E3E6)
 val TextDark = Color(0xFF153238)
 val TextMid = Color(0xFF46666B)
 val TextMuted = Color(0xFF6C8A8F)
-

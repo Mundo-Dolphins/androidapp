@@ -25,4 +25,3 @@ fun rememberGameResultSummary(game: HistoricalGame): String {
 
     return if (parts.isEmpty()) fallback else parts.joinToString(separator = separator)
 }
-

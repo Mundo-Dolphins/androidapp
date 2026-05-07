@@ -65,4 +65,3 @@ fun NavGraphBuilder.historicalNavigation(
         )
     }
 }
-

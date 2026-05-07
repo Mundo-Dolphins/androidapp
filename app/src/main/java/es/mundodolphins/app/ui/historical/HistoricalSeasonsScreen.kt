@@ -65,11 +65,16 @@ private fun HistoricalSeasonsContent(
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+        contentPadding =
+            androidx.compose.foundation.layout
+                .PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+        item(span = {
+            androidx.compose.foundation.lazy.grid
+                .GridItemSpan(maxLineSpan)
+        }) {
             Column(modifier = Modifier.padding(bottom = 4.dp)) {
                 Text(
                     text = stringResource(R.string.historical),
@@ -87,4 +92,3 @@ private fun HistoricalSeasonsContent(
         }
     }
 }
-

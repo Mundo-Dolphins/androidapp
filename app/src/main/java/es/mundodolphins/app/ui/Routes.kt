@@ -54,5 +54,4 @@ sealed class Routes(
     data object Social : Routes("social")
 
     data object HistoricalSeasons : Routes("historical")
-
 }

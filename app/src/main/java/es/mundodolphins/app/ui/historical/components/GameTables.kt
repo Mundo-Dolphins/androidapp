@@ -42,7 +42,15 @@ fun LinescoreTable(
     rows: List<HistoricalLineScoreRow>,
     modifier: Modifier = Modifier,
 ) {
-    val columns = listOf(stringResource(R.string.historical_linescore_team_header), "1", "2", "3", "4", stringResource(R.string.historical_linescore_final_header))
+    val columns =
+        listOf(
+            stringResource(R.string.historical_linescore_team_header),
+            "1",
+            "2",
+            "3",
+            "4",
+            stringResource(R.string.historical_linescore_final_header),
+        )
     val firstWidth = 180.dp
     val cellWidth = 66.dp
     val tableWidth = firstWidth + (cellWidth * (columns.size - 1))
@@ -201,4 +209,3 @@ fun ScoringPlayItem(
         }
     }
 }
-

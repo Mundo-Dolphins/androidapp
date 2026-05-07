@@ -15,8 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import es.mundodolphins.app.ui.historical.historicalNavigation
 import es.mundodolphins.app.ui.Routes
+import es.mundodolphins.app.ui.historical.historicalNavigation
 import es.mundodolphins.app.ui.views.articles.ArticleScreen
 import es.mundodolphins.app.ui.views.articles.ListArticlesView
 import es.mundodolphins.app.ui.views.info.EpisodeScreen

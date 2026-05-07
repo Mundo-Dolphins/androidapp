@@ -27,4 +27,3 @@ interface HistoricalService {
         @Path("year") year: Int,
     ): Response<HistoricalGamesResponse>
 }
-
