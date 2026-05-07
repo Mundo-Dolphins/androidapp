@@ -1,5 +1,6 @@
 package es.mundodolphins.app.ui.historical.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -15,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import es.mundodolphins.app.R
 import es.mundodolphins.app.models.historical.HistoricalLineScoreRow
 import es.mundodolphins.app.models.historical.HistoricalScoringPlay
@@ -51,8 +54,8 @@ fun LinescoreTable(
             "4",
             stringResource(R.string.historical_linescore_final_header),
         )
-    val firstWidth = 180.dp
-    val cellWidth = 66.dp
+    val firstWidth = 154.dp
+    val cellWidth = 52.dp
     val tableWidth = firstWidth + (cellWidth * (columns.size - 1))
 
     Column(
@@ -69,12 +72,13 @@ fun LinescoreTable(
                     color = MaterialTheme.colorScheme.onPrimary,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.labelMedium,
                     modifier =
                         Modifier
                             .width(width)
                             .background(TealDark)
                             .border(1.dp, TableBorder)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 7.dp),
                 )
             }
         }
@@ -90,24 +94,27 @@ fun LinescoreTable(
                     text = row.team,
                     color = TextDark,
                     fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp,
                     modifier =
                         Modifier
                             .width(firstWidth)
                             .background(TealRowHead)
                             .border(1.dp, TableBorder)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 7.dp),
                 )
 
                 listOf("1", "2", "3", "4").forEach { quarter ->
                     Text(
                         text = row.periods[quarter].orEmpty().ifBlank { stringResource(R.string.historical_dash) },
                         textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
                         modifier =
                             Modifier
                                 .width(cellWidth)
                                 .background(MaterialTheme.colorScheme.surface)
                                 .border(1.dp, TableBorder)
-                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                                .padding(horizontal = 8.dp, vertical = 7.dp),
                     )
                 }
 
@@ -115,12 +122,13 @@ fun LinescoreTable(
                     text = row.finalScore.ifBlank { stringResource(R.string.historical_dash) },
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
                     modifier =
                         Modifier
                             .width(cellWidth)
                             .background(TealRowAlt)
                             .border(1.dp, TableBorder)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 7.dp),
                 )
             }
         }
@@ -140,7 +148,10 @@ fun ScoringPlayItem(
         )
 
     Card(
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, TableBorder),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier =
             modifier
                 .fillMaxWidth()
@@ -155,8 +166,7 @@ fun ScoringPlayItem(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .border(1.dp, TableBorder)
-                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+                    .padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +177,7 @@ fun ScoringPlayItem(
                     contentAlignment = Alignment.Center,
                     modifier =
                         Modifier
-                            .size(32.dp)
+                            .size(28.dp)
                             .background(color = TealDark, shape = CircleShape),
                 ) {
                     Text(
@@ -190,6 +200,8 @@ fun ScoringPlayItem(
                     text = play.team,
                     color = TextDark,
                     fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    lineHeight = 20.sp,
                     modifier = Modifier.weight(1f),
                 )
 
@@ -197,14 +209,16 @@ fun ScoringPlayItem(
                     text = scoreLabel,
                     color = TealDark,
                     fontWeight = FontWeight.Bold,
+                    fontSize = 17.sp,
                 )
             }
 
             Text(
                 text = play.description,
                 color = TextMuted,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 10.dp),
+                fontSize = 14.sp,
+                lineHeight = 19.sp,
+                modifier = Modifier.padding(top = 8.dp),
             )
         }
     }

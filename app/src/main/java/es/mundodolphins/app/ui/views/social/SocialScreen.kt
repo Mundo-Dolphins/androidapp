@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +36,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.views.loading.BrandedLoadingView
 import es.mundodolphins.app.viewmodel.SocialUiModel
 import es.mundodolphins.app.viewmodel.SocialViewModel
 import es.mundodolphins.app.viewmodel.SocialViewModel.LoadStatus.EMPTY
@@ -74,12 +74,7 @@ fun SocialScreen(
         }
 
         LOADING -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxSize(0.5F))
-            }
+            BrandedLoadingView(modifier = modifier)
         }
 
         ERROR -> {

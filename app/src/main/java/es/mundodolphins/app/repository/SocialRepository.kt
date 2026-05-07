@@ -13,6 +13,6 @@ class SocialRepository
         suspend fun getSocialPosts(): List<SocialUiModel> =
             socialService
                 .getSocialPosts()
-                .mapNotNull { it.toSocialUiModel() }
+                .mapNotNull { it?.toSocialUiModel() }
                 .sortedByDescending { it.publishedTimestamp }
     }

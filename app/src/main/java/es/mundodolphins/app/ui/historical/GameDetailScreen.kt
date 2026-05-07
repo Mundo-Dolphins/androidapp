@@ -83,8 +83,8 @@ private fun GameDetailContent(
         modifier = modifier.fillMaxSize(),
         contentPadding =
             androidx.compose.foundation.layout
-                .PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+                .PaddingValues(14.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -104,7 +104,8 @@ private fun GameDetailContent(
                 )
                 Text(
                     text = game.title,
-                    fontSize = 22.sp,
+                    fontSize = 24.sp,
+                    lineHeight = 29.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = TextDark,
                     modifier = Modifier.padding(top = 6.dp),
@@ -122,7 +123,8 @@ private fun GameDetailContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.historical_section_game_info),
-                    style = MaterialTheme.typography.titleLarge,
+                    fontSize = 22.sp,
+                    lineHeight = 26.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
@@ -137,9 +139,10 @@ private fun GameDetailContent(
                     val value = game.gameInfo[key].orEmpty().ifBlank { stringResource(R.string.historical_dash) }
                     Text(
                         text = stringResource(R.string.historical_key_value, key, value),
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 15.sp,
+                        lineHeight = 21.sp,
                         color = TextDark,
-                        modifier = Modifier.padding(vertical = 3.dp),
+                        modifier = Modifier.padding(vertical = 2.dp),
                     )
                 }
             }
@@ -149,7 +152,8 @@ private fun GameDetailContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.historical_section_linescore),
-                    style = MaterialTheme.typography.titleLarge,
+                    fontSize = 22.sp,
+                    lineHeight = 26.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp),
                 )
@@ -168,7 +172,8 @@ private fun GameDetailContent(
         item {
             Text(
                 text = stringResource(R.string.historical_section_scoring_summary),
-                style = MaterialTheme.typography.titleLarge,
+                fontSize = 22.sp,
+                lineHeight = 26.sp,
                 fontWeight = FontWeight.Bold,
             )
         }

@@ -2,9 +2,11 @@ package es.mundodolphins.app.ui.views.list
 
 import android.text.Html
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -52,11 +55,12 @@ fun EpisodeRow(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier
-                .padding(6.dp)
+                .padding(horizontal = 10.dp, vertical = 8.dp)
                 .fillMaxWidth()
                 .wrapContentSize(Alignment.Center)
-                .clip(shape = RoundedCornerShape(20.dp))
-                .shadow(elevation = 2.dp, clip = true),
+                .shadow(elevation = 3.dp, shape = RoundedCornerShape(8.dp), clip = false)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(colorScheme.surface),
     ) {
         EpisodeHeader(episode)
         Text(
@@ -72,10 +76,11 @@ fun EpisodeRow(
                         },
                         Html.FROM_HTML_MODE_LEGACY,
                     ).toString(),
-            fontSize = 18.sp,
+            fontSize = 15.sp,
             color = colorScheme.onSurface,
-            textAlign = TextAlign.Justify,
-            modifier = Modifier.padding(6.dp),
+            textAlign = TextAlign.Start,
+            lineHeight = 20.sp,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
         )
         EpisodeBottom(episode, navController)
     }
@@ -91,20 +96,21 @@ private fun EpisodeHeader(episode: Episode) {
     ) {
         Text(
             text = episode.title,
-            fontSize = 24.sp,
+            fontSize = 17.sp,
+            lineHeight = 21.sp,
             fontWeight = Bold,
-            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
+            modifier = Modifier.padding(top = 10.dp, start = 14.dp, end = 14.dp),
             color = colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Left,
         )
         Text(
             text = episode.publishedOn,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             color = colorScheme.onSecondaryContainer,
             modifier =
                 Modifier
                     .fillMaxWidth(0.9f)
-                    .padding(10.dp),
+                    .padding(start = 14.dp, top = 5.dp, end = 14.dp, bottom = 10.dp),
             textAlign = TextAlign.Left,
         )
     }
@@ -120,13 +126,15 @@ private fun ColumnScope.EpisodeBottom(
             Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
-                .padding(10.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Box(
             modifier =
                 Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(10.dp),
+                    .weight(1f)
+                    .padding(end = 10.dp),
         ) {
             if (episode.listeningStatus == LISTENED) {
                 ListenedBadge()
@@ -135,7 +143,12 @@ private fun ColumnScope.EpisodeBottom(
             }
         }
         Button(
-            modifier = Modifier.padding(bottom = 6.dp),
+            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                ),
             onClick = {
                 navController.navigate(Routes.EpisodeView.route + "/${episode.id}")
             },
@@ -145,7 +158,7 @@ private fun ColumnScope.EpisodeBottom(
                 color = colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 fontWeight = Bold,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
             )
         }
     }
@@ -157,7 +170,7 @@ private fun ListeningBadge() {
         modifier =
             Modifier
                 .background(lightYellow)
-                .padding(4.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
         Icon(
             painter = painterResource(R.drawable.pause_icon),
@@ -165,14 +178,14 @@ private fun ListeningBadge() {
             tint = darkYellow,
             modifier =
                 Modifier
-                    .size(20.dp)
+                    .size(18.dp)
                     .align(Alignment.CenterVertically),
         )
         Text(
             text = stringResource(R.string.listening),
             color = darkYellow,
             modifier = Modifier.padding(start = 4.dp),
-            fontSize = 14.sp,
+            fontSize = 13.sp,
         )
     }
 }
@@ -183,7 +196,7 @@ private fun ListenedBadge() {
         modifier =
             Modifier
                 .background(lightGreen)
-                .padding(4.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
         Icon(
             Icons.Filled.Check,
@@ -191,14 +204,14 @@ private fun ListenedBadge() {
             tint = darkGreen,
             modifier =
                 Modifier
-                    .size(20.dp)
+                    .size(18.dp)
                     .align(Alignment.CenterVertically),
         )
         Text(
             text = stringResource(R.string.listened),
             color = darkGreen,
             modifier = Modifier.padding(start = 4.dp),
-            fontSize = 14.sp,
+            fontSize = 13.sp,
         )
     }
 }

@@ -2,6 +2,8 @@ package es.mundodolphins.app.client
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import com.google.gson.GsonBuilder
+import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -65,11 +67,84 @@ class SocialServiceMockWebServerTest {
             val response = service.getSocialPosts()
 
             assertThat(response).hasSize(1)
-            assertThat(response.first().blueSkyPost?.bskyProfile).isEqualTo("@mundodolphins.es - Mundo Dolphins")
-            assertThat(response.first().publishedTimestamp).isEqualTo(1770805140000L)
+            assertThat(response.first()?.blueSkyPost?.bskyProfile).isEqualTo("@mundodolphins.es - Mundo Dolphins")
+            assertThat(response.first()?.publishedTimestamp).isEqualTo(1770805140000L)
 
             val request = server.takeRequest()
             assertThat(request.path).isEqualTo("/social.json")
+
+            server.shutdown()
+        }
+
+    @Test
+    fun `getSocialPosts succeeds when response contains a string instead of an object`() =
+        runTest {
+            System.setProperty("okhttp.platform", "jdk")
+
+            val server = MockWebServer()
+            server.start()
+
+            val body =
+                """
+                [
+                  {
+                    "id": "1",
+                    "stype": 0,
+                    "PublishedOn": "2026-02-11T10:19:00Z",
+                    "BlueSkyPost": {
+                      "BskyURI": "uri1",
+                      "BskyCID": "cid1",
+                      "Description": "Desc 1",
+                      "BskyProfileURI": "p-uri1",
+                      "BskyProfile": "profile1",
+                      "BskyPost": "post1"
+                    },
+                    "InstagramPost": null
+                  },
+                  "This is an unexpected string",
+                  {
+                    "id": "2",
+                    "stype": 0,
+                    "PublishedOn": "2026-02-11T10:20:00Z",
+                    "BlueSkyPost": {
+                      "BskyURI": "uri2",
+                      "BskyCID": "cid2",
+                      "Description": "Desc 2",
+                      "BskyProfileURI": "p-uri2",
+                      "BskyProfile": "profile2",
+                      "BskyPost": "post2"
+                    },
+                    "InstagramPost": null
+                  }
+                ]
+                """.trimIndent()
+
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(body)
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            val gson =
+                GsonBuilder()
+                    .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
+                    .create()
+
+            val retrofit =
+                Retrofit
+                    .Builder()
+                    .baseUrl(server.url("/"))
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build()
+
+            val service = retrofit.create(SocialService::class.java)
+            val posts = service.getSocialPosts()
+
+            assertThat(posts).hasSize(3)
+            assertThat(posts[0]?.id).isEqualTo("1")
+            assertThat(posts[1]).isNull()
+            assertThat(posts[2]?.id).isEqualTo("2")
 
             server.shutdown()
         }

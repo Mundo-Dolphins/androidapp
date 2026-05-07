@@ -1,5 +1,10 @@
 package es.mundodolphins.app.ui.bar
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,15 +16,17 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.TealDeep
@@ -71,43 +78,66 @@ fun AppNavigationDrawer(
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ModalDrawerSheet(modifier = modifier) {
+    ModalDrawerSheet(
+        modifier = modifier,
+        drawerContainerColor = MaterialTheme.colorScheme.background,
+    ) {
         Text(
             text = stringResource(R.string.navigation_menu_title),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 18.dp),
         )
 
         drawerItems.forEach { item ->
-            NavigationDrawerItem(
-                label = { Text(text = stringResource(item.label)) },
+            DrawerRow(
+                item = item,
                 selected = selectedRoute == item.route,
                 onClick = { onItemClick(item.route) },
-                icon = {
-                    if (item.icon != null) {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = stringResource(item.label),
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(item.drawable!!),
-                            contentDescription = stringResource(item.label),
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors =
-                    NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = TealPale,
-                        selectedIconColor = TealDeep,
-                        selectedTextColor = TealDeep,
-                        unselectedIconColor = TextMid,
-                        unselectedTextColor = TextMid,
-                    ),
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun DrawerRow(
+    item: DrawerItem,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val itemColor = if (selected) TealDeep else TextMid
+    Row(
+        modifier =
+            Modifier
+                .padding(horizontal = 12.dp, vertical = 2.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(if (selected) TealPale else Color.Transparent)
+                .clickable(onClick = onClick)
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (item.icon != null) {
+            Icon(
+                imageVector = item.icon,
+                contentDescription = stringResource(item.label),
+                tint = itemColor,
+            )
+        } else {
+            Icon(
+                painter = painterResource(item.drawable!!),
+                contentDescription = stringResource(item.label),
+                tint = itemColor,
+            )
+        }
+        Text(
+            text = stringResource(item.label),
+            color = itemColor,
+            fontSize = 20.sp,
+            letterSpacing = 0.sp,
+            modifier = Modifier.padding(start = 22.dp),
+        )
     }
 }
 
