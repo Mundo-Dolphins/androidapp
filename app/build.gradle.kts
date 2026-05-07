@@ -1,8 +1,3 @@
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
-import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.crashlytics)
@@ -13,13 +8,22 @@ plugins {
     id("jacoco") // Added
     // Static analysis plugins
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.detekt)
+    alias(libs.plugins.detekt) apply false
 }
 
 val isCoverageBuild =
     gradle.startParameter.taskNames.any { taskName ->
         taskName.contains("Coverage", ignoreCase = true)
     }
+
+val isDetektTask =
+    gradle.startParameter.taskNames.any { taskName ->
+        taskName.contains("detekt", ignoreCase = true)
+    }
+
+if (isDetektTask) {
+    apply(plugin = "dev.detekt")
+}
 
 // Import types to avoid fully-qualified names and remove warnings
 
@@ -45,6 +49,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -243,7 +248,9 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
 // }
 
 // Configure detekt to use our custom configuration file
-detekt {
-    config.setFrom(files("${project.rootDir}/detekt.yml"))
-    buildUponDefaultConfig = true
+if (isDetektTask) {
+    extensions.configure<dev.detekt.gradle.extensions.DetektExtension> {
+        config.setFrom(rootProject.layout.projectDirectory.file("detekt.yml"))
+        buildUponDefaultConfig = true
+    }
 }

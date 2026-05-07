@@ -52,4 +52,6 @@ sealed class Routes(
     data object Videos : Routes("videos")
 
     data object Social : Routes("social")
+
+    data object HistoricalSeasons : Routes("historical")
 }

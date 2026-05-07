@@ -253,7 +253,7 @@ main() {
   release_start_ref="$(git rev-parse HEAD)"
   pr_body_file="$(mktemp)"
 
-  trap 'rm -f "$pr_body_file"' EXIT
+  trap 'if [[ -n "${pr_body_file:-}" ]]; then rm -f "$pr_body_file"; fi' EXIT
 
   if git rev-parse --verify "$branch_name" >/dev/null 2>&1; then
     echo "Error: local branch already exists: $branch_name" >&2

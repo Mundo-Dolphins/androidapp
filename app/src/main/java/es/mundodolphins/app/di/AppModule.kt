@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import es.mundodolphins.app.client.ArticlesService
 import es.mundodolphins.app.client.FeedService
+import es.mundodolphins.app.client.HistoricalService
 import es.mundodolphins.app.client.SocialService
 import es.mundodolphins.app.client.VideosService
 import es.mundodolphins.app.data.AppDatabase
@@ -17,6 +18,7 @@ import es.mundodolphins.app.data.episodes.EpisodeDao
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -27,6 +29,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("historical")
+    fun provideHistoricalRetrofit(): Retrofit =
         Retrofit
             .Builder()
             .baseUrl(BASE_URL)
@@ -48,6 +60,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSocialService(retrofit: Retrofit): SocialService = retrofit.create(SocialService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideHistoricalService(
+        @Named("historical") retrofit: Retrofit,
+    ): HistoricalService = retrofit.create(HistoricalService::class.java)
 
     @Provides
     @Singleton

@@ -1,8 +1,10 @@
 package es.mundodolphins.app.ui.bar
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
@@ -20,6 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.Routes
+import es.mundodolphins.app.ui.theme.TealDeep
+import es.mundodolphins.app.ui.theme.TealPale
+import es.mundodolphins.app.ui.theme.TextMid
 
 private val drawerItems =
     listOf(
@@ -37,6 +42,11 @@ private val drawerItems =
             route = Routes.SeasonsList.route,
             icon = Icons.AutoMirrored.Filled.List,
             label = R.string.seasons,
+        ),
+        DrawerItem(
+            route = Routes.HistoricalSeasons.route,
+            icon = Icons.Filled.History,
+            label = R.string.historical,
         ),
         DrawerItem(
             route = Routes.Articles.route,
@@ -86,11 +96,16 @@ fun AppNavigationDrawer(
                         )
                     }
                 },
+                shape = RoundedCornerShape(8.dp),
                 colors =
                     NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedContainerColor = TealPale,
+                        selectedIconColor = TealDeep,
+                        selectedTextColor = TealDeep,
+                        unselectedIconColor = TextMid,
+                        unselectedTextColor = TextMid,
                     ),
-                modifier = Modifier.padding(horizontal = 12.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
             )
         }
     }
