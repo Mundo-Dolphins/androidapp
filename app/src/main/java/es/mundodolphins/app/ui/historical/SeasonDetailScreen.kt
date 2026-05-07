@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import es.mundodolphins.app.R
 import es.mundodolphins.app.models.historical.HistoricalSeasonDetail
@@ -129,6 +130,8 @@ private fun SeasonDetailContent(
                 Tab(
                     selected = selectedTab == index,
                     onClick = { onSelectTab(index) },
+                    selectedContentColor = TealPrimary,
+                    unselectedContentColor = TextDark,
                     text = { Text(stringResource(tab.labelRes)) },
                 )
             }
@@ -175,10 +178,10 @@ private fun SeasonDetailContent(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .sizeIn(minHeight = 56.dp)
+                                    .sizeIn(minHeight = 58.dp)
                                     .clickable { onGameClick(season.year, game.gameId) }
                                     .background(MaterialTheme.colorScheme.surface)
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
@@ -187,18 +190,22 @@ private fun SeasonDetailContent(
                                     text = game.title,
                                     color = TextDark,
                                     fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    lineHeight = 22.sp,
                                 )
                                 Text(
                                     text = resultSummary,
                                     color = TextMuted,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 13.sp,
+                                    lineHeight = 17.sp,
                                     modifier = Modifier.padding(top = 2.dp),
                                 )
                             }
                             Text(
                                 text = game.date,
                                 color = TextMuted,
-                                style = MaterialTheme.typography.labelSmall,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
                             )
                         }
                         androidx.compose.foundation.layout.Box(

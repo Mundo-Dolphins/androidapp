@@ -15,7 +15,7 @@ class SocialRepositoryTest {
         runTest {
             val service =
                 object : SocialService {
-                    override suspend fun getSocialPosts(): List<SocialPostResponse> =
+                    override suspend fun getSocialPosts(): List<SocialPostResponse?> =
                         listOf(
                             socialPost(
                                 id = "old",
@@ -39,6 +39,30 @@ class SocialRepositoryTest {
             assertThat(result[0].description).isEqualTo("Newer")
             assertThat(result[0].postUrl).isEqualTo("https://bsky.app/profile/mundodolphins.es/post/new")
             assertThat(result[0].imageUrls).containsExactly("https://cdn.bsky.app/img/new.jpg")
+        }
+
+    @Test
+    fun `getSocialPosts filters out nulls from service`() =
+        runTest {
+            val service =
+                object : SocialService {
+                    override suspend fun getSocialPosts(): List<SocialPostResponse?> =
+                        listOf(
+                            socialPost(
+                                id = "valid",
+                                publishedOn = "2026-02-11T10:00:00Z",
+                                description = "Valid",
+                            ),
+                            null,
+                        )
+                }
+
+            val repository = SocialRepository(service)
+
+            val result = repository.getSocialPosts()
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].id).isEqualTo("valid")
         }
 
     private fun socialPost(

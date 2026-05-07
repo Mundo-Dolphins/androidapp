@@ -5,22 +5,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = orange,
+        primary = coral,
+        onPrimary = White,
         secondary = aqua,
-        tertiary = orange,
-        background = White,
-        surface = White,
         onSecondary = White,
-        onSecondaryContainer = White,
-        onBackground = gray900,
+        tertiary = orange,
+        background = pageBackground,
+        surface = White,
+        surfaceVariant = cardTint,
+        onBackground = aquaDark,
         onSurface = gray900,
-        primaryContainer = White,
-        secondaryContainer = aqua,
+        onSurfaceVariant = gray700,
+        primaryContainer = aqua,
+        onPrimaryContainer = White,
+        secondaryContainer = aquaMuted,
+        onSecondaryContainer = White,
         tertiaryContainer = orange,
+        outline = Color(0xFFDCE8EA),
     /*
     Other default colors to override
     surface = Color(0xFFFFFBFE),
@@ -38,14 +44,17 @@ private val DarkColorScheme =
         secondary = aqua,
         tertiary = orange,
         background = gray900,
-        surface = gray900,
+        surface = gray800,
+        surfaceVariant = gray800,
         onPrimary = White,
         onSecondary = White,
         onTertiary = White,
         onBackground = gray100,
         onSurface = gray100,
+        onSurfaceVariant = gray100,
         onSecondaryContainer = gray100,
-        primaryContainer = gray800,
+        primaryContainer = aquaDark,
+        onPrimaryContainer = White,
         secondaryContainer = gray800,
         tertiaryContainer = gray800,
     )

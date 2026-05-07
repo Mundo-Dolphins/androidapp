@@ -52,17 +52,19 @@ fun SeasonSummaryTable(
                         .fillMaxWidth()
                         .background(background)
                         .border(1.dp, TableBorder)
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .padding(horizontal = 12.dp, vertical = 9.dp),
             ) {
                 Text(
                     text = entry.key,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold,
+                    color = TealDark,
                     modifier = Modifier.weight(0.4f),
                 )
                 Text(
                     text = entry.value.ifBlank { stringResource(R.string.historical_dash) },
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TealDark,
                     modifier = Modifier.weight(0.6f),
                 )
             }

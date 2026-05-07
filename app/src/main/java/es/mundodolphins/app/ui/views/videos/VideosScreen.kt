@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import es.mundodolphins.app.R
+import es.mundodolphins.app.ui.views.loading.BrandedLoadingView
 import es.mundodolphins.app.viewmodel.VideoUiModel
 import es.mundodolphins.app.viewmodel.VideosViewModel
 import es.mundodolphins.app.viewmodel.VideosViewModel.LoadStatus.EMPTY
@@ -77,12 +77,7 @@ fun VideosScreen(
         }
 
         LOADING -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                CircularProgressIndicator(modifier = Modifier.fillMaxSize(0.5F))
-            }
+            BrandedLoadingView(modifier = modifier)
         }
 
         ERROR -> {

@@ -2,6 +2,7 @@ package es.mundodolphins.app.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,7 @@ import es.mundodolphins.app.client.VideosService
 import es.mundodolphins.app.data.AppDatabase
 import es.mundodolphins.app.data.InstantConverter
 import es.mundodolphins.app.data.episodes.EpisodeDao
+import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -28,12 +30,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit =
-        Retrofit
+    fun provideRetrofit(): Retrofit {
+        val gson =
+            GsonBuilder()
+                .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
+                .create()
+        return Retrofit
             .Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+    }
 
     @Provides
     @Singleton

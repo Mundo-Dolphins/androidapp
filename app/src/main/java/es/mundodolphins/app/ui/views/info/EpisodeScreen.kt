@@ -4,15 +4,16 @@ import android.os.Build
 import android.text.Html
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +27,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -33,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -63,47 +67,45 @@ fun EpisodeScreen(
         ) {
             EpisodeHeader(navController, episode)
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
             ) {
                 EpisodeInfo(episode)
                 TextSizeControls(
                     onDecrease = { bodyTextScale = (bodyTextScale - 0.1f).coerceIn(0.8f, 1.8f) },
                     onIncrease = { bodyTextScale = (bodyTextScale + 0.1f).coerceIn(0.8f, 1.8f) },
                 )
-                Spacer(
-                    modifier =
-                        Modifier
-                            .padding(16.dp)
-                            .height(1.dp),
-                )
-                Box(
+                Text(
+                    text =
+                        Html
+                            .fromHtml(
+                                episode?.description ?: "",
+                                Html.FROM_HTML_MODE_COMPACT,
+                            ).toString(),
+                    fontSize = 16.sp * bodyTextScale,
+                    lineHeight = 24.sp * bodyTextScale,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                    textAlign = TextAlign.Start,
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                ) {
-                    Text(
-                        text =
-                            Html
-                                .fromHtml(
-                                    episode?.description ?: "",
-                                    Html.FROM_HTML_MODE_COMPACT,
-                                ).toString(),
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize * bodyTextScale,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                        textAlign = TextAlign.Justify,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                    )
-                }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                )
 
                 if (episode?.imgMain != null && episode.imgMain.isNotEmpty()) {
                     AsyncImage(
                         model = episode.imgMain,
                         contentDescription = episode.title,
+                        contentScale = ContentScale.Fit,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .heightIn(max = 280.dp)
+                                .clip(RoundedCornerShape(8.dp)),
                     )
                 }
 
@@ -127,18 +129,21 @@ private fun TextSizeControls(
     onIncrease: () -> Unit,
 ) {
     Row(
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 6.dp),
     ) {
-        OutlinedButton(onClick = onDecrease) {
+        OutlinedButton(
+            onClick = onDecrease,
+            modifier = Modifier.height(36.dp),
+        ) {
             Text(text = stringResource(R.string.text_size_decrease))
         }
         OutlinedButton(
             onClick = onIncrease,
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.height(36.dp),
         ) {
             Text(text = stringResource(R.string.text_size_increase))
         }
@@ -151,10 +156,14 @@ private fun EpisodeHeader(
     episode: Episode?,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
         IconButton(
             onClick = { navController.popBackStack() },
+            modifier = Modifier.size(40.dp),
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
@@ -164,11 +173,15 @@ private fun EpisodeHeader(
         }
         Text(
             text = episode?.title ?: "",
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            fontSize = 24.sp,
+            lineHeight = 28.sp,
             color = MaterialTheme.colorScheme.secondary,
             fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp),
         )
     }
 }
@@ -179,18 +192,18 @@ private fun EpisodeInfo(episode: Episode?) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.published_on, episode?.publishedOn ?: ""),
-            fontSize = MaterialTheme.typography.labelLarge.fontSize,
+            fontSize = 14.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.duration, episode?.len ?: ""),
-            fontSize = MaterialTheme.typography.labelLarge.fontSize,
+            fontSize = 14.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
             modifier = Modifier.fillMaxWidth(),

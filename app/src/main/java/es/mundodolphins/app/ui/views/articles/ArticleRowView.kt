@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,11 +51,12 @@ fun ArticleRow(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier
-                .padding(6.dp)
+                .padding(horizontal = 10.dp, vertical = 8.dp)
                 .fillMaxWidth()
                 .wrapContentSize(Alignment.Center)
-                .clip(shape = RoundedCornerShape(20.dp))
-                .shadow(elevation = 2.dp, clip = true),
+                .shadow(elevation = 3.dp, shape = RoundedCornerShape(8.dp), clip = false)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(colorScheme.surface),
     ) {
         ArticleHeader(
             title = title,
@@ -66,10 +68,11 @@ fun ArticleRow(
                     .create(LocalContext.current)
                     .toMarkdown(preview)
                     .toString(),
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             color = colorScheme.onSurface,
             textAlign = TextAlign.Justify,
-            modifier = Modifier.padding(6.dp),
+            lineHeight = 22.sp,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
         )
         ArticleBottom(
             publishedTimestamp = article.publishedTimestamp,
@@ -91,9 +94,10 @@ private fun ArticleHeader(
     ) {
         Text(
             text = title,
-            fontSize = 24.sp,
+            fontSize = 19.sp,
+            lineHeight = 23.sp,
             fontWeight = Bold,
-            modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp),
+            modifier = Modifier.padding(top = 12.dp, start = 14.dp, end = 14.dp),
             color = colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Left,
         )
@@ -104,7 +108,7 @@ private fun ArticleHeader(
             modifier =
                 Modifier
                     .fillMaxWidth(0.9f)
-                    .padding(10.dp),
+                    .padding(start = 14.dp, top = 6.dp, end = 14.dp, bottom = 12.dp),
             textAlign = TextAlign.Left,
         )
     }
@@ -128,6 +132,11 @@ private fun ColumnScope.ArticleBottom(
         Button(
             modifier = Modifier.padding(bottom = 6.dp),
             enabled = publishedTimestamp != null,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                ),
             onClick = {
                 publishedTimestamp?.let {
                     navController.navigate(Routes.Article.route + "/$it")

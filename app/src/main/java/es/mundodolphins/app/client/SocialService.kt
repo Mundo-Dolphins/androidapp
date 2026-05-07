@@ -5,5 +5,5 @@ import retrofit2.http.GET
 
 interface SocialService {
     @GET("social.json")
-    suspend fun getSocialPosts(): List<SocialPostResponse>
+    suspend fun getSocialPosts(): List<SocialPostResponse?>
 }

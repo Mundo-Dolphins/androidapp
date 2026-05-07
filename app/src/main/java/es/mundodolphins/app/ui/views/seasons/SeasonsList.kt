@@ -1,12 +1,23 @@
 package es.mundodolphins.app.ui.views.seasons
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +35,11 @@ import androidx.navigation.NavController
 import es.mundodolphins.app.R
 import es.mundodolphins.app.ui.Routes
 import es.mundodolphins.app.ui.theme.MundoDolphinsTheme
+import es.mundodolphins.app.ui.theme.TealBorder
+import es.mundodolphins.app.ui.theme.TealDeep
+import es.mundodolphins.app.ui.theme.TealPale
+import es.mundodolphins.app.ui.theme.TextMid
+import es.mundodolphins.app.ui.theme.orange
 import es.mundodolphins.app.viewmodel.EpisodesViewModel
 
 @Composable
@@ -53,7 +69,8 @@ fun SeasonsList(
             modifier
                 .fillMaxWidth()
                 .background(color = colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(seasons) {
             SeasonRow(it, navController)
@@ -67,21 +84,60 @@ fun SeasonRow(
     navController: NavController,
 ) {
     if (seasonId > 0) {
-        Button(
+        Card(
             modifier =
                 Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(6.dp),
-            onClick = {
-                navController.navigate(Routes.SeasonView.route + "/$seasonId")
-            },
+                    .fillMaxWidth()
+                    .heightIn(min = 78.dp)
+                    .clickable { navController.navigate(Routes.SeasonView.route + "/$seasonId") },
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, TealBorder),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = stringResource(R.string.season, seasonId),
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(TealPale.copy(alpha = 0.42f))
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.season, seasonId),
+                        color = TealDeep,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        letterSpacing = 0.sp,
+                    )
+                    Text(
+                        text = stringResource(R.string.episodios),
+                        color = TextMid,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .padding(end = 8.dp)
+                                .size(width = 18.dp, height = 3.dp)
+                                .background(orange, RoundedCornerShape(8.dp)),
+                    )
+                    Text(
+                        text = "Ver →",
+                        color = TealDeep,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
+                }
+            }
         }
     }
 }
