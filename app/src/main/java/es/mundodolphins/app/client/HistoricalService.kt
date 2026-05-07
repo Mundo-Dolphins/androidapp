@@ -7,6 +7,7 @@ import es.mundodolphins.app.models.historical.HistoricalSeasonsResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Url
 
 interface HistoricalService {
     @GET("historical/seasons.json")
@@ -17,13 +18,28 @@ interface HistoricalService {
         @Path("year") year: Int,
     ): Response<HistoricalSeasonResponse>
 
+    @GET
+    suspend fun getHistoricalSeasonByUrl(
+        @Url url: String,
+    ): Response<HistoricalSeasonResponse>
+
     @GET("historical/seasons/{year}/stats.json")
     suspend fun getHistoricalSeasonStats(
         @Path("year") year: Int,
     ): Response<HistoricalSeasonStatsResponse>
 
+    @GET
+    suspend fun getHistoricalSeasonStatsByUrl(
+        @Url url: String,
+    ): Response<HistoricalSeasonStatsResponse>
+
     @GET("historical/seasons/{year}/games.json")
     suspend fun getHistoricalSeasonGames(
         @Path("year") year: Int,
+    ): Response<HistoricalGamesResponse>
+
+    @GET
+    suspend fun getHistoricalSeasonGamesByUrl(
+        @Url url: String,
     ): Response<HistoricalGamesResponse>
 }

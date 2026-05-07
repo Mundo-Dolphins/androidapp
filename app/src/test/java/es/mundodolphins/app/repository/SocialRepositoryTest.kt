@@ -65,6 +65,46 @@ class SocialRepositoryTest {
             assertThat(result[0].id).isEqualTo("valid")
         }
 
+    @Test
+    fun `getSocialPosts maps instagram post when bluesky post is empty`() =
+        runTest {
+            val service =
+                object : SocialService {
+                    override suspend fun getSocialPosts(): List<SocialPostResponse?> =
+                        listOf(
+                            SocialPostResponse(
+                                id = "https://www.instagram.com/p/test/",
+                                stype = 1,
+                                publishedOn = "2026-02-11T10:00:00Z",
+                                blueSkyPost =
+                                    BlueSkyPostResponse(
+                                        bskyUri = "",
+                                        bskyCid = "",
+                                        description = "",
+                                        bskyProfileUri = "",
+                                        bskyProfile = "",
+                                        bskyPost = "",
+                                    ),
+                                instagramPost =
+                                    InstagramPostResponse(
+                                        url = "https://www.instagram.com/p/test/",
+                                        description = "Instagram update",
+                                        svgPath = "",
+                                    ),
+                            ),
+                        )
+                }
+
+            val repository = SocialRepository(service)
+
+            val result = repository.getSocialPosts()
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].description).isEqualTo("Instagram update")
+            assertThat(result[0].postUrl).isEqualTo("https://www.instagram.com/p/test/")
+            assertThat(result[0].profileName).isEqualTo("Instagram")
+        }
+
     private fun socialPost(
         id: String,
         publishedOn: String,

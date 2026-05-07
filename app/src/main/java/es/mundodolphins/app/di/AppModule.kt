@@ -18,8 +18,11 @@ import es.mundodolphins.app.data.InstantConverter
 import es.mundodolphins.app.data.episodes.EpisodeDao
 import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import es.mundodolphins.app.viewmodel.player.PlayerServiceHelper
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -27,6 +30,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     private const val BASE_URL = "https://mundodolphins.es/api/"
+    private const val HISTORICAL_CACHE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
+    private const val HISTORICAL_CACHE_SIZE_BYTES = 10L * 1024L * 1024L
 
     @Provides
     @Singleton
@@ -45,12 +50,33 @@ object AppModule {
     @Provides
     @Singleton
     @Named("historical")
-    fun provideHistoricalRetrofit(): Retrofit =
-        Retrofit
+    fun provideHistoricalRetrofit(
+        @ApplicationContext context: Context,
+    ): Retrofit {
+        val cache =
+            Cache(
+                directory = File(context.cacheDir, "historical_http_cache"),
+                maxSize = HISTORICAL_CACHE_SIZE_BYTES,
+            )
+        val client =
+            OkHttpClient
+                .Builder()
+                .cache(cache)
+                .addNetworkInterceptor { chain ->
+                    chain
+                        .proceed(chain.request())
+                        .newBuilder()
+                        .header("Cache-Control", "public, max-age=$HISTORICAL_CACHE_MAX_AGE_SECONDS")
+                        .build()
+                }.build()
+
+        return Retrofit
             .Builder()
             .baseUrl(BASE_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
 
     @Provides
     @Singleton

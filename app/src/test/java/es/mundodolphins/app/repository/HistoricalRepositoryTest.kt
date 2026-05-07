@@ -82,11 +82,18 @@ class HistoricalRepositoryTest {
         override suspend fun getHistoricalSeason(year: Int): Response<HistoricalSeasonResponse> =
             Response.success(gson.fromJson(SEASON_JSON, HistoricalSeasonResponse::class.java))
 
+        override suspend fun getHistoricalSeasonByUrl(url: String): Response<HistoricalSeasonResponse> = getHistoricalSeason(2024)
+
         override suspend fun getHistoricalSeasonStats(year: Int): Response<HistoricalSeasonStatsResponse> =
             Response.success(gson.fromJson(STATS_JSON, HistoricalSeasonStatsResponse::class.java))
 
+        override suspend fun getHistoricalSeasonStatsByUrl(url: String): Response<HistoricalSeasonStatsResponse> =
+            getHistoricalSeasonStats(2024)
+
         override suspend fun getHistoricalSeasonGames(year: Int): Response<HistoricalGamesResponse> =
             Response.success(gson.fromJson(GAMES_JSON, HistoricalGamesResponse::class.java))
+
+        override suspend fun getHistoricalSeasonGamesByUrl(url: String): Response<HistoricalGamesResponse> = getHistoricalSeasonGames(2024)
     }
 
     private class ErrorHistoricalService : HistoricalService {
@@ -95,10 +102,19 @@ class HistoricalRepositoryTest {
         override suspend fun getHistoricalSeason(year: Int): Response<HistoricalSeasonResponse> =
             Response.error(500, "boom".toResponseBody())
 
+        override suspend fun getHistoricalSeasonByUrl(url: String): Response<HistoricalSeasonResponse> =
+            Response.error(500, "boom".toResponseBody())
+
         override suspend fun getHistoricalSeasonStats(year: Int): Response<HistoricalSeasonStatsResponse> =
             Response.error(500, "boom".toResponseBody())
 
+        override suspend fun getHistoricalSeasonStatsByUrl(url: String): Response<HistoricalSeasonStatsResponse> =
+            Response.error(500, "boom".toResponseBody())
+
         override suspend fun getHistoricalSeasonGames(year: Int): Response<HistoricalGamesResponse> =
+            Response.error(500, "boom".toResponseBody())
+
+        override suspend fun getHistoricalSeasonGamesByUrl(url: String): Response<HistoricalGamesResponse> =
             Response.error(500, "boom".toResponseBody())
     }
 

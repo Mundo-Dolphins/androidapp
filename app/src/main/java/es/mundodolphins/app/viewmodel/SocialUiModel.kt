@@ -50,4 +50,19 @@ fun SocialPostResponse.toSocialUiModel(): SocialUiModel? =
                 publishedOn = publishedInstant.atOffset(UTC).format(ofPattern("dd/MM/yyyy HH:mm")),
                 publishedTimestamp = publishedTimestamp,
             )
+        } ?: instagramPost
+        ?.takeIf { it.url.isNotBlank() && it.description.isNotBlank() }
+        ?.let { post ->
+            val publishedInstant = Instant.ofEpochMilli(publishedTimestamp)
+            SocialUiModel(
+                id = id,
+                description = post.description,
+                profileName = "Instagram",
+                profileUrl = post.url,
+                postUrl = post.url,
+                imageUrls = emptyList(),
+                publishedAt = publishedInstant,
+                publishedOn = publishedInstant.atOffset(UTC).format(ofPattern("dd/MM/yyyy HH:mm")),
+                publishedTimestamp = publishedTimestamp,
+            )
         }

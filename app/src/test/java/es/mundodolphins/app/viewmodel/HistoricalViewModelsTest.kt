@@ -86,11 +86,18 @@ class HistoricalViewModelsTest {
         override suspend fun getHistoricalSeason(year: Int): Response<HistoricalSeasonResponse> =
             Response.success(gson.fromJson(SEASON_JSON, HistoricalSeasonResponse::class.java))
 
+        override suspend fun getHistoricalSeasonByUrl(url: String): Response<HistoricalSeasonResponse> = getHistoricalSeason(2024)
+
         override suspend fun getHistoricalSeasonStats(year: Int): Response<HistoricalSeasonStatsResponse> =
             Response.success(gson.fromJson(STATS_JSON, HistoricalSeasonStatsResponse::class.java))
 
+        override suspend fun getHistoricalSeasonStatsByUrl(url: String): Response<HistoricalSeasonStatsResponse> =
+            getHistoricalSeasonStats(2024)
+
         override suspend fun getHistoricalSeasonGames(year: Int): Response<HistoricalGamesResponse> =
             Response.success(gson.fromJson(GAMES_JSON, HistoricalGamesResponse::class.java))
+
+        override suspend fun getHistoricalSeasonGamesByUrl(url: String): Response<HistoricalGamesResponse> = getHistoricalSeasonGames(2024)
     }
 
     private inner class EmptyGamesHistoricalService : HistoricalService {
@@ -100,11 +107,18 @@ class HistoricalViewModelsTest {
         override suspend fun getHistoricalSeason(year: Int): Response<HistoricalSeasonResponse> =
             Response.success(gson.fromJson(SEASON_JSON, HistoricalSeasonResponse::class.java))
 
+        override suspend fun getHistoricalSeasonByUrl(url: String): Response<HistoricalSeasonResponse> = getHistoricalSeason(2024)
+
         override suspend fun getHistoricalSeasonStats(year: Int): Response<HistoricalSeasonStatsResponse> =
             Response.success(gson.fromJson(STATS_JSON, HistoricalSeasonStatsResponse::class.java))
 
+        override suspend fun getHistoricalSeasonStatsByUrl(url: String): Response<HistoricalSeasonStatsResponse> =
+            getHistoricalSeasonStats(2024)
+
         override suspend fun getHistoricalSeasonGames(year: Int): Response<HistoricalGamesResponse> =
             Response.success(HistoricalGamesResponse(emptyList()))
+
+        override suspend fun getHistoricalSeasonGamesByUrl(url: String): Response<HistoricalGamesResponse> = getHistoricalSeasonGames(2024)
     }
 
     private companion object {

@@ -3,6 +3,13 @@ package es.mundodolphins.app.models.historical
 data class HistoricalSeasonSummary(
     val year: Int,
     val title: String,
+    val urls: HistoricalSeasonUrls = HistoricalSeasonUrls(),
+)
+
+data class HistoricalSeasonUrls(
+    val season: String = "",
+    val stats: String = "",
+    val games: String = "",
 )
 
 data class HistoricalSeasonDetail(
