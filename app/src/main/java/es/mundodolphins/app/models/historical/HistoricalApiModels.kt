@@ -13,6 +13,17 @@ data class HistoricalSeasonSummaryResponse(
     val year: Int = 0,
     @SerializedName("title")
     val title: String = "",
+    @SerializedName("urls")
+    val urls: HistoricalSeasonUrlsResponse = HistoricalSeasonUrlsResponse(),
+)
+
+data class HistoricalSeasonUrlsResponse(
+    @SerializedName("season")
+    val season: String = "",
+    @SerializedName("stats")
+    val stats: String = "",
+    @SerializedName("games")
+    val games: String = "",
 )
 
 data class HistoricalSeasonResponse(

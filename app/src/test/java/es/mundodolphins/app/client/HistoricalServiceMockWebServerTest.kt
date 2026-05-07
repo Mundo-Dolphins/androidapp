@@ -4,6 +4,8 @@ import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import es.mundodolphins.app.models.historical.HistoricalGameResponse
 import es.mundodolphins.app.models.historical.HistoricalSeasonResponse
+import es.mundodolphins.app.models.historical.HistoricalSeasonSummaryResponse
+import es.mundodolphins.app.models.historical.HistoricalSeasonUrlsResponse
 import es.mundodolphins.app.models.historical.HistoricalSeasonsResponse
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
@@ -55,14 +57,41 @@ class HistoricalServiceMockWebServerTest {
                 HistoricalSeasonsResponse(
                     seasons =
                         listOf(
-                            es.mundodolphins.app.models.historical.HistoricalSeasonSummaryResponse(
+                            HistoricalSeasonSummaryResponse(
                                 year = 2024,
                                 title = "Temporada 2024",
+                                urls =
+                                    HistoricalSeasonUrlsResponse(
+                                        season = "/historical/seasons/2024.json",
+                                        stats = "/historical/seasons/2024/stats.json",
+                                        games = "/historical/seasons/2024/games.json",
+                                    ),
                             ),
                         ),
                 ),
             )
             assertThat(server.takeRequest().path).isEqualTo("/historical/seasons.json")
+            server.shutdown()
+        }
+
+    @Test
+    fun `getHistoricalSeason by linked url uses provided path`() =
+        runTest {
+            val server = MockWebServer()
+            server.start()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody("""{"sections":{}}"""),
+            )
+
+            val service = createService(server)
+
+            val response = service.getHistoricalSeasonByUrl("/api/historical/seasons/2024.json")
+
+            assertThat(response.isSuccessful).isTrue()
+            assertThat(server.takeRequest().path).isEqualTo("/api/historical/seasons/2024.json")
             server.shutdown()
         }
 

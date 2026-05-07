@@ -12,6 +12,7 @@ import es.mundodolphins.app.models.historical.HistoricalScoringPlay
 import es.mundodolphins.app.models.historical.HistoricalSeasonDetail
 import es.mundodolphins.app.models.historical.HistoricalSeasonSummary
 import es.mundodolphins.app.models.historical.HistoricalSeasonSummaryResponse
+import es.mundodolphins.app.models.historical.HistoricalSeasonUrls
 import es.mundodolphins.app.models.historical.HistoricalStatsSection
 import es.mundodolphins.app.models.historical.HistoricalStatsTable
 import retrofit2.HttpException
@@ -55,12 +56,17 @@ class HistoricalRepository
                 seasonDetailCache[year]?.let { return it }
             }
 
-            val seasonResponse = historicalService.getHistoricalSeason(year).bodyOrThrow()
-            val games = getGames(year, force)
             val seasons = getSeasons(force)
-            val seasonTitle = seasons.firstOrNull { it.year == year }?.title ?: "$SEASON_TITLE_PREFIX $year"
+            val seasonSummary = seasons.firstOrNull { it.year == year }
+            val urls = seasonSummary?.urls ?: HistoricalSeasonUrls()
+            val seasonResponse =
+                historicalService
+                    .getHistoricalSeasonByUrl(urls.seasonUrl(year))
+                    .bodyOrThrow()
+            val games = getGames(year, force, urls)
+            val seasonTitle = seasonSummary?.title ?: "$SEASON_TITLE_PREFIX $year"
             val overview = parseSeasonOverview(seasonResponse.sections)
-            val statsSections = parseStatsSections(loadStatsSections(year))
+            val statsSections = parseStatsSections(loadStatsSections(urls.statsUrl(year)))
             val draftPlayers = parseDraftPlayers(seasonResponse.sections)
 
             return HistoricalSeasonDetail(
@@ -83,9 +89,22 @@ class HistoricalRepository
                 seasonGamesCache[year]?.let { return it }
             }
 
+            val urls = getSeasons(force).firstOrNull { it.year == year }?.urls ?: HistoricalSeasonUrls()
+            return getGames(year, force, urls)
+        }
+
+        private suspend fun getGames(
+            year: Int,
+            force: Boolean,
+            urls: HistoricalSeasonUrls,
+        ): List<HistoricalGame> {
+            if (!force) {
+                seasonGamesCache[year]?.let { return it }
+            }
+
             val games =
                 historicalService
-                    .getHistoricalSeasonGames(year)
+                    .getHistoricalSeasonGamesByUrl(urls.gamesUrl(year))
                     .bodyOrThrow()
                     .games
                     .map { it.toDomain() }
@@ -104,6 +123,12 @@ class HistoricalRepository
             HistoricalSeasonSummary(
                 year = year,
                 title = title,
+                urls =
+                    HistoricalSeasonUrls(
+                        season = urls.season,
+                        stats = urls.stats,
+                        games = urls.games,
+                    ),
             )
 
         private fun HistoricalGameResponse.toDomain(): HistoricalGame {
@@ -131,10 +156,10 @@ class HistoricalRepository
             }
         }
 
-        private suspend fun loadStatsSections(year: Int): Map<String, JsonElement> =
+        private suspend fun loadStatsSections(url: String): Map<String, JsonElement> =
             runCatching {
                 historicalService
-                    .getHistoricalSeasonStats(year)
+                    .getHistoricalSeasonStatsByUrl(url)
                     .bodyOrThrow()
                     .sections
             }.getOrDefault(emptyMap())
@@ -333,6 +358,12 @@ class HistoricalRepository
         }
 
         private fun JsonArray.toList(): List<JsonElement> = map { it }
+
+        private fun HistoricalSeasonUrls.seasonUrl(year: Int): String = season.ifBlank { "historical/seasons/$year.json" }
+
+        private fun HistoricalSeasonUrls.statsUrl(year: Int): String = stats.ifBlank { "historical/seasons/$year/stats.json" }
+
+        private fun HistoricalSeasonUrls.gamesUrl(year: Int): String = games.ifBlank { "historical/seasons/$year/games.json" }
 
         private companion object {
             const val SEASON_TITLE_PREFIX = "Temporada"
