@@ -35,8 +35,8 @@ android {
         applicationId = "es.mundodolphins.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
-        versionName = "2.3.4"
+        versionCode = 20
+        versionName = "2.3.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
