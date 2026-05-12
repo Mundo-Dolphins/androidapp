@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Videos API Contract",
+  "description": "Schema for videos-regular.json endpoint",
+  "type": "object",
+  "properties": {
+    "videos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "duration": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isPodcast": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "embeddable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isPodcast",
+          "published_at",
+          "title",
+          "url",
+          "embeddable"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "totalCount": {
+      "type": "integer"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "videos",
+    "totalCount",
+    "lastUpdated"
+  ],
+  "additionalProperties": true
+}

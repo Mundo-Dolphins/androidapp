@@ -67,7 +67,7 @@ jobs:
       - name: Run static analysis, build and tests
         run: |
           chmod +x gradlew
-          ./gradlew :app:ktlintCheck :app:detekt :app:assembleDebug :app:testDebugUnitTest --console=plain --stacktrace --parallel --build-cache
+          ./gradlew :app:ktlintCheck :app:detekt :app:assembleDebug :app:testDebugUnitTest :app:validateApiContracts --console=plain --stacktrace --parallel --build-cache
 
       - name: Upload CI reports
         if: always()

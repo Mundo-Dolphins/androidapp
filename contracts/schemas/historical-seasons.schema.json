@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Historical Seasons API Contract",
+  "description": "Schema for historical/seasons.json endpoint",
+  "type": "object",
+  "properties": {
+    "seasons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "urls": {
+            "type": "object",
+            "properties": {
+              "season": {
+                "type": "string"
+              },
+              "stats": {
+                "type": "string"
+              },
+              "games": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "season",
+              "stats",
+              "games"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "year",
+          "title",
+          "urls"
+        ],
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": [
+    "seasons"
+  ],
+  "additionalProperties": true
+}
