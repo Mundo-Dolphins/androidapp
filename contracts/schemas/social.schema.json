@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Social Posts API Contract",
+  "description": "Schema for social.json endpoint",
+  "type": "array",
+  "items": {
+    "anyOf": [
+      {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "stype": {
+            "type": "integer"
+          },
+          "PublishedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BlueSkyPost": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "BskyURI": {
+                "type": "string"
+              },
+              "BskyCID": {
+                "type": "string"
+              },
+              "Description": {
+                "type": "string"
+              },
+              "BskyProfileURI": {
+                "type": "string",
+                "format": "uri"
+              },
+              "BskyProfile": {
+                "type": "string"
+              },
+              "BskyPost": {
+                "type": "string",
+                "format": "uri"
+              },
+              "Image": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "Images": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/definitions/BlueSkyImage"
+                }
+              },
+              "Media": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "$ref": "#/definitions/BlueSkyImage"
+                }
+              }
+            },
+            "required": [
+              "BskyURI",
+              "BskyCID",
+              "Description",
+              "BskyProfileURI",
+              "BskyProfile",
+              "BskyPost"
+            ],
+            "additionalProperties": true
+          },
+          "InstagramPost": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "URL": {
+                "type": "string"
+              },
+              "Description": {
+                "type": "string"
+              },
+              "SvgPath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "URL",
+              "Description",
+              "SvgPath"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "stype",
+          "PublishedOn"
+        ],
+        "additionalProperties": true
+      },
+      {
+        "type": "string"
+      }
+    ]
+  },
+  "definitions": {
+    "BlueSkyImage": {
+      "type": "object",
+      "properties": {
+        "URL": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Fullsize": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Thumbnail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Thumb": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

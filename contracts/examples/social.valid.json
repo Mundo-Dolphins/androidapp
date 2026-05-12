@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://bsky.app/profile/mundodolphins.es/post/3melauwf6ks2u",
+    "stype": 0,
+    "PublishedOn": "2026-02-11T10:19:00Z",
+    "BlueSkyPost": {
+      "BskyURI": "at://did:plc:nkx2wlw3rno7dqmzbj5cysme/app.bsky.feed.post/3melauwf6ks2u",
+      "BskyCID": "bafyreiaxmwtror6art5nxk3qdl3n3d45ptjpzbjcl5ufgqkxrmvbi5t42y",
+      "Description": "Segundo fichaje de Sully para los Dolphins",
+      "BskyProfileURI": "https://bsky.app/profile/mundodolphins.es",
+      "BskyProfile": "@mundodolphins.es - Mundo Dolphins",
+      "BskyPost": "https://bsky.app/profile/mundodolphins.es/post/3melauwf6ks2u",
+      "Images": [
+        {
+          "URL": "https://cdn.bsky.app/img/1.jpg"
+        }
+      ]
+    },
+    "InstagramPost": null
+  },
+  "This is a string that might appear in the feed and should be handled safely",
+  {
+    "id": "ig_123",
+    "stype": 1,
+    "PublishedOn": "2026-02-11T11:00:00Z",
+    "BlueSkyPost": null,
+    "InstagramPost": {
+      "URL": "https://instagram.com/p/123",
+      "Description": "Instagram post",
+      "SvgPath": "M10 10L20 20"
+    }
+  }
+]

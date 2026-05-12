@@ -1,0 +1,13 @@
+{
+  "seasons": [
+    {
+      "year": 2024,
+      "title": "Temporada 2024",
+      "urls": {
+        "season": "https://mundodolphins.es/api/historical/seasons/2024.json",
+        "stats": "https://mundodolphins.es/api/historical/seasons/2024/stats.json",
+        "games": "https://mundodolphins.es/api/historical/seasons/2024/games.json"
+      }
+    }
+  ]
+}

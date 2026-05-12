@@ -1,0 +1,16 @@
+{
+  "games": [
+    {
+      "game_id": "2024_01",
+      "title": "Week 1: Dolphins vs Jaguars",
+      "date": "2024-09-08",
+      "slug": "week-1-dolphins-vs-jaguars",
+      "sections": {
+        "score": {
+          "home": 20,
+          "away": 17
+        }
+      }
+    }
+  ]
+}
