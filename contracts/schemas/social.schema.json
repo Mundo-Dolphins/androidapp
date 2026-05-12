@@ -1,156 +1,39 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Social Posts API Contract",
-  "description": "Schema for social.json endpoint",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mundodolphins.es/contracts/social.schema.json",
+  "title": "Social API",
   "type": "array",
   "items": {
-    "anyOf": [
-      {
+    "type": "object",
+    "required": ["BlueSkyPost", "InstagramPost", "PublishedOn", "id", "stype"],
+    "properties": {
+      "BlueSkyPost": {
         "type": "object",
+        "required": ["BskyCID", "BskyPost", "BskyProfile", "BskyProfileURI", "BskyURI", "Description"],
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "stype": {
-            "type": "integer"
-          },
-          "PublishedOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BlueSkyPost": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "properties": {
-              "BskyURI": {
-                "type": "string"
-              },
-              "BskyCID": {
-                "type": "string"
-              },
-              "Description": {
-                "type": "string"
-              },
-              "BskyProfileURI": {
-                "type": "string",
-                "format": "uri"
-              },
-              "BskyProfile": {
-                "type": "string"
-              },
-              "BskyPost": {
-                "type": "string",
-                "format": "uri"
-              },
-              "Image": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "Images": {
-                "type": [
-                  "array",
-                  "null"
-                ],
-                "items": {
-                  "$ref": "#/definitions/BlueSkyImage"
-                }
-              },
-              "Media": {
-                "type": [
-                  "array",
-                  "null"
-                ],
-                "items": {
-                  "$ref": "#/definitions/BlueSkyImage"
-                }
-              }
-            },
-            "required": [
-              "BskyURI",
-              "BskyCID",
-              "Description",
-              "BskyProfileURI",
-              "BskyProfile",
-              "BskyPost"
-            ],
-            "additionalProperties": true
-          },
-          "InstagramPost": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "properties": {
-              "URL": {
-                "type": "string"
-              },
-              "Description": {
-                "type": "string"
-              },
-              "SvgPath": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "URL",
-              "Description",
-              "SvgPath"
-            ],
-            "additionalProperties": true
-          }
+          "BskyCID": { "type": "string" },
+          "BskyPost": { "type": "string" },
+          "BskyProfile": { "type": "string" },
+          "BskyProfileURI": { "type": "string" },
+          "BskyURI": { "type": "string" },
+          "Description": { "type": "string" }
         },
-        "required": [
-          "id",
-          "stype",
-          "PublishedOn"
-        ],
         "additionalProperties": true
       },
-      {
-        "type": "string"
-      }
-    ]
-  },
-  "definitions": {
-    "BlueSkyImage": {
-      "type": "object",
-      "properties": {
-        "URL": {
-          "type": [
-            "string",
-            "null"
-          ]
+      "InstagramPost": {
+        "type": "object",
+        "required": ["Description", "SvgPath", "URL"],
+        "properties": {
+          "Description": { "type": "string" },
+          "SvgPath": { "type": "string" },
+          "URL": { "type": "string" }
         },
-        "Uri": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "Fullsize": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "Thumbnail": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "Thumb": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "additionalProperties": true
       },
-      "additionalProperties": true
-    }
+      "PublishedOn": { "type": "string", "format": "date-time" },
+      "id": { "type": "string", "format": "uri" },
+      "stype": { "type": "integer" }
+    },
+    "additionalProperties": true
   }
 }

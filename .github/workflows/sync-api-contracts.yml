@@ -1,0 +1,70 @@
+name: Sync API Contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      contracts_ref:
+        description: 'Branch or Ref to sync from'
+        required: true
+        default: 'main'
+      source_repo:
+        description: 'Repository to sync from'
+        required: true
+        default: 'Mundo-Dolphins/mundo-dolphins.github.io'
+  repository_dispatch:
+    types: [api-contracts-updated]
+
+jobs:
+  sync-contracts:
+    name: Sync and Validate Contracts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Android repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Sync contracts
+        env:
+          CONTRACTS_REF: ${{ github.event.inputs.contracts_ref || github.event.client_payload.ref || 'main' }}
+          CONTRACTS_REPO: ${{ github.event.inputs.source_repo || github.event.client_payload.repo || 'Mundo-Dolphins/mundo-dolphins.github.io' }}
+        run: |
+          ./scripts/sync-api-contracts.sh
+
+      - name: Validate API Contracts (Gradle Task)
+        run: ./gradlew :app:validateApiContracts
+
+      - name: Run all Unit Tests
+        run: ./gradlew :app:testDebugUnitTest
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync API contracts from web service"
+          branch: chore/sync-api-contracts
+          title: "chore: sync API contracts from web service"
+          body: |
+            Automatically synchronized API contracts from the backend service repository.
+
+            - **Source Repository:** ${{ env.CONTRACTS_REPO }}
+            - **Source Ref:** ${{ env.CONTRACTS_REF }}
+
+            The Android app's contract validation and unit tests have been executed. 
+            If this PR is in **red**, the new schemas have introduced a **breaking change** that is incompatible with the current app logic.
+
+            Please review carefully before merging.
+          labels: |
+            automated-pr
+            api-contract
