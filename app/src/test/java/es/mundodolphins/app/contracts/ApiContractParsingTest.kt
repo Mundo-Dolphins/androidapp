@@ -15,10 +15,10 @@ import org.junit.Test
 import java.io.File
 
 class ApiContractParsingTest {
-
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
-        .create()
+    private val gson: Gson =
+        GsonBuilder()
+            .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
+            .create()
 
     private fun readExample(fileName: String): String {
         // Assuming the test runs from the root or app directory
@@ -91,14 +91,15 @@ class ApiContractParsingTest {
 
     @Test
     fun `gson ignores unknown fields by default`() {
-        val json = """
+        val json =
+            """
             [
               {
                 "title": "Test Article",
                 "unknown_field": "some value"
               }
             ]
-        """.trimIndent()
+            """.trimIndent()
         val type = object : TypeToken<List<ArticlesResponse>>() {}.type
         val result: List<ArticlesResponse> = gson.fromJson(json, type)
         assertThat(result).hasSize(1)

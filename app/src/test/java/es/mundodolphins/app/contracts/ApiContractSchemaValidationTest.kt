@@ -9,11 +9,13 @@ import org.junit.Test
 import java.io.File
 
 class ApiContractSchemaValidationTest {
-
     private val mapper = ObjectMapper()
     private val factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7)
 
-    private fun validate(schemaName: String, exampleName: String) {
+    private fun validate(
+        schemaName: String,
+        exampleName: String,
+    ) {
         val rootDir = File("..").canonicalFile
         val schemaFile = File(rootDir, "contracts/schemas/$schemaName")
         val exampleFile = File(rootDir, "contracts/examples/$exampleName")
@@ -25,7 +27,7 @@ class ApiContractSchemaValidationTest {
         val node: JsonNode = mapper.readTree(exampleFile.inputStream())
 
         val errors = schema.validate(node)
-        
+
         val errorMessage = errors.joinToString("\n") { it.message }
         assertTrue("Validation errors in $exampleName against $schemaName:\n$errorMessage", errors.isEmpty())
     }
