@@ -51,7 +51,7 @@ class ApiContractParsingTest {
         val type = object : TypeToken<List<String>>() {}.type
         val result: List<String> = gson.fromJson(json, type)
         assertThat(result).hasSize(3)
-        assertThat(result).contains("2026")
+        assertThat(result).contains("season_2026.json")
     }
 
     @Test
@@ -67,10 +67,19 @@ class ApiContractParsingTest {
         val json = readExample("social.valid.json")
         val type = object : TypeToken<List<SocialPostResponse?>>() {}.type
         val result: List<SocialPostResponse?> = gson.fromJson(json, type)
-        assertThat(result).hasSize(3)
+        assertThat(result).hasSize(2)
         assertThat(result[0]?.id).contains("3melauwf6ks2u")
-        assertThat(result[1]).isNull() // The string element should be null due to our safe adapter
-        assertThat(result[2]?.id).isEqualTo("ig_123")
+    }
+
+    @Test
+    fun `social adapter handles unexpected string safely`() {
+        val json = """["valid", "unexpected string"]"""
+        val type = object : TypeToken<List<SocialPostResponse?>>() {}.type
+        // Note: our adapter skips non-objects, but "valid" here is also a string, so both should be null if they are not objects
+        val result: List<SocialPostResponse?> = gson.fromJson(json, type)
+        assertThat(result).hasSize(2)
+        assertThat(result[0]).isNull()
+        assertThat(result[1]).isNull()
     }
 
     @Test
