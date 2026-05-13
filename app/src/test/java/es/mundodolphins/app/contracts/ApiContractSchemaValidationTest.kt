@@ -18,13 +18,14 @@ class ApiContractSchemaValidationTest {
     ) {
         val rootDir = File("..").canonicalFile
         val schemaFile = File(rootDir, "contracts/schemas/$schemaName")
-        val exampleFile = File(rootDir, "contracts/examples/$exampleName")
 
         assertTrue("Schema file not found: ${schemaFile.absolutePath}", schemaFile.exists())
-        assertTrue("Example file not found: ${exampleFile.absolutePath}", exampleFile.exists())
 
         val schema = factory.getSchema(schemaFile.inputStream())
-        val node: JsonNode = mapper.readTree(exampleFile.inputStream())
+        val exampleStream = javaClass.classLoader?.getResourceAsStream("api-contracts/$exampleName")
+            ?: throw IllegalArgumentException("Example not found: $exampleName")
+
+        val node: JsonNode = mapper.readTree(exampleStream)
 
         val errors = schema.validate(node)
 
@@ -52,4 +53,10 @@ class ApiContractSchemaValidationTest {
 
     @Test
     fun `historical games example matches schema`() = validate("historical-season-games.schema.json", "historical-games.valid.json")
+
+    @Test
+    fun `historical season detail example matches schema`() = validate("historical-season-detail.schema.json", "historical-season-detail.valid.json")
+
+    @Test
+    fun `historical season stats example matches schema`() = validate("historical-season-stats.schema.json", "historical-season-stats.valid.json")
 }

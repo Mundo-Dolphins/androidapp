@@ -10,9 +10,10 @@ import es.mundodolphins.app.models.SocialPostResponse
 import es.mundodolphins.app.models.SocialPostResponseAdapterFactory
 import es.mundodolphins.app.models.VideosResponse
 import es.mundodolphins.app.models.historical.HistoricalGamesResponse
+import es.mundodolphins.app.models.historical.HistoricalSeasonResponse
+import es.mundodolphins.app.models.historical.HistoricalSeasonStatsResponse
 import es.mundodolphins.app.models.historical.HistoricalSeasonsResponse
 import org.junit.Test
-import java.io.File
 
 class ApiContractParsingTest {
     private val gson: Gson =
@@ -20,12 +21,12 @@ class ApiContractParsingTest {
             .registerTypeAdapterFactory(SocialPostResponseAdapterFactory())
             .create()
 
-    private fun readExample(fileName: String): String {
-        // Assuming the test runs from the root or app directory
-        val rootDir = File("..").canonicalFile
-        val contractFile = File(rootDir, "contracts/examples/$fileName")
-        return contractFile.readText()
-    }
+    private fun readExample(fileName: String): String =
+        javaClass.classLoader
+            ?.getResourceAsStream("api-contracts/$fileName")
+            ?.bufferedReader()
+            ?.use { it.readText() }
+            ?: throw IllegalArgumentException("Fixture not found: $fileName")
 
     @Test
     fun `parse articles valid example`() {
@@ -88,6 +89,22 @@ class ApiContractParsingTest {
         val result: HistoricalSeasonsResponse = gson.fromJson(json, HistoricalSeasonsResponse::class.java)
         assertThat(result.seasons).isNotEmpty()
         assertThat(result.seasons[0].year).isEqualTo(2024)
+    }
+
+    @Test
+    fun `parse historical season detail valid example`() {
+        val json = readExample("historical-season-detail.valid.json")
+        val result: HistoricalSeasonResponse = gson.fromJson(json, HistoricalSeasonResponse::class.java)
+        assertThat(result.sections).isNotEmpty()
+        assertThat(result.sections).containsKey("QB")
+    }
+
+    @Test
+    fun `parse historical season stats valid example`() {
+        val json = readExample("historical-season-stats.valid.json")
+        val result: HistoricalSeasonStatsResponse = gson.fromJson(json, HistoricalSeasonStatsResponse::class.java)
+        assertThat(result.sections).isNotEmpty()
+        assertThat(result.year).isEqualTo(1984)
     }
 
     @Test
