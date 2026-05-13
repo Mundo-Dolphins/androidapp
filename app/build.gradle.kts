@@ -134,7 +134,8 @@ dependencies {
     implementation(libs.markwon)
 
     // Test
-    testImplementation(libs.json.schema.validator)
+    testImplementation(libs.jsonSchemaValidator)
+    testImplementation(libs.jackson.databind)
     testImplementation(libs.androidx.core)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.androidx.room.testing)
