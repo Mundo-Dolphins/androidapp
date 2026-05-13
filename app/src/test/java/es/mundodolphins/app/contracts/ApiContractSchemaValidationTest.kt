@@ -1,16 +1,14 @@
 package es.mundodolphins.app.contracts
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SpecVersion
+import com.networknt.schema.InputFormat
+import com.networknt.schema.SchemaRegistry
+import com.networknt.schema.SpecificationVersion
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
 class ApiContractSchemaValidationTest {
-    private val mapper = ObjectMapper()
-    private val factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7)
+    private val schemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_7)
 
     private fun validate(
         schemaName: String,
@@ -21,13 +19,12 @@ class ApiContractSchemaValidationTest {
 
         assertTrue("Schema file not found: ${schemaFile.absolutePath}", schemaFile.exists())
 
-        val schema = factory.getSchema(schemaFile.inputStream())
         val exampleStream = javaClass.classLoader?.getResourceAsStream("api-contracts/$exampleName")
             ?: throw IllegalArgumentException("Example not found: $exampleName")
+        val exampleJson = exampleStream.bufferedReader().use { it.readText() }
 
-        val node: JsonNode = mapper.readTree(exampleStream)
-
-        val errors = schema.validate(node)
+        val schema = schemaRegistry.getSchema(schemaFile.inputStream())
+        val errors = schema.validate(exampleJson, InputFormat.JSON)
 
         val errorMessage = errors.joinToString("\n") { it.message }
         assertTrue("Validation errors in $exampleName against $schemaName:\n$errorMessage", errors.isEmpty())
