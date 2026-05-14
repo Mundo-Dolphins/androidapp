@@ -27,26 +27,44 @@ class ApiContractSchemaValidationTest {
         val errors = schema.validate(exampleJson, InputFormat.JSON)
 
         val errorMessage = errors.joinToString("\n") { it.message }
-        assertTrue("Validation errors in $exampleName against $schemaName:\n$errorMessage", errors.isEmpty())
+        assertTrue(
+            "Validation errors in $exampleName against $schemaName:\n$errorMessage",
+            errors.isEmpty(),
+        )
     }
 
     @Test
-    fun `articles example matches schema`() = validate("articles.schema.json", "articles.valid.json")
+    fun `articles example matches schema`() {
+        validate("articles.schema.json", "articles.valid.json")
+    }
 
     @Test
-    fun `episodes example matches schema`() = validate("episodes.schema.json", "episodes.valid.json")
+    fun `episodes example matches schema`() {
+        validate("episodes.schema.json", "episodes.valid.json")
+    }
 
     @Test
-    fun `seasons example matches schema`() = validate("season-index.schema.json", "seasons.valid.json")
+    fun `seasons example matches schema`() {
+        validate("season-index.schema.json", "seasons.valid.json")
+    }
 
     @Test
-    fun `videos example matches schema`() = validate("videos.schema.json", "videos.valid.json")
+    fun `videos example matches schema`() {
+        validate("videos.schema.json", "videos.valid.json")
+    }
 
     @Test
-    fun `social example matches schema`() = validate("social.schema.json", "social.valid.json")
+    fun `social example matches schema`() {
+        validate("social.schema.json", "social.valid.json")
+    }
 
     @Test
-    fun `historical seasons example matches schema`() = validate("historical-season-index.schema.json", "historical-seasons.valid.json")
+    fun `historical seasons example matches schema`() {
+        validate(
+            "historical-season-index.schema.json",
+            "historical-seasons.valid.json",
+        )
+    }
 
     @Test
     fun `historical games example matches schema`() = validate("historical-season-games.schema.json", "historical-games.valid.json")
