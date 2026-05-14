@@ -16,36 +16,81 @@ class ApiContractSchemaValidationTest {
     ) {
         val rootDir = File("..").canonicalFile
         val schemaFile = File(rootDir, "contracts/schemas/$schemaName")
-        val exampleFile = File(rootDir, "contracts/examples/$exampleName")
 
-        assertTrue("Schema file not found: ${schemaFile.absolutePath}", schemaFile.exists())
-        assertTrue("Example file not found: ${exampleFile.absolutePath}", exampleFile.exists())
+        assertTrue(
+            "Schema file not found: ${schemaFile.absolutePath}",
+            schemaFile.exists(),
+        )
+
+        val exampleStream =
+            javaClass.classLoader?.getResourceAsStream("api-contracts/$exampleName")
+                ?: throw IllegalArgumentException("Example not found: $exampleName")
+        val exampleJson = exampleStream.bufferedReader().use { it.readText() }
 
         val schema = schemaRegistry.getSchema(schemaFile.inputStream())
-        val errors = schema.validate(exampleFile.readText(), InputFormat.JSON)
+        val errors = schema.validate(exampleJson, InputFormat.JSON)
 
         val errorMessage = errors.joinToString("\n") { it.message }
-        assertTrue("Validation errors in $exampleName against $schemaName:\n$errorMessage", errors.isEmpty())
+        assertTrue(
+            "Validation errors in $exampleName against $schemaName:\n$errorMessage",
+            errors.isEmpty(),
+        )
     }
 
     @Test
-    fun `articles example matches schema`() = validate("articles.schema.json", "articles.valid.json")
+    fun `articles example matches schema`() {
+        validate("articles.schema.json", "articles.valid.json")
+    }
 
     @Test
-    fun `episodes example matches schema`() = validate("episodes.schema.json", "episodes.valid.json")
+    fun `episodes example matches schema`() {
+        validate("episodes.schema.json", "episodes.valid.json")
+    }
 
     @Test
-    fun `seasons example matches schema`() = validate("season-index.schema.json", "seasons.valid.json")
+    fun `seasons example matches schema`() {
+        validate("season-index.schema.json", "seasons.valid.json")
+    }
 
     @Test
-    fun `videos example matches schema`() = validate("videos.schema.json", "videos.valid.json")
+    fun `videos example matches schema`() {
+        validate("videos.schema.json", "videos.valid.json")
+    }
 
     @Test
-    fun `social example matches schema`() = validate("social.schema.json", "social.valid.json")
+    fun `social example matches schema`() {
+        validate("social.schema.json", "social.valid.json")
+    }
 
     @Test
-    fun `historical seasons example matches schema`() = validate("historical-season-index.schema.json", "historical-seasons.valid.json")
+    fun `historical seasons example matches schema`() {
+        validate(
+            "historical-season-index.schema.json",
+            "historical-seasons.valid.json",
+        )
+    }
 
     @Test
-    fun `historical games example matches schema`() = validate("historical-season-games.schema.json", "historical-games.valid.json")
+    fun `historical games example matches schema`() {
+        validate(
+            "historical-season-games.schema.json",
+            "historical-games.valid.json",
+        )
+    }
+
+    @Test
+    fun `historical season detail example matches schema`() {
+        validate(
+            "historical-season-detail.schema.json",
+            "historical-season-detail.valid.json",
+        )
+    }
+
+    @Test
+    fun `historical season stats example matches schema`() {
+        validate(
+            "historical-season-stats.schema.json",
+            "historical-season-stats.valid.json",
+        )
+    }
 }

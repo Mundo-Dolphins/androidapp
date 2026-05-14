@@ -34,6 +34,10 @@ data class HistoricalSeasonResponse(
 data class HistoricalSeasonStatsResponse(
     @SerializedName("sections")
     val sections: Map<String, JsonElement> = emptyMap(),
+    @SerializedName("title")
+    val title: String = "",
+    @SerializedName("year")
+    val year: Int = 0,
 )
 
 data class HistoricalGamesResponse(
