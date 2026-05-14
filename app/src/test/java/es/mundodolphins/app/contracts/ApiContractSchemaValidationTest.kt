@@ -17,10 +17,14 @@ class ApiContractSchemaValidationTest {
         val rootDir = File("..").canonicalFile
         val schemaFile = File(rootDir, "contracts/schemas/$schemaName")
 
-        assertTrue("Schema file not found: ${schemaFile.absolutePath}", schemaFile.exists())
+        assertTrue(
+            "Schema file not found: ${schemaFile.absolutePath}",
+            schemaFile.exists(),
+        )
 
-        val exampleStream = javaClass.classLoader?.getResourceAsStream("api-contracts/$exampleName")
-            ?: throw IllegalArgumentException("Example not found: $exampleName")
+        val exampleStream =
+            javaClass.classLoader?.getResourceAsStream("api-contracts/$exampleName")
+                ?: throw IllegalArgumentException("Example not found: $exampleName")
         val exampleJson = exampleStream.bufferedReader().use { it.readText() }
 
         val schema = schemaRegistry.getSchema(schemaFile.inputStream())
@@ -67,11 +71,26 @@ class ApiContractSchemaValidationTest {
     }
 
     @Test
-    fun `historical games example matches schema`() = validate("historical-season-games.schema.json", "historical-games.valid.json")
+    fun `historical games example matches schema`() {
+        validate(
+            "historical-season-games.schema.json",
+            "historical-games.valid.json",
+        )
+    }
 
     @Test
-    fun `historical season detail example matches schema`() = validate("historical-season-detail.schema.json", "historical-season-detail.valid.json")
+    fun `historical season detail example matches schema`() {
+        validate(
+            "historical-season-detail.schema.json",
+            "historical-season-detail.valid.json",
+        )
+    }
 
     @Test
-    fun `historical season stats example matches schema`() = validate("historical-season-stats.schema.json", "historical-season-stats.valid.json")
+    fun `historical season stats example matches schema`() {
+        validate(
+            "historical-season-stats.schema.json",
+            "historical-season-stats.valid.json",
+        )
+    }
 }
