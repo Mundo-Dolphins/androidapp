@@ -29,12 +29,12 @@ if (isDetektTask) {
 
 android {
     namespace = "es.mundodolphins.app"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "es.mundodolphins.app"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 20
         versionName = "2.3.6"
 
