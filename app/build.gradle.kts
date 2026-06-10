@@ -129,6 +129,7 @@ dependencies {
     // KSP
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
+    ksp(libs.kotlinMetadataJvm)
 
     // Markwon
     implementation(libs.markwon)
