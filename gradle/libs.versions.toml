@@ -46,7 +46,7 @@ hilt = "2.60.1"
 hiltNavigationCompose = "1.4.0"
 installReferrer = "2.2"
 jsonSchemaValidator = "3.0.6"
-jackson = "2.22.0"
+jackson = "2.22.1"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
