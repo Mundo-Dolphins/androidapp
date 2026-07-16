@@ -130,6 +130,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlinMetadataJvm)
+    add("kspTest", libs.androidx.room.compiler)
 
     // Markwon
     implementation(libs.markwon)
